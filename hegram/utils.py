@@ -77,10 +77,6 @@ def binyanim_freq(
     else:
         title = f"Fréquence des Binyanim de {_df.index[0]}"
 
-    # if threshold is not None:
-    #     _df = _df[_df.Rank <= threshold]
-    #     title = f"Fréquence de binyanim pour les {threshold} racines les plus courantes"
-
     freq = (_df.sum() / _df.sum()["Total"]).drop(
         ["Rank", "Common", "Total"]
     ).sort_values(ascending=False) * 100
