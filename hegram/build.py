@@ -12,6 +12,7 @@ hegram_path = Path.home() / ".local/share/hegram"
 if not hegram_path.exists():
     hegram_path.mkdir(parents=True)
 
+
 def get_occurences() -> pd.DataFrame:
     """Uses text-fabric and BHSA to build a dataframe of verb root occurence by
     binyanim and tenses. This saves the csv to ~/.local/share/hegram/occurences.csv
@@ -78,8 +79,10 @@ def get_occurences() -> pd.DataFrame:
         df = pd.read_csv(occurence_path, index_col=0)
     return df
 
+
 osis = "{http://www.bibletechnologies.net/2003/OSIS/namespace}"
-xml =  "{http://www.w3.org/XML/1998/namespace}"
+xml = "{http://www.w3.org/XML/1998/namespace}"
+
 
 class Entry:
     def __init__(self, entry_node):
@@ -93,6 +96,7 @@ class Entry:
             for def_node in list_node.findall(f"{osis}item"):
                 self.definitions.append(def_node.text)
 
+
 def get_definitions() -> Dict:
     """Uses data from OpenScriptures to build a dictionnary of biblical hebrew
     words. This saves the csv to ~/.local/share/hegram/definitions.csv
@@ -105,12 +109,20 @@ def get_definitions() -> Dict:
     definitions_path = hegram_path / "definitions.json"
     if not definitions_path.exists():
         verbs = {}
-        r = requests.get("https://raw.githubusercontent.com/openscriptures/strongs/refs/heads/master/hebrew/StrongHebrewG.xml")
+        r = requests.get(
+            "https://raw.githubusercontent.com/openscriptures/strongs/refs/heads/master/hebrew/StrongHebrewG.xml"
+        )
         tree = ET.ElementTree(ET.fromstring(r.text))
         root = tree.getroot()
-        osistext = root.findall("{http://www.bibletechnologies.net/2003/OSIS/namespace}osisText")[0]
-        glossary = osistext.find("{http://www.bibletechnologies.net/2003/OSIS/namespace}div")
-        for entry_node in glossary.findall("{http://www.bibletechnologies.net/2003/OSIS/namespace}div"):
+        osistext = root.findall(
+            "{http://www.bibletechnologies.net/2003/OSIS/namespace}osisText"
+        )[0]
+        glossary = osistext.find(
+            "{http://www.bibletechnologies.net/2003/OSIS/namespace}div"
+        )
+        for entry_node in glossary.findall(
+            "{http://www.bibletechnologies.net/2003/OSIS/namespace}div"
+        ):
             entry = Entry(entry_node)
             if entry.morph == "v" and entry.lang == "heb":
                 if entry.root not in verbs:
@@ -123,6 +135,7 @@ def get_definitions() -> Dict:
         with open(definitions_path, "r") as f:
             verbs = json.load(f)
     return verbs
+
 
 df = get_occurences()
 definitions = get_definitions()

@@ -23,19 +23,19 @@ table = dash_table.DataTable(
     page_action="custom",
     style_cell={"fontSize": 20, "font-familiy": "monospace"},
     style_cell_conditional=[
-            {
-                'if': {'column_id': 'Racine'},
-                'font-family': 'serif',
-                "fontSize": 20,
-            },
-            {
-                'if': {'column_id': 'Classe'},
-                'font-family': 'serif',
-                "fontSize": 20,
-            }
-        ],
-    sort_action='custom',
-    sort_mode='single',
+        {
+            "if": {"column_id": "Racine"},
+            "font-family": "serif",
+            "fontSize": 20,
+        },
+        {
+            "if": {"column_id": "Classe"},
+            "font-family": "serif",
+            "fontSize": 20,
+        },
+    ],
+    sort_action="custom",
+    sort_mode="single",
     sort_by=[],
     tooltip_duration=None,
 )
