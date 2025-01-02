@@ -2,6 +2,7 @@ from hegram.data import binyanim_names, tense_names, common_binyanim
 from hegram.utils import VerbRoot
 from tf.app import use
 import pandas as pd
+from typing import Dict
 import requests
 import xml.etree.ElementTree as ET
 import json
@@ -11,7 +12,15 @@ hegram_path = Path.home() / ".local/share/hegram"
 if not hegram_path.exists():
     hegram_path.mkdir(parents=True)
 
-def get_occurences():
+def get_occurences() -> pd.DataFrame:
+    """Uses text-fabric and BHSA to build a dataframe of verb root occurence by
+    binyanim and tenses. This saves the csv to ~/.local/share/hegram/occurences.csv
+    If the file already exists, it is simply loaded instead or rebuilding the
+    dataframe.
+
+    Returns:
+        pd.DataFrame: The dataframe of verb occurences
+    """
     occurence_path = hegram_path / "occurences.csv"
     if not occurence_path.exists():
         A = use("ETCBC/bhsa", hoist=globals())
@@ -84,7 +93,15 @@ class Entry:
             for def_node in list_node.findall(f"{osis}item"):
                 self.definitions.append(def_node.text)
 
-def get_definitions():
+def get_definitions() -> Dict:
+    """Uses data from OpenScriptures to build a dictionnary of biblical hebrew
+    words. This saves the csv to ~/.local/share/hegram/definitions.csv
+    If the file already exists, it is simply loaded instead or rebuilding the
+    dataframe.
+
+    Returns:
+        Dict: The dictionnary of word definitions
+    """
     definitions_path = hegram_path / "definitions.json"
     if not definitions_path.exists():
         verbs = {}
