@@ -1,85 +1,10 @@
-from hegram.data import binyanim_names, tense_names, common_binyanim
-from hegram.utils import VerbRoot
-from tf.app import use
-import pandas as pd
 from typing import Dict
 import requests
 import xml.etree.ElementTree as ET
 import json
 import re
 from pathlib import Path
-
-hegram_path = Path("./data")
-if not hegram_path.exists():
-    hegram_path.mkdir(parents=True)
-
-
-def get_occurences() -> pd.DataFrame:
-    """Uses text-fabric and BHSA to build a dataframe of verb root occurence by
-    binyanim and tenses. This saves the csv to ~/.local/share/hegram/occurences.csv
-    If the file already exists, it is simply loaded instead or rebuilding the
-    dataframe.
-
-    Returns:
-        pd.DataFrame: The dataframe of verb occurences
-    """
-    occurence_path = hegram_path / "occurences.csv"
-    if not occurence_path.exists():
-        A = use("ETCBC/bhsa", hoist=globals())
-        handles = {}
-        A.hoist(handles)
-        F = handles["F"]
-
-        binyan_dict = {}
-        translations = {}
-        tenses_dict = {}
-        for w in F.otype.s("word"):
-            if F.sp.v(w) != "verb":
-                continue
-            if F.language.v(w) != "Hebrew":
-                continue
-            utf8 = F.lex_utf8.v(w)
-            stem = binyanim_names[F.vs.v(w)]
-            gloss = F.gloss.v(w)
-            tense = tense_names[F.vt.v(w)]
-
-            if utf8 not in binyan_dict:
-                binyan_dict[utf8] = {}
-            if stem not in binyan_dict[utf8]:
-                binyan_dict[utf8][stem] = 0
-            binyan_dict[utf8][stem] += 1
-            if utf8 not in translations:
-                translations[utf8] = set()
-            translations[utf8].add(gloss)
-
-            if utf8 not in tenses_dict:
-                tenses_dict[utf8] = {}
-            if tense not in tenses_dict[utf8]:
-                tenses_dict[utf8][tense] = 0
-            tenses_dict[utf8][tense] += 1
-
-        binyan = pd.DataFrame(data=binyan_dict).T.fillna(0).convert_dtypes()
-        uncommon = [u for u in binyan.columns if u not in common_binyanim]
-        binyan["Total"] = binyan.sum(axis=1)
-        binyan["Common"] = binyan[common_binyanim].sum(axis=1)
-        binyan["Uncommon"] = binyan[uncommon].sum(axis=1)
-        binyan = binyan.drop(uncommon, axis=1).sort_values(by="Total", ascending=False)
-        binyan["Rank"] = [i + 1 for i in range(len(binyan))]
-
-        tenses = (pd.DataFrame(data=tenses_dict).T.fillna(0).convert_dtypes())[
-            tense_names.values()
-        ]
-        tenses["Total"] = tenses.sum(axis=1)
-        tenses = tenses.sort_values(by="Total", ascending=False)
-        tenses["Rank"] = [i + 1 for i in range(len(tenses))]
-
-        df = pd.concat([binyan, tenses.drop(["Total", "Rank"], axis=1)], axis=1)
-        df["Classe"] = [VerbRoot(i).root_class.hebrew for i in df.index]
-        df.to_csv(occurence_path, index=True)
-    else:
-        df = pd.read_csv(occurence_path, index_col=0)
-    return df
-
+from hegram.env import data_path
 
 osis = "{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 xml = "{http://www.w3.org/XML/1998/namespace}"
@@ -100,11 +25,13 @@ class Entry:
                 self.definitions.append(def_node.text)
         self.definitions = [strong_to_markdown(self.definitions)]
 
+
 def char_to_ordinal(ch: str):
     if ch.isdigit():
         return int(ch)
     else:
         return ord(ch) - 96
+
 
 def strong_to_markdown(definition):
     full = ""
@@ -124,7 +51,6 @@ def strong_to_markdown(definition):
     return full.strip()
 
 
-
 def get_definitions() -> Dict:
     """Uses data from OpenScriptures to build a dictionnary of biblical hebrew
     words. This saves the csv to ~/.local/share/hegram/definitions.csv
@@ -134,7 +60,7 @@ def get_definitions() -> Dict:
     Returns:
         Dict: The dictionnary of word definitions
     """
-    definitions_path = hegram_path / "definitions.json"
+    definitions_path = data_path / "definitions.json"
     if not definitions_path.exists():
         verbs = {}
         r = requests.get(
@@ -165,5 +91,4 @@ def get_definitions() -> Dict:
     return verbs
 
 
-df = get_occurences()
 definitions = get_definitions()

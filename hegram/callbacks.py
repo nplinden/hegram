@@ -1,6 +1,7 @@
 from dash import callback, Output, Input
 from dash.exceptions import PreventUpdate
-from hegram.build import df, definitions
+from hegram.occurences import df
+from hegram.definitions import definitions
 from hegram.utils import binyanim_freq
 from loguru import logger
 from hebrew import Hebrew
@@ -18,9 +19,7 @@ Data = Dict[str, str | int]
     ],
     prevent_initial_call=True,
 )
-def table_select(
-    data: DataList, selected_cells: DataList
-) -> "go.Figure":
+def table_select(data: DataList, selected_cells: DataList) -> "go.Figure":
     """Trigger figure update on cell selection
 
     Args:
@@ -125,6 +124,7 @@ def update_table(
         tooltip_data.append({"Racine": {"value": val, "type": "markdown"}})
     return _df.to_dict("records"), [{"name": c, "id": c} for c in columns], tooltip_data
 
+
 @callback(
     Output("definition", "children"),
     Input("table", "active_cell"),
@@ -145,6 +145,7 @@ def update_definition(active_cell: Data, data: DataList):
     val += "\n\n".join(definition[0])
     print(definition)
     return val
+
 
 @callback(Output("table", "page_count"), Input("table", "page_size"))
 def update_table_page_number(page_size: int) -> int:

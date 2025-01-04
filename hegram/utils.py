@@ -1,5 +1,4 @@
 import plotly.graph_objects as go
-from dash import dash_table
 import pandas as pd
 from typing import List
 from hegram.data import tense_names, common_binyanim

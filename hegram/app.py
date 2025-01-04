@@ -1,10 +1,9 @@
 from hegram.server import app
-from hegram.build import df
+from hegram.occurences import df
 from hegram.utils import binyanim_freq, root_table_data
 import dash_bootstrap_components as dbc
 from hegram.callbacks import *
 from dash import html, dcc, dash_table
-import pandas as pd
 
 roots = sorted(list(df.index))
 
@@ -46,8 +45,11 @@ dropdown = dcc.Dropdown(
     multi=True,
 )
 
-definition_markdown = dcc.Markdown('''
-''', id="definition")
+definition_markdown = dcc.Markdown(
+    """
+""",
+    id="definition",
+)
 
 app.layout = html.Div(
     [
