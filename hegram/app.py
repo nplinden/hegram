@@ -46,6 +46,9 @@ dropdown = dcc.Dropdown(
     multi=True,
 )
 
+definition_markdown = dcc.Markdown('''
+''', id="definition")
+
 app.layout = html.Div(
     [
         dbc.Row(dbc.Col(html.H1("Made by ניקולא לינדן"))),
@@ -56,6 +59,7 @@ app.layout = html.Div(
                 dbc.Col(dcc.Graph("binyanim_root", figure=binyanim_freq(df))),
             ]
         ),
+        dbc.Row([dbc.Col(definition_markdown), dbc.Col()]),
     ],
     style=CONTENT_STYLE,
 )

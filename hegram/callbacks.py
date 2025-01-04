@@ -15,19 +15,17 @@ Data = Dict[str, str | int]
     [
         Input("table", "data"),
         Input("table", "selected_cells"),
-        Input("table", "page_current"),
     ],
     prevent_initial_call=True,
 )
 def table_select(
-    data: DataList, selected_cells: DataList, page_current: int
+    data: DataList, selected_cells: DataList
 ) -> "go.Figure":
     """Trigger figure update on cell selection
 
     Args:
         data (DataList): The data contained in the table
         selected_cells (DataList): The list of selected cells
-        page_current (int): The current table page
 
     Raises:
         PreventUpdate: In case no cell is selected
@@ -38,9 +36,7 @@ def table_select(
     logger.info("Triggering table_select callback")
     if selected_cells is None:
         raise PreventUpdate
-    logger.info("data={}", data)
     logger.info("selected_cells={}", selected_cells)
-    logger.info("page_current={}", page_current)
     roots = set()
     for cell in selected_cells:
         roots |= get_roots_from_cell(data, cell)
@@ -87,7 +83,7 @@ def get_roots_from_cell(data: DataList, cell: Data) -> Set[str]:
 )
 def update_table(
     page_current: int, page_size: int, sort_by: str, dropdown_values: List[str]
-) -> Tuple[DataList, DataList, DataList]:
+) -> Tuple[DataList, DataList, DataList, str]:
     """Update the table page on the value of the dropdown widget.
 
     Args:
@@ -122,15 +118,33 @@ def update_table(
     ]
     tooltip_data = []
     for row in _df.to_dict("records"):
-        print(list(Hebrew(row["Racine"]).graphemes))
         root = Hebrew(row["Racine"]).text_only()
         definition = definitions.get(str(root), [["No definition found"]])
-        logger.info(definitions["אמר"])
-        val = f"**{root}**\n\n"
+        val = f"# {root}\n\n"
         val += "\n\n".join(definition[0])
         tooltip_data.append({"Racine": {"value": val, "type": "markdown"}})
     return _df.to_dict("records"), [{"name": c, "id": c} for c in columns], tooltip_data
 
+@callback(
+    Output("definition", "children"),
+    Input("table", "active_cell"),
+    Input("table", "data"),
+)
+def update_definition(active_cell: Data, data: DataList):
+    logger.info("active_cell={}", active_cell)
+    if active_cell is None:
+        raise PreventUpdate
+    if active_cell["column_id"] != "Racine":
+        raise PreventUpdate
+
+    root = Hebrew(list(get_roots_from_cell(data, active_cell))[0]).text_only()
+    logger.info("root={}", root)
+    definition = definitions.get(str(root), [["No definition found"]])
+
+    val = f"# {root}\n\n"
+    val += "\n\n".join(definition[0])
+    print(definition)
+    return val
 
 @callback(Output("table", "page_count"), Input("table", "page_size"))
 def update_table_page_number(page_size: int) -> int:

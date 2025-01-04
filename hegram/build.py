@@ -6,9 +6,10 @@ from typing import Dict
 import requests
 import xml.etree.ElementTree as ET
 import json
+import re
 from pathlib import Path
 
-hegram_path = Path.home() / ".local/share/hegram"
+hegram_path = Path("./data")
 if not hegram_path.exists():
     hegram_path.mkdir(parents=True)
 
@@ -88,6 +89,8 @@ class Entry:
     def __init__(self, entry_node):
         w = entry_node.find(f"{osis}w")
         self.morph = w.attrib["morph"]
+        if self.morph != "v":
+            return
         self.root = w.text
         self.lang = w.attrib[f"{xml}lang"]
 
@@ -95,6 +98,31 @@ class Entry:
         if (list_node := entry_node.find(f"{osis}list")) is not None:
             for def_node in list_node.findall(f"{osis}item"):
                 self.definitions.append(def_node.text)
+        self.definitions = [strong_to_markdown(self.definitions)]
+
+def char_to_ordinal(ch: str):
+    if ch.isdigit():
+        return int(ch)
+    else:
+        return ord(ch) - 96
+
+def strong_to_markdown(definition):
+    full = ""
+    for line in definition:
+        print(line)
+        try:
+            level = re.match("(^[1-9a-z]+)\\)", line).groups()[0]
+        except AttributeError:
+            full += f"{line}\n"
+            continue
+        text = line.replace(f"{level}) ", "")
+        levels = [char_to_ordinal(c) for c in level]
+        depth = len(level)
+        tabs = "".join(["\t" for _ in range(depth - 1)])
+        tabs += f"{levels[-1]}. {text}"
+        full += f"{tabs}\n"
+    return full.strip()
+
 
 
 def get_definitions() -> Dict:
