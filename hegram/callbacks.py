@@ -6,6 +6,7 @@ from hegram.utils import binyanim_freq
 from loguru import logger
 from hebrew import Hebrew
 from typing import Dict, List, Set, Any, Tuple
+import plotly.graph_objects as go
 
 DataList = List[Dict[str, Any]]
 Data = Dict[str, str | int]
@@ -19,7 +20,7 @@ Data = Dict[str, str | int]
     ],
     prevent_initial_call=True,
 )
-def table_select(data: DataList, selected_cells: DataList) -> "go.Figure":
+def table_select(data: DataList, selected_cells: DataList) -> go.Figure:
     """Trigger figure update on cell selection
 
     Args:
