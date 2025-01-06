@@ -1,11 +1,8 @@
 from hegram.server import app
-from hegram.occurences import df
-from hegram.utils import binyanim_freq, root_table_data
+from hegram.occurences import occurences
 import dash_bootstrap_components as dbc
 from hegram.callbacks import *
 from dash import html, dcc, dash_table
-
-roots = sorted(list(df.index))
 
 CONTENT_STYLE = {
     "margin-left": "2rem",
@@ -15,7 +12,7 @@ CONTENT_STYLE = {
 
 table = dash_table.DataTable(
     id="table",
-    columns=[{"name": c, "id": c} for c in ["Rank", "Racine", "Classe", "Total"]],
+    columns=[{"name": c, "id": c} for c in ["Rank", "Root", "Class", "Total"]],
     page_current=0,
     page_size=12,
     page_count=100,
@@ -23,12 +20,12 @@ table = dash_table.DataTable(
     style_cell={"fontSize": 20, "font-familiy": "monospace"},
     style_cell_conditional=[
         {
-            "if": {"column_id": "Racine"},
+            "if": {"column_id": "Root"},
             "font-family": "serif",
             "fontSize": 20,
         },
         {
-            "if": {"column_id": "Classe"},
+            "if": {"column_id": "Class"},
             "font-family": "serif",
             "fontSize": 20,
         },
@@ -40,7 +37,7 @@ table = dash_table.DataTable(
 )
 
 dropdown = dcc.Dropdown(
-    ["Total", "Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal", "Classe"],
+    ["Total", "Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal", "Class"],
     id="dropdown",
     multi=True,
 )
@@ -58,7 +55,7 @@ app.layout = html.Div(
         dbc.Row(
             [
                 dbc.Col(table),
-                dbc.Col(dcc.Graph("binyanim_root", figure=binyanim_freq(df))),
+                dbc.Col(dcc.Graph("binyanim_root", figure=occurences.binyanim_bar_graph())),
             ]
         ),
         dbc.Row([dbc.Col(definition_markdown), dbc.Col()]),
