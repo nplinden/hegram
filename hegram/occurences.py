@@ -6,8 +6,10 @@ import plotly.graph_objects as go
 from dataclasses import dataclass
 from hebrew import Hebrew
 
+
 def strip_nikkud(word):
     return str(Hebrew(word).text_only())
+
 
 @dataclass
 class RootClass:
@@ -15,6 +17,7 @@ class RootClass:
 
     hebrew: str
     latin: str
+
 
 class VerbRoot:
     gutturals = "אהחע"
@@ -160,16 +163,23 @@ class Occurences:
         else:
             return self._df.groupby(level=("Root", "Binyan")).sum()["Occurences"]
 
-    def rbo_frame(self, total: bool= True, verb_class: bool = True, remove_uncommon_binyanim: bool = True) -> pd.DataFrame:
-        df = (self.rbo(remove_uncommon_binyanim)
-                .reset_index(level=1)
-                .pivot_table("Occurences", ["Root"], ["Binyan"])
-                .fillna(0)
-                .convert_dtypes())
+    def rbo_frame(
+        self,
+        total: bool = True,
+        verb_class: bool = True,
+        remove_uncommon_binyanim: bool = True,
+    ) -> pd.DataFrame:
+        df = (
+            self.rbo(remove_uncommon_binyanim)
+            .reset_index(level=1)
+            .pivot_table("Occurences", ["Root"], ["Binyan"])
+            .fillna(0)
+            .convert_dtypes()
+        )
         if total:
             df["Total"] = df.sum(axis=1)
             df = df.sort_values(["Total"], ascending=False)
-            df["Rank"] = list(range(1, len(df)+1))
+            df["Rank"] = list(range(1, len(df) + 1))
         if verb_class:
             df["Class"] = [VerbRoot(r).root_class.hebrew for r in df.index]
         return df
@@ -192,7 +202,9 @@ class Occurences:
         else:
             return self._df.groupby(level=["Root", "Tense"]).sum()["Occurences"]
 
-    def binyanim_bar_graph(self, roots: List[str] = None, remove_uncommon_binyanim: bool = True):
+    def binyanim_bar_graph(
+        self, roots: List[str] = None, remove_uncommon_binyanim: bool = True
+    ):
         if roots is None:
             roots = self.roots
 
@@ -202,15 +214,20 @@ class Occurences:
         else:
             title = f"Fréquence des Binyanim pour {len(df)} racines"
 
-        frequency = (df.sum() / df.sum()["Total"]).drop(["Total", "Rank"]).sort_values(ascending=False) * 100
-        text = [f"{f:d}" for f in df.sum().drop(["Rank", "Total"]).sort_values(ascending=False)]
+        frequency = (df.sum() / df.sum()["Total"]).drop(["Total", "Rank"]).sort_values(
+            ascending=False
+        ) * 100
+        text = [
+            f"{f:d}"
+            for f in df.sum().drop(["Rank", "Total"]).sort_values(ascending=False)
+        ]
 
         fig = go.Figure(
             [
                 go.Bar(
-                    name = "Frequency of Binyanim",
-                    x = frequency.index,
-                    y = frequency.values,
+                    name="Frequency of Binyanim",
+                    x=frequency.index,
+                    y=frequency.values,
                     text=text,
                 )
             ]
@@ -218,7 +235,7 @@ class Occurences:
         fig.update_layout(
             title=dict(text=title),
             xaxis=dict(title="Binyan"),
-            yaxis=dict(title=r"Frequency (%)")
+            yaxis=dict(title=r"Frequency (%)"),
         )
         return fig
 
@@ -293,5 +310,6 @@ class Occurences:
             List[str]: The list of roots
         """
         return sorted(list(self._df.index.levels[0]))
+
 
 occurences = Occurences()

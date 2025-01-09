@@ -1,5 +1,6 @@
 from hegram.server import app
-from hegram.occurences import occurences
+from hegram.components.textbox import textbox
+from hegram.components.menu import menu
 import dash_bootstrap_components as dbc
 from hegram.callbacks import *
 from dash import html, dcc, dash_table
@@ -40,25 +41,53 @@ dropdown = dcc.Dropdown(
     ["Total", "Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal", "Class"],
     id="dropdown",
     multi=True,
+    className="dropdown",
 )
 
 definition_markdown = dcc.Markdown(
     """
 """,
     id="definition",
+    className="textbox-text",
 )
 
-app.layout = html.Div(
+graph = dcc.Graph("binyanim_root", figure=occurences.binyanim_bar_graph())
+
+core = dbc.Container(
     [
-        dbc.Row(dbc.Col(html.H1("Made by ניקולא לינדן"))),
-        dbc.Row([dbc.Col(dropdown), dbc.Col()]),
+        dbc.Row(
+            textbox(
+                "An app for hebrew grammar analysis in the Hebrew Bible",
+                "Hegram by ניקולא לינדן",
+            ),
+            class_name="textbox-container",
+        ),
         dbc.Row(
             [
-                dbc.Col(table),
-                dbc.Col(dcc.Graph("binyanim_root", figure=occurences.binyanim_bar_graph())),
-            ]
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.Div("Verbal Roots", className="menu-title"),
+                            dropdown,
+                            table,
+                        ],
+                    ),
+                ),
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.Div("Occurences", className="menu-title"),
+                            graph,
+                        ],
+                    ),
+                ),
+            ],
+            className="graph-row",
         ),
-        dbc.Row([dbc.Col(definition_markdown), dbc.Col()]),
-    ],
-    style=CONTENT_STYLE,
+        dbc.Row(
+            dbc.Col(html.Div([definition_markdown], className="textbox-container"))
+        ),
+    ]
 )
+
+app.layout = html.Div(children=[core])
