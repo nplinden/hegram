@@ -59,7 +59,7 @@ def get_definitions() -> Dict:
     Returns:
         Dict: The dictionnary of word definitions
     """
-    definitions_path = Path("./data/definitions.json")
+    definitions_path = Path("definitions.json")
     if not definitions_path.exists():
         verbs = {}
         r = requests.get(
