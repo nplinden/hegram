@@ -11,15 +11,71 @@ DataList = List[Dict[str, Any]]
 Data = Dict[str, str | int]
 
 
+# @callback(Output("mantine-bargraph", "series"), Input("percent-checkbox", "checked"))
+# def toggle_percent(checked):
+#     if checked:
+#         return [
+#             {"name": "Frequency", "color": "orange.6"},
+#         ]
+#     else:
+#         return [
+#             {"name": "Occurences", "color": "orange.6"},
+#         ]
+
+
 @callback(
-    Output("binyanim_root", "figure", allow_duplicate=True),
+    Output("mantine-bargraph", "series"),
+    Output("mantine-bargraph", "dataKey"),
+    Output("mantine-bargraph", "xAxisLabel"),
+    Input("radiogroup", "value"),
+)
+def update_barchart_series(radio):
+    if radio == "Binyan-Tense":
+        return (
+            [
+                {"name": "Qatal", "color": "red.6"},
+                {"name": "Yiqtol", "color": "green.6"},
+                {"name": "Wayyiqtol", "color": "indigo.6"},
+                {"name": "Imperative", "color": "grape.6"},
+                {"name": "Infinitive (abslute)", "color": "teal.6"},
+                {"name": "Infinitive (construct)", "color": "yellow.6"},
+                {"name": "Participle", "color": "pink.6"},
+                {"name": "Participle (passive)", "color": "lime.6"},
+            ],
+            "Binyan",
+            "Binyan",
+        )
+    elif radio == "Tense-Binyan":
+        return (
+            [
+                {"name": "Paal", "color": "red.6"},
+                {"name": "Piel", "color": "green.6"},
+                {"name": "Pual", "color": "indigo.6"},
+                {"name": "Nifal", "color": "grape.6"},
+                {"name": "Hofal", "color": "teal.6"},
+                {"name": "Hitpael", "color": "yellow.6"},
+                {"name": "Hifil", "color": "yellow.6"},
+            ],
+            "Tense",
+            "Tense",
+        )
+    elif radio == "Binyan":
+        return [{"name": "Occurences", "color": "green.6"}], "Binyan", "Binyan"
+    elif radio == "Tense":
+        return [{"name": "Occurences", "color": "green.6"}], "Tense", "Tense"
+
+
+@callback(
+    Output("mantine-bargraph", "data"),
     [
         Input("table", "data"),
         Input("table", "selected_cells"),
+        Input("radiogroup", "value"),
     ],
-    prevent_initial_call=True,
 )
-def update_binyanim_bar_graph(data: DataList, selected_cells: DataList) -> go.Figure:
+def update_binyanim_bar_graph(
+    data: DataList, selected_cells: DataList, radio
+) -> go.Figure:
     """Trigger figure update on cell selection
 
     Args:
@@ -34,14 +90,14 @@ def update_binyanim_bar_graph(data: DataList, selected_cells: DataList) -> go.Fi
     """
     logger.info("Triggering table_select callback")
     if selected_cells is None:
-        raise PreventUpdate
+        return occurences.binyanim_bar_graph(radio)
     roots = set()
     for cell in selected_cells:
         roots |= get_roots_from_cell(data, cell)
     if roots:
         logger.info(roots)
-        return occurences.binyanim_bar_graph(list(roots))
-    return occurences.binyanim_bar_graph()
+        return occurences.binyanim_bar_graph(radio, list(roots))
+    return occurences.binyanim_bar_graph(radio)
 
 
 def get_roots_from_cell(data: DataList, cell: Data) -> Set[str]:
@@ -58,11 +114,6 @@ def get_roots_from_cell(data: DataList, cell: Data) -> Set[str]:
     row = cell["row"]
     if column_id == "Root":
         return set([data[row][column_id]])
-    elif column_id == "Class":
-        classname = data[row][column_id]
-        _df = occurences.rbo_frame()
-        _df = _df[_df.Class == classname]
-        return set(_df.index)
     else:
         return set()
 
@@ -109,7 +160,7 @@ def update_table(
             .reset_index("Root")
             .iloc[page_current * page_size : (page_current + 1) * page_size]
         )
-    columns = ["Rank", "Root", "Class"]
+    columns = ["Root"]
     if dropdown_values is not None:
         columns += dropdown_values
     tooltip_data = [
@@ -144,7 +195,6 @@ def update_definition(active_cell: Data, data: DataList):
 
     val = f"# {root}\n\n"
     val += "\n\n".join(definition[0])
-    print(definition)
     return val
 
 

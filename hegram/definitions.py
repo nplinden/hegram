@@ -4,7 +4,6 @@ import xml.etree.ElementTree as ET
 import json
 import re
 from pathlib import Path
-from hegram.env import data_path
 
 osis = "{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 xml = "{http://www.w3.org/XML/1998/namespace}"
@@ -60,7 +59,7 @@ def get_definitions() -> Dict:
     Returns:
         Dict: The dictionnary of word definitions
     """
-    definitions_path = data_path / "definitions.json"
+    definitions_path = Path("./data/definitions.json")
     if not definitions_path.exists():
         verbs = {}
         r = requests.get(

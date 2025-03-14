@@ -3,20 +3,7 @@ from tf.app import use
 from pathlib import Path
 from typing import List
 import plotly.graph_objects as go
-from dataclasses import dataclass
 from hebrew import Hebrew
-
-
-def strip_nikkud(word):
-    return str(Hebrew(word).text_only())
-
-
-@dataclass
-class RootClass:
-    """Class for storing root class names"""
-
-    hebrew: str
-    latin: str
 
 
 class VerbRoot:
@@ -28,29 +15,6 @@ class VerbRoot:
         self.peh = graphemes[0]
         self.ayin = graphemes[1]
         self.lamed = graphemes[2]
-
-        if self.peh == "א":
-            self.root_class = RootClass("פ׳׳א", "peh-aleph")
-        elif self.peh in "וי":
-            self.root_class = RootClass("פ׳׳וי", "peh-vav[yod]")
-        elif self.peh == "נ":
-            self.root_class = RootClass("פ׳׳נ", "peh-nun")
-        elif self.ayin in "וי":
-            self.root_class = RootClass("ע׳׳וי", "ayin-vav[yod]")
-        elif self.ayin == self.lamed:
-            self.root_class = RootClass("ע׳׳ע", "Géminé")
-        elif self.lamed == "א":
-            self.root_class = RootClass("ל׳׳א", "lamed-aleph")
-        elif self.lamed == "ה":
-            self.root_class = RootClass("ל׳׳ה", "lamed-he")
-        elif self.peh in self.gutturals:
-            self.root_class = RootClass("פ׳׳ג", "peh-gutturale")
-        elif self.ayin in self.gutturals:
-            self.root_class = RootClass("ע׳׳ג", "ayin-gutturale")
-        elif self.lamed in self.gutturals:
-            self.root_class = RootClass("ל׳׳ג", "lamed-gutturale")
-        else:
-            self.root_class = RootClass("Fort", "Fort")
 
 
 class Occurences:
@@ -92,24 +56,6 @@ class Occurences:
         "pasq": "Passiveqal",
     }
     common_binyanim = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
-    #     uncommon_binyanim = ['Hitpoel',
-    #  'Poal',
-    #  'Poel',
-    #  'Afel',
-    #  'Etpaal',
-    #  'Etpeel',
-    #  'Hafel',
-    #  'Hotpaal',
-    #  'Hishtafal',
-    #  'Hitpaal',
-    #  'Hitpeel',
-    #  'Nitpael',
-    #  'Pael',
-    #  'Peal',
-    #  'Peil',
-    #  'Shafel',
-    #  'Tifal',
-    #  'Passiveqal']
 
     def __init__(self):
         if Path("Occurences.csv").exists():
@@ -146,7 +92,21 @@ class Occurences:
         return [b for b in biynan_list if b not in self.common_binyanim]
 
     def rbo(self, remove_uncommon_binyanim: bool = True) -> pd.Series:
-        """Root-Binyan occurences.
+        """Root-Binyan occurence series:
+
+        Root  Binyan
+        אבד   Hifil       26
+              Paal       119
+              Piel        41
+        אבה   Paal        54
+        אבך   Hitpael      1
+                        ...
+        תקן   Piel         2
+        תקע   Nifal        3
+              Paal        64
+        תקף   Paal         3
+        תרגם  Pual         1
+        Name: Occurences, Length: 2869, dtype: int64
 
         Args:
             remove_uncommon_binyanim (bool, optional): Whether to ommit very rare binyanim forms. Defaults to True.
@@ -166,7 +126,6 @@ class Occurences:
     def rbo_frame(
         self,
         total: bool = True,
-        verb_class: bool = True,
         remove_uncommon_binyanim: bool = True,
     ) -> pd.DataFrame:
         df = (
@@ -180,127 +139,82 @@ class Occurences:
             df["Total"] = df.sum(axis=1)
             df = df.sort_values(["Total"], ascending=False)
             df["Rank"] = list(range(1, len(df) + 1))
-        if verb_class:
-            df["Class"] = [VerbRoot(r).root_class.hebrew for r in df.index]
         return df
 
-    def rto(self, remove_uncommon_binyanim: bool = True) -> pd.Series:
-        """Root-Tense occurences.
-
-        Args:
-            remove_uncommon_binyanim (bool, optional): Whether to ommit very rare binyanim forms. Defaults to True.
-
-        Returns:
-            pd.DataFrame: The series of occurences of root-tense couples
-        """
-        if remove_uncommon_binyanim:
-            return (
-                self._df.drop(self.uncommon_binyanim, level=1)
-                .groupby(level=["Root", "Tense"])
-                .sum()["Occurences"]
-            )
-        else:
-            return self._df.groupby(level=["Root", "Tense"]).sum()["Occurences"]
-
     def binyanim_bar_graph(
-        self, roots: List[str] = None, remove_uncommon_binyanim: bool = True
+        self,
+        radio,
+        roots: List[str] = None,
     ):
         if roots is None:
             roots = self.roots
 
-        df = self.rbo_frame(True, False, remove_uncommon_binyanim).loc[roots]
-        if len(df) == 1:
-            title = f"Fréquence des Binyanim de {df.index[0]}"
-        else:
-            title = f"Fréquence des Binyanim pour {len(df)} racines"
-
-        frequency = (df.sum() / df.sum()["Total"]).drop(["Total", "Rank"]).sort_values(
-            ascending=False
-        ) * 100
-        text = [
-            f"{f:d}"
-            for f in df.sum().drop(["Rank", "Total"]).sort_values(ascending=False)
-        ]
-
-        fig = go.Figure(
-            [
-                go.Bar(
-                    name="Frequency of Binyanim",
-                    x=frequency.index,
-                    y=frequency.values,
-                    text=text,
+        if radio == "Binyan-Tense":
+            ddf = self._df.reset_index()
+            ddf = ddf[ddf["Root"].isin(roots)]
+            ddf = ddf[~ddf["Binyan"].isin(self.uncommon_binyanim)]
+            ddf = (
+                ddf.drop(["Root"], axis=1)
+                .groupby(["Binyan", "Tense"])
+                .sum()
+                .reset_index()
+                .pivot_table(
+                    values="Occurences",
+                    index="Binyan",
+                    columns=["Tense"],
+                    aggfunc="sum",
                 )
-            ]
-        )
-        fig.update_layout(
-            title=dict(text=title),
-            xaxis=dict(title="Binyan"),
-            yaxis=dict(title=r"Frequency (%)"),
-        )
-        return fig
-
-    def bto(self, remove_uncommon_binyanim: bool = True) -> pd.Series:
-        """Binyan-Tense occurences.
-
-        Args:
-            remove_uncommon_binyanim (bool, optional): Whether to ommit very rare binyanim forms. Defaults to True.
-
-        Returns:
-            pd.DataFrame: The series of occurences of binyan-tense couples
-        """
-        if remove_uncommon_binyanim:
-            return (
-                self._df.drop(self.uncommon_binyanim, level=1)
-                .groupby(level=["Binyan", "Tense"])
-                .sum()["Occurences"]
+                .fillna(0)
             )
-        else:
-            return self._df.groupby(level=["Binyan", "Tense"]).sum()["Occurences"]
-
-    def ro(self, remove_uncommon_binyanim: bool = True) -> pd.Series:
-        """Root occurences
-
-        Returns:
-            pd.DataFrame: The series of root occurences
-        """
-        if remove_uncommon_binyanim:
-            return (
-                self._df.drop(self.uncommon_binyanim, level=1)
-                .groupby(level=["Root"])
-                .sum()["Occurences"]
+            ddf["Total"] = sum(ddf[c] for c in ddf.columns)
+            print(ddf)
+            ddf = ddf.sort_values(["Total"], ascending=False).reset_index()
+            return ddf.to_dict("records")
+        if radio == "Tense-Binyan":
+            ddf = self._df.reset_index()
+            ddf = ddf[ddf["Root"].isin(roots)]
+            ddf = ddf[~ddf["Binyan"].isin(self.uncommon_binyanim)]
+            ddf = (
+                ddf.drop(["Root"], axis=1)
+                .groupby(["Binyan", "Tense"])
+                .sum()
+                .reset_index()
+                .pivot_table(
+                    values="Occurences",
+                    index="Tense",
+                    columns=["Binyan"],
+                    aggfunc="sum",
+                )
+                .fillna(0)
             )
-        else:
-            return self._df.groupby(level=["Root"]).sum()["Occurences"]
-
-    def bo(self, remove_uncommon_binyanim: bool = True) -> pd.Series:
-        """Binyan occurences
-
-        Returns:
-            pd.DataFrame: The series of binyan occurences
-        """
-        if remove_uncommon_binyanim:
-            return (
-                self._df.drop(self.uncommon_binyanim, level=1)
-                .groupby(level=["Binyan"])
-                .sum()["Occurences"]
+            ddf["Total"] = sum(ddf[c] for c in ddf.columns)
+            print(ddf)
+            ddf = ddf.sort_values(["Total"], ascending=False).reset_index()
+            return ddf.to_dict("records")
+        if radio == "Binyan":
+            ddf = self._df.reset_index()
+            ddf = ddf[ddf["Root"].isin(roots)]
+            ddf = ddf[~ddf["Binyan"].isin(self.uncommon_binyanim)]
+            ddf = (
+                ddf.drop(["Root", "Tense"], axis=1)
+                .groupby(["Binyan"])
+                .sum()
+                .reset_index()
+                .sort_values(["Occurences"], ascending=False)
             )
-        else:
-            return self._df.groupby(level=["Binyan"]).sum()["Occurences"]
-
-    def to(self, remove_uncommon_binyanim: bool = True) -> pd.Series:
-        """Tense occurences
-
-        Returns:
-            pd.DataFrame: The series of tense occurences
-        """
-        if remove_uncommon_binyanim:
-            return (
-                self._df.drop(self.uncommon_binyanim, level=1)
-                .groupby(level=["Tense"])
-                .sum()["Occurences"]
+            return ddf.to_dict("records")
+        if radio == "Tense":
+            ddf = self._df.reset_index()
+            ddf = ddf[ddf["Root"].isin(roots)]
+            ddf = ddf[~ddf["Binyan"].isin(self.uncommon_binyanim)]
+            ddf = (
+                ddf.drop(["Root", "Binyan"], axis=1)
+                .groupby(["Tense"])
+                .sum()
+                .reset_index()
+                .sort_values(["Occurences"], ascending=False)
             )
-        else:
-            return self._df.groupby(level=["Tense"]).sum()["Occurences"]
+            return ddf.to_dict("records")
 
     @property
     def roots(self) -> List[str]:
