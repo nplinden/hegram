@@ -1,3 +1,4 @@
+import dash
 from dash import callback, Output, Input
 from dash.exceptions import PreventUpdate
 from hegram.definitions import definitions
@@ -7,20 +8,13 @@ from hebrew import Hebrew
 from typing import Dict, List, Set, Any, Tuple
 import plotly.graph_objects as go
 
+import dash_mantine_components as dmc
+from dash import html, dcc, dash_table
+
+dash.register_page(__name__, path="/statistics")
+
 DataList = List[Dict[str, Any]]
 Data = Dict[str, str | int]
-
-
-# @callback(Output("mantine-bargraph", "series"), Input("percent-checkbox", "checked"))
-# def toggle_percent(checked):
-#     if checked:
-#         return [
-#             {"name": "Frequency", "color": "orange.6"},
-#         ]
-#     else:
-#         return [
-#             {"name": "Occurences", "color": "orange.6"},
-#         ]
 
 
 @callback(
@@ -211,3 +205,137 @@ def update_table_page_number(page_size: int) -> int:
     """
     _df = occurences.rbo_frame()
     return len(_df) // page_size + int((len(_df) % page_size) != 0)
+
+
+table = dash_table.DataTable(
+    id="table",
+    columns=[{"name": c, "id": c} for c in ["Rank", "Root", "Class", "Total"]],
+    page_current=0,
+    page_size=12,
+    page_count=100,
+    page_action="custom",
+    style_cell={"fontSize": 20, "font-familiy": "monospace"},
+    style_cell_conditional=[
+        {
+            "if": {"column_id": "Root"},
+            "font-family": "serif",
+            "fontSize": 20,
+        },
+        {
+            "if": {"column_id": "Class"},
+            "font-family": "serif",
+            "fontSize": 20,
+        },
+    ],
+    sort_action="custom",
+    sort_mode="single",
+    sort_by=[],
+    tooltip_duration=None,
+)
+
+
+dropdown = dmc.MultiSelect(
+    data=[
+        {"value": k, "label": k}
+        for k in ["Total", "Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
+    ],
+    value=["Total"],
+    id="dropdown",
+    mb=10,
+)
+
+definition_markdown = dcc.Markdown(
+    """
+    # Select a root in the table!
+""",
+    id="definition",
+)
+
+
+chart = dmc.BarChart(
+    h=450,
+    dataKey="Binyan",
+    data=[],
+    series=[
+        {"name": "Qatal", "color": "red.6"},
+        {"name": "Yiqtol", "color": "green.6"},
+        {"name": "Wayyiqtol", "color": "indigo.6"},
+        {"name": "Imperative", "color": "grape.6"},
+        {"name": "Infinitive (abslute)", "color": "teal.6"},
+        {"name": "Infinitive (construct)", "color": "yellow.6"},
+        {"name": "Participle", "color": "pink.6"},
+        {"name": "Participle (passive)", "color": "lime.6"},
+    ],
+    type="stacked",
+    barProps={"isAnimationActive": True},
+    xAxisLabel="Binyan",
+    yAxisLabel="Occurences",
+    id="mantine-bargraph",
+    className="mantine-barchart",
+    px=25,
+)
+
+
+layout = dmc.MantineProvider(
+    children=[
+        html.Div(
+            [
+                html.H1("Verbal Root Statistics"),
+                html.P(
+                    "This page gives an insight into the number of occurences of each verbal root in the Hebrew Bible, with a breakdown on binyanim and tenses. There are three components to this page:"
+                ),
+                dmc.List(
+                    [
+                        dmc.ListItem(
+                            "A table of all existing verbal roots and their total number of occurences. By selecting a binyan in the dropdown menu, you can add the corresponding column to the table. By clicking the arrows in the column header, you can sort the table by number of occurences for the corresponding binyan. Clicking the arrow in the Root column sorts the roots alphabetically."
+                        ),
+                        dmc.ListItem(
+                            "The bar chart shows the repartition of binyan and tense occurences in the Hebrew Bible. By default, it show an aggregation of all verbal root occurences. By selecting one or multiple roots in the table, you can restrict the roots counted in the chart."
+                        ),
+                        dmc.ListItem(
+                            [
+                                "When a root is selected in the table, a definition section appears below the chart. The definitions are taken from the ",
+                                html.A(
+                                    "openscripture github repository.",
+                                    href="https://github.com/openscriptures/strongs/",
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+                html.Div(
+                    children=[
+                        html.Div([dropdown, table]),
+                        html.Div(
+                            [
+                                chart,
+                                dmc.RadioGroup(
+                                    children=dmc.Group(
+                                        [
+                                            dmc.Radio(k, value=k)
+                                            for k in [
+                                                "Binyan",
+                                                "Tense",
+                                                "Binyan-Tense",
+                                                "Tense-Binyan",
+                                            ]
+                                        ],
+                                        my=10,
+                                    ),
+                                    id="radiogroup",
+                                    value="Binyan-Tense",
+                                    size="sm",
+                                    mb=10,
+                                    px=25,
+                                ),
+                            ],
+                        ),
+                    ],
+                    className="occurence-grid textbox-container",
+                ),
+                html.Div([definition_markdown], className="textbox-container"),
+            ],
+            className="container",
+        )
+    ]
+)
