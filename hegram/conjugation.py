@@ -7,6 +7,7 @@ handles = {}
 A.hoist(handles)
 F = handles["F"]
 L = handles["L"]
+T = handles["T"]
 
 binyanim = {
     "qal": "Paal",
@@ -57,6 +58,7 @@ header = [
     "WordId",
     "ClauseId",
     "VerseId",
+    "Book",
     "Root",
     "Binyan",
     "Tense",
@@ -69,12 +71,14 @@ data = []
 for i in verbs:
     clause_id = [u for u in L.u(i) if F.otype.v(u) == "clause"][0]
     verse_id = [u for u in L.u(i) if F.otype.v(u) == "verse"][0]
+    book_id = [u for u in L.u(i) if F.otype.v(u) == "book"][0]
 
     data.append(
         [
             i,
             clause_id,
             verse_id,
+            T.bookName(book_id),
             F.lex_utf8.v(i),
             binyanim.get(F.vs.v(i), F.vs.v(i)),
             tenses.get(F.vt.v(i), F.vt.v(i)),

@@ -143,6 +143,20 @@ app.layout = dmc.MantineProvider(
                                     ),
                                 ],
                             ),
+                            dmc.NavLink(
+                                label="Hiphil",
+                                childrenOffset=28,
+                                children=[
+                                    dmc.NavLink(
+                                        label="Strong Verb",
+                                        href=page_registry["pages.hiphil_strong"]["relative_path"],
+                                        id={
+                                            "type": "navlink",
+                                            "index": page_registry["pages.hiphil_strong"]["relative_path"],
+                                        },
+                                    ),
+                                ],
+                            ),
                         ],
                     ),
                 ],

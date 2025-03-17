@@ -7,7 +7,8 @@ from random import randint
 from bs4 import BeautifulSoup
 from hegram.conjugation import conjugation, A
 from xml.etree import ElementTree
-from dash import callback, Input, Output, State
+from dash import callback, Input, Output, State, dcc
+from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
 
 
@@ -66,15 +67,20 @@ def passage(element_id: int):
     Output("clause-div", "children"),
     Output("weblink-span", "children"),
     Output("word-div", "children"),
+    Output("solution-storage", "data"),
     Input("clause-btn", "n_clicks"),
+    State("root-number", "value"),
+    State("conjugation-book-dropdown", "value"),
     State("conjugation-binyan-dropdown", "value"),
     State("conjugation-tense-dropdown", "value"),
     State("conjugation-person-dropdown", "value"),
     State("conjugation-gender-dropdown", "value"),
     State("conjugation-number-dropdown", "value"),
 )
-def generate_verb(clicked, binyanim, tenses, persons, genders, numbers):
+def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, numbers):
     df = conjugation
+    if book:
+        df = df[df["Book"].isin(book)]
     if binyanim:
         df = df[df["Binyan"].isin(binyanim)]
     if tenses:
@@ -85,24 +91,44 @@ def generate_verb(clicked, binyanim, tenses, persons, genders, numbers):
         df = df[df["Gender"].isin(genders)]
     if numbers:
         df = df[df["Number"].isin(numbers)]
+    if max_roots:
+        roots = list(df["Root"].value_counts().sort_values(ascending=False).index[:max_roots])
+        df = df[df["Root"].isin(roots)]
 
+    print(df.head())
     row = df.iloc[randint(0, len(df) - 1)]
-    print(row)
+    print(row.to_dict())
     verse, word = int(row.VerseId), int(row.WordId)
+    return get_verse(verse, word), passage(word), get_verse(word), row.to_dict()
 
-    return get_verse(verse, word), passage(word), get_verse(word)
+
+@callback(Output("solution-body", "children"), Input("solution-btn", "n_clicks"), State("solution-storage", "data"))
+def show_solution(n_clicks, data):
+    if not n_clicks:
+        raise PreventUpdate
+    return [
+        dmc.TableTr(
+            [
+                dmc.TableTd(data["Root"]),
+                dmc.TableTd(data["Binyan"]),
+                dmc.TableTd(data["Tense"]),
+                dmc.TableTd(data["Person"]),
+                dmc.TableTd(data["Gender"]),
+                dmc.TableTd(data["Number"]),
+            ]
+        )
+    ]
 
 
 def data_from_list(items):
     return [{"value": k, "label": k} for k in items]
 
 
-root_input = dmc.Textarea(
-    label="Racines autorisées",
-    placeholder='Roots should be entered in hebrew and separated by whitespaces, e.g. "אמר דבר קדש"',
-    id="root-input",
-    autosize=True,
-    minRows=2,
+book_select = dmc.MultiSelect(
+    label="Livres autorisés",
+    data=data_from_list(sorted(pd.unique(conjugation["Book"]))),
+    value=[],
+    id="conjugation-book-dropdown",
     mb=10,
 )
 
@@ -146,6 +172,35 @@ number_select = dmc.MultiSelect(
     mb=10,
 )
 
+solution_head = dmc.TableThead(
+    dmc.TableTr(
+        [
+            dmc.TableTh("Racine"),
+            dmc.TableTh("Binyan"),
+            dmc.TableTh("Tense"),
+            dmc.TableTh("Person"),
+            dmc.TableTh("Gender"),
+            dmc.TableTh("Number"),
+        ]
+    )
+)
+
+solution_body = dmc.TableTbody(
+    [
+        dmc.TableTr(
+            [
+                dmc.TableTd(""),
+                dmc.TableTd(""),
+                dmc.TableTd(""),
+                dmc.TableTd(""),
+                dmc.TableTd(""),
+                dmc.TableTd(""),
+            ]
+        )
+    ],
+    id="solution-body",
+)
+
 
 layout = dmc.MantineProvider(
     dash.html.Div(
@@ -170,7 +225,12 @@ layout = dmc.MantineProvider(
                             ),
                             dmc.AccordionPanel(
                                 children=[
-                                    root_input,
+                                    dmc.NumberInput(
+                                        label="Niveau d'occurence maximum autorisé (e.g. 50 n'autorise que les 50 racines les plus courantes)",
+                                        min=0,
+                                        id="root-number",
+                                    ),
+                                    book_select,
                                     binyan_select,
                                     tense_select,
                                     person_select,
@@ -191,13 +251,17 @@ layout = dmc.MantineProvider(
                 [
                     "Analysez cette forme verbale issue de ",
                     html.Span(id="weblink-span"),
-                    ".",
+                    ":",
                 ]
             ),
             html.Div(children=[], id="word-div", style={"textAlign": "center"}),
             html.P("Verset complet:"),
             html.Div(children=[], id="clause-div", style={}),
-            html.Table(),
+            html.Div(
+                [dmc.Button("Afficher la solution", id="solution-btn")],
+            ),
+            dcc.Store(id="solution-storage", storage_type="local"),
+            dmc.Table([solution_head, solution_body], className="conjugation-table"),
         ],
         className="container",
     )
