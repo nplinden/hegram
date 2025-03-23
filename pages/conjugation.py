@@ -4,7 +4,7 @@ from dash import html
 import pandas as pd
 from random import randint
 from bs4 import BeautifulSoup
-from hegram.conjugation import conjugation, A, F, L, T
+from hegram.conjugation import conjugation, A
 from xml.etree import ElementTree
 from dash import callback, Input, Output, State, dcc
 from dash.exceptions import PreventUpdate

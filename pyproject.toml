@@ -9,11 +9,13 @@ dependencies = [
     "dash-iconify>=0.1.2",
     "dash-mantine-components>=0.15.3",
     "dash>=2.18.2",
+    "fastparquet>=2024.11.0",
     "hebrew>=0.8.1",
     "jupyter>=1.1.1",
     "loguru>=0.7.3",
     "pandas>=2.2.3",
     "plotly>=5.24.1",
+    "pyarrow>=19.0.1",
     "requests>=2.32.3",
     "text-fabric>=12.6.2",
 ]
