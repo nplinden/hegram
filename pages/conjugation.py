@@ -1,15 +1,16 @@
 import dash
 import dash_mantine_components as dmc
 from dash import html
-from tf.app import use
 import pandas as pd
 from random import randint
 from bs4 import BeautifulSoup
-from hegram.conjugation import conjugation, A
+from hegram.conjugation import conjugation, A, F, L, T
 from xml.etree import ElementTree
 from dash import callback, Input, Output, State, dcc
 from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
+from hegram.mechon_mamre import verse_to_url, en_to_fr_books
+from hegram.data import dropdown_data, en_to_fr
 
 
 dash.register_page(__name__, path="/conjugation")
@@ -54,10 +55,16 @@ def get_verse(verse_id, word_id=None):
 
 
 def passage(element_id: int):
-    name, href = A.webLink(element_id, _asString=True).split(" => ")
+    section = A.sectionStrFromNode(element_id)
+    book = en_to_fr_books[section.split()[0]]
+    chapter, verse = section.split()[1].split(":")
+    name = f"{book} {chapter}:{verse}"
+    url = verse_to_url(book, int(chapter))
+
+    print(name, url)
     return html.A(
-        children=[name.replace("_", " ")],
-        href=href,
+        children=[name],
+        href=url,
         target="_blank",
         className="manual-link",
     )
@@ -68,6 +75,10 @@ def passage(element_id: int):
     Output("weblink-span", "children"),
     Output("word-div", "children"),
     Output("solution-storage", "data"),
+    Output("solution-body", "children", allow_duplicate=True),
+    Output("solution-table", "style", allow_duplicate=True),
+    Output("analyze-div", "style"),
+    Output("fullverse-div", "style"),
     Input("clause-btn", "n_clicks"),
     State("root-number", "value"),
     State("conjugation-book-dropdown", "value"),
@@ -76,6 +87,7 @@ def passage(element_id: int):
     State("conjugation-person-dropdown", "value"),
     State("conjugation-gender-dropdown", "value"),
     State("conjugation-number-dropdown", "value"),
+    prevent_initial_call=True,
 )
 def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, numbers):
     df = conjugation
@@ -99,10 +111,34 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
     row = df.iloc[randint(0, len(df) - 1)]
     print(row.to_dict())
     verse, word = int(row.VerseId), int(row.WordId)
-    return get_verse(verse, word), passage(word), get_verse(word), row.to_dict()
+    return (
+        get_verse(verse, word),
+        passage(word),
+        get_verse(word),
+        row.to_dict(),
+        dmc.TableTr(
+            [
+                dmc.TableTd(""),
+                dmc.TableTd(""),
+                dmc.TableTd(""),
+                dmc.TableTd(""),
+                dmc.TableTd(""),
+                dmc.TableTd(""),
+            ]
+        ),
+        {"display": "none"},
+        {"display": "block"},
+        {"display": "block"},
+    )
 
 
-@callback(Output("solution-body", "children"), Input("solution-btn", "n_clicks"), State("solution-storage", "data"))
+@callback(
+    Output("solution-body", "children", allow_duplicate=True),
+    Output("solution-table", "style", allow_duplicate=True),
+    Input("solution-btn", "n_clicks"),
+    State("solution-storage", "data"),
+    prevent_initial_call=True,
+)
 def show_solution(n_clicks, data):
     if not n_clicks:
         raise PreventUpdate
@@ -111,12 +147,13 @@ def show_solution(n_clicks, data):
             [
                 dmc.TableTd(data["Root"]),
                 dmc.TableTd(data["Binyan"]),
-                dmc.TableTd(data["Tense"]),
-                dmc.TableTd(data["Person"]),
-                dmc.TableTd(data["Gender"]),
-                dmc.TableTd(data["Number"]),
+                dmc.TableTd(en_to_fr["Tense"][data["Tense"]]),
+                dmc.TableTd(en_to_fr["Person"].get(data["Person"], "N/A")),
+                dmc.TableTd(en_to_fr["Gender"].get(data["Gender"], "N/A")),
+                dmc.TableTd(en_to_fr["Number"].get(data["Number"], "N/A")),
             ]
-        )
+        ),
+        {"display": "block"},
     ]
 
 
@@ -126,7 +163,7 @@ def data_from_list(items):
 
 book_select = dmc.MultiSelect(
     label="Livres autorisés",
-    data=data_from_list(sorted(pd.unique(conjugation["Book"]))),
+    data=dropdown_data["Book"],
     value=[],
     id="conjugation-book-dropdown",
     mb=10,
@@ -134,7 +171,7 @@ book_select = dmc.MultiSelect(
 
 binyan_select = dmc.MultiSelect(
     label="Binyanim autorisés",
-    data=data_from_list(sorted(pd.unique(conjugation["Binyan"]))),
+    data=dropdown_data["Binyan"],
     value=[],
     id="conjugation-binyan-dropdown",
     mb=10,
@@ -142,7 +179,7 @@ binyan_select = dmc.MultiSelect(
 
 tense_select = dmc.MultiSelect(
     label="Temps autorisés",
-    data=data_from_list(sorted(pd.unique(conjugation["Tense"]))),
+    data=dropdown_data["Tense"],
     value=[],
     id="conjugation-tense-dropdown",
     mb=10,
@@ -150,7 +187,7 @@ tense_select = dmc.MultiSelect(
 
 person_select = dmc.MultiSelect(
     label="Personnes autorisées",
-    data=data_from_list(sorted(pd.unique(conjugation["Person"]))),
+    data=dropdown_data["Person"],
     value=[],
     id="conjugation-person-dropdown",
     mb=10,
@@ -158,7 +195,7 @@ person_select = dmc.MultiSelect(
 
 gender_select = dmc.MultiSelect(
     label="Genres autorisés",
-    data=data_from_list(sorted(pd.unique(conjugation["Gender"]))),
+    data=dropdown_data["Gender"],
     value=[],
     id="conjugation-gender-dropdown",
     mb=10,
@@ -166,7 +203,7 @@ gender_select = dmc.MultiSelect(
 
 number_select = dmc.MultiSelect(
     label="Nombres autorisées",
-    data=data_from_list(sorted(pd.unique(conjugation["Number"]))),
+    data=dropdown_data["Number"],
     value=[],
     id="conjugation-number-dropdown",
     mb=10,
@@ -177,10 +214,10 @@ solution_head = dmc.TableThead(
         [
             dmc.TableTh("Racine"),
             dmc.TableTh("Binyan"),
-            dmc.TableTh("Tense"),
-            dmc.TableTh("Person"),
-            dmc.TableTh("Gender"),
-            dmc.TableTh("Number"),
+            dmc.TableTh("Temps"),
+            dmc.TableTh("Personne"),
+            dmc.TableTh("Genre"),
+            dmc.TableTh("Nombre"),
         ]
     )
 )
@@ -205,13 +242,39 @@ solution_body = dmc.TableTbody(
 layout = dmc.MantineProvider(
     dash.html.Div(
         children=[
-            html.H1("Exercice de conjugaison"),
-            html.P(
-                "Une application d'exercice à la conjugaison en hébreu biblique. Cliquez sur \"Trouver un verbe\" pour choisir aléatoirement une forme verbale dans le corpus biblique. Essayez d'analyser la conjugaison de ce verbe! Le verset correspondant est également fourni pour plus de contexte."
-            ),
-            html.P('Le menu "Paramètres" ci-dessous permet de restreindre le choix des formes verbales.'),
             dmc.Accordion(
-                disableChevronRotation=True,
+                disableChevronRotation=False,
+                children=[
+                    dmc.AccordionItem(
+                        [
+                            dmc.AccordionControl(
+                                "Introduction",
+                                icon=DashIconify(
+                                    icon="material-symbols:text-snippet",
+                                    color=dmc.DEFAULT_THEME["colors"]["blue"][6],
+                                    width=20,
+                                ),
+                            ),
+                            dmc.AccordionPanel(
+                                children=[
+                                    html.H1("Exercice de conjugaison"),
+                                    html.P(
+                                        "Une application d'exercice à la conjugaison en hébreu biblique. Cliquez sur \"Trouver un verbe\" pour choisir aléatoirement une forme verbale dans le corpus biblique. Essayez d'analyser la conjugaison de ce verbe! Le verset correspondant est également fourni pour plus de contexte."
+                                    ),
+                                    html.P(
+                                        'Le menu "Paramètres" ci-dessous permet de restreindre le choix des formes verbales.'
+                                    ),
+                                ]
+                            ),
+                        ],
+                        value="introduction",
+                    ),
+                ],
+                mb=10,
+                value="introduction",
+            ),
+            dmc.Accordion(
+                disableChevronRotation=False,
                 children=[
                     dmc.AccordionItem(
                         [
@@ -244,24 +307,51 @@ layout = dmc.MantineProvider(
                 ],
                 mb=10,
             ),
-            html.Div(
-                [dmc.Button("Trouver un verbe", id="clause-btn")],
-            ),
-            html.P(
+            dmc.Flex(
                 [
-                    "Analysez cette forme verbale issue de ",
-                    html.Span(id="weblink-span"),
-                    ":",
-                ]
+                    dmc.Button("Trouver un verbe", id="clause-btn"),
+                    dmc.Button("Afficher la solution", id="solution-btn"),
+                ],
+                direction={"base": "column", "sm": "row"},
+                gap={"base": "sm", "sm": "lg"},
+                justify={"sm": "center"},
+                mb=10,
+            ),
+            html.Div(
+                [
+                    html.P(
+                        [
+                            "Analysez cette forme verbale issue de ",
+                            html.Span(id="weblink-span"),
+                            ":",
+                        ]
+                    ),
+                ],
+                style={"display": "none"},
+                id="analyze-div",
             ),
             html.Div(children=[], id="word-div", style={"textAlign": "center"}),
-            html.P("Verset complet:"),
-            html.Div(children=[], id="clause-div", style={}),
             html.Div(
-                [dmc.Button("Afficher la solution", id="solution-btn")],
+                [
+                    html.P("Verset complet:"),
+                ],
+                style={"display": "none"},
+                id="fullverse-div",
             ),
+            html.Div(children=[], id="clause-div", style={}),
             dcc.Store(id="solution-storage", storage_type="local"),
-            dmc.Table([solution_head, solution_body], className="conjugation-table"),
+            dmc.Flex(
+                [
+                    dmc.Table(
+                        [solution_head, solution_body],
+                        className="conjugation-table",
+                        style={"display": "none"},
+                        id="solution-table",
+                    ),
+                ],
+                justify={"sm": "center"},
+                className="conjugation-container",
+            ),
         ],
         className="container",
     )

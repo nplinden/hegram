@@ -6,4 +6,6 @@ COPY . /app
 
 EXPOSE 7777
 
+RUN uv sync
+
 CMD ["uv", "run", "main.py"]

@@ -32,11 +32,16 @@ h1 {
   font-style: italic;
 }
 
+.hidden {
+  display: none;
+}
+
 .conjugation-container {
   margin-inline: 5%;
 }
 
 .conjugation-table {
+  display: block;
   font-family: SBLHebrew;
   font-size: 2rem;
 }

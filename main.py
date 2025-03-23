@@ -68,7 +68,7 @@ app.layout = dmc.MantineProvider(
                                 childrenOffset=28,
                                 children=[
                                     dmc.NavLink(
-                                        label="Strong Verb",
+                                        label="Verbe fort",
                                         href=page_registry["pages.paal_strong"]["relative_path"],
                                         id={
                                             "type": "navlink",
@@ -98,7 +98,7 @@ app.layout = dmc.MantineProvider(
                                 childrenOffset=28,
                                 children=[
                                     dmc.NavLink(
-                                        label="Strong Verb",
+                                        label="Verbe fort",
                                         href=page_registry["pages.piel_strong"]["relative_path"],
                                         id={
                                             "type": "navlink",
@@ -112,7 +112,7 @@ app.layout = dmc.MantineProvider(
                                 childrenOffset=28,
                                 children=[
                                     dmc.NavLink(
-                                        label="Strong Verb",
+                                        label="Verbe fort",
                                         href=page_registry["pages.niphal_strong"]["relative_path"],
                                         id={
                                             "type": "navlink",
@@ -134,7 +134,7 @@ app.layout = dmc.MantineProvider(
                                 childrenOffset=28,
                                 children=[
                                     dmc.NavLink(
-                                        label="Strong Verb",
+                                        label="Verbe fort",
                                         href=page_registry["pages.poual_strong"]["relative_path"],
                                         id={
                                             "type": "navlink",
@@ -148,7 +148,7 @@ app.layout = dmc.MantineProvider(
                                 childrenOffset=28,
                                 children=[
                                     dmc.NavLink(
-                                        label="Strong Verb",
+                                        label="Verbe fort",
                                         href=page_registry["pages.hiphil_strong"]["relative_path"],
                                         id={
                                             "type": "navlink",
