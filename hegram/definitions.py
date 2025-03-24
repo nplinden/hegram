@@ -59,33 +59,28 @@ def get_definitions() -> Dict:
     Returns:
         Dict: The dictionnary of word definitions
     """
-    definitions_path = Path("definitions.json")
-    if not definitions_path.exists():
+    p = Path("data/definitions.json")
+    p.parent.mkdir(exist_ok=True)
+    if not p.exists():
         verbs = {}
         r = requests.get(
             "https://raw.githubusercontent.com/openscriptures/strongs/refs/heads/master/hebrew/StrongHebrewG.xml"
         )
         tree = ET.ElementTree(ET.fromstring(r.text))
         root = tree.getroot()
-        osistext = root.findall(
-            "{http://www.bibletechnologies.net/2003/OSIS/namespace}osisText"
-        )[0]
-        glossary = osistext.find(
-            "{http://www.bibletechnologies.net/2003/OSIS/namespace}div"
-        )
-        for entry_node in glossary.findall(
-            "{http://www.bibletechnologies.net/2003/OSIS/namespace}div"
-        ):
+        osistext = root.findall("{http://www.bibletechnologies.net/2003/OSIS/namespace}osisText")[0]
+        glossary = osistext.find("{http://www.bibletechnologies.net/2003/OSIS/namespace}div")
+        for entry_node in glossary.findall("{http://www.bibletechnologies.net/2003/OSIS/namespace}div"):
             entry = Entry(entry_node)
             if entry.morph == "v" and entry.lang == "heb":
                 if entry.root not in verbs:
                     verbs[entry.root] = [entry.definitions]
                 else:
                     verbs[entry.root].append(entry.definitions)
-        with open(definitions_path, "w") as f:
+        with open(p, "w") as f:
             json.dump(verbs, f, indent=2)
     else:
-        with open(definitions_path, "r") as f:
+        with open(p, "r") as f:
             verbs = json.load(f)
     return verbs
 

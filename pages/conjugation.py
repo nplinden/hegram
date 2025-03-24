@@ -233,8 +233,6 @@ solution_body = dmc.TableTbody(
     id="solution-body",
 )
 
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/solar.csv")
-
 layout = dmc.MantineProvider(
     dash.html.Div(
         children=[

@@ -1,5 +1,5 @@
-definitions.json
-Occurences.csv
+.vscode/*
+data/*
 
 # Python-generated files
 __pycache__/

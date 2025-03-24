@@ -2,7 +2,9 @@ from tf.app import use
 from pathlib import Path
 import pandas as pd
 
-if not Path("conjugation.parquet").exists():
+p = Path("data/conjugation.parquet")
+p.parent.mkdir(exist_ok=True)
+if not p.exists():
     A = use("ETCBC/bhsa")
     handles = {}
     A.hoist(handles)
@@ -90,8 +92,8 @@ if not Path("conjugation.parquet").exists():
             ]
         )
     conjugation = pd.DataFrame(data, columns=header)
-    conjugation.to_parquet("conjugation.parquet")
+    conjugation.to_parquet(p)
 
 
 A = use("ETCBC/bhsa")
-conjugation = pd.read_parquet("conjugation.parquet")
+conjugation = pd.read_parquet(p)

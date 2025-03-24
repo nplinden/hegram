@@ -58,11 +58,13 @@ class Occurences:
     common_binyanim = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
 
     def __init__(self):
-        if Path("Occurences.csv").exists():
-            self._df = pd.read_csv("Occurences.csv", index_col=[0, 1, 2], header=0)
+        p = Path("data/Occurences.csv")
+        p.parent.mkdir(exist_ok=True)
+        if p.exists():
+            self._df = pd.read_csv(p, index_col=[0, 1, 2], header=0)
         else:
             self._df = self.generate_occurences_df()
-            self._df.to_csv("Occurences.csv")
+            self._df.to_csv(p)
 
     @classmethod
     def generate_occurences_df(cls) -> pd.DataFrame:
@@ -115,11 +117,7 @@ class Occurences:
             pd.Series: The series of occurences of root-binyan couples.
         """
         if remove_uncommon_binyanim:
-            return (
-                self._df.drop(self.uncommon_binyanim, level=1)
-                .groupby(level=("Root", "Binyan"))
-                .sum()["Occurences"]
-            )
+            return self._df.drop(self.uncommon_binyanim, level=1).groupby(level=("Root", "Binyan")).sum()["Occurences"]
         else:
             return self._df.groupby(level=("Root", "Binyan")).sum()["Occurences"]
 
