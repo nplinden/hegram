@@ -1,10 +1,9 @@
 import dash
 import dash_mantine_components as dmc
-from dash import html, dash_table
-import pandas as pd
-from random import randint
+from dash import html, dash_table, no_update
+import polars as pl
 from bs4 import BeautifulSoup
-from hegram.conjugation import conjugation, A
+from hegram.conjugation import A
 from xml.etree import ElementTree
 from dash import callback, Input, Output, State, dcc
 from dash.exceptions import PreventUpdate
@@ -78,6 +77,7 @@ def passage(element_id: int):
     Output("analyze-div", "style"),
     Output("fullverse-div", "style"),
     Output("solution-datatable-div", "style", allow_duplicate=True),
+    Output("notification", "children"),
     Input("clause-btn", "n_clicks"),
     State("root-number", "value"),
     State("conjugation-book-dropdown", "value"),
@@ -89,36 +89,61 @@ def passage(element_id: int):
     prevent_initial_call=True,
 )
 def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, numbers):
-    df = conjugation
-    if book:
-        df = df[df["Book"].isin(book)]
-    if binyanim:
-        df = df[df["Binyan"].isin(binyanim)]
-    if tenses:
-        df = df[df["Tense"].isin(tenses)]
-    if persons:
-        df = df[df["Person"].isin(persons)]
-    if genders:
-        df = df[df["Gender"].isin(genders)]
-    if numbers:
-        df = df[df["Number"].isin(numbers)]
-    if max_roots:
-        roots = list(df["Root"].value_counts().sort_values(ascending=False).index[:max_roots])
-        df = df[df["Root"].isin(roots)]
+    if clicked is None:
+        raise PreventUpdate
+    df = pl.scan_parquet("data/conjugation.parquet")
 
-    print(df.head())
-    row = df.iloc[randint(0, len(df) - 1)]
-    print(row.to_dict())
-    verse, word = int(row.VerseId), int(row.WordId)
-    return (
-        get_verse(verse, word),
-        passage(word),
-        get_verse(word),
-        row.to_dict(),
-        {"display": "block"},
-        {"display": "block"},
-        {"display": "none"},
-    )
+    if max_roots:
+        roots = (
+            df.select([pl.col("Root").value_counts(sort=True)])
+            .collect()
+            .unnest(pl.col("Root"))
+            .top_k(max_roots, by="count")
+            .select(pl.col("Root"))
+            .to_series()
+        ).to_list()
+    else:
+        roots = []
+
+    filtered = df.filter(
+        pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
+        & pl.when(bool(binyanim)).then(pl.col("Binyan").is_in(binyanim)).otherwise(pl.lit(True))
+        & pl.when(bool(tenses)).then(pl.col("Tense").is_in(tenses)).otherwise(pl.lit(True))
+        & pl.when(bool(persons)).then(pl.col("Person").is_in(persons)).otherwise(pl.lit(True))
+        & pl.when(bool(genders)).then(pl.col("Gender").is_in(genders)).otherwise(pl.lit(True))
+        & pl.when(bool(numbers)).then(pl.col("Number").is_in(numbers)).otherwise(pl.lit(True))
+        & pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
+    ).collect()
+    if filtered.is_empty():
+        return (
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            dmc.Notification(
+                title="Erreur",
+                action="show",
+                message="Aucun verbe ne satisfait ces filtres !",
+                icon=DashIconify(icon="material-symbols:error-outline-rounded"),
+            ),
+        )
+    else:
+        sample = filtered.sample(n=1).to_dicts()[0]
+        print(sample)
+        verse, word = sample["VerseId"], sample["WordId"]
+        return (
+            get_verse(verse, word),
+            passage(word),
+            get_verse(word),
+            sample,
+            {"display": "block"},
+            {"display": "block"},
+            {"display": "none"},
+            no_update,
+        )
 
 
 @callback(
@@ -130,9 +155,10 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
     prevent_initial_call=True,
 )
 def show_solution(n_clicks, data):
+    print(data)
     if not n_clicks:
         raise PreventUpdate
-    df = pd.DataFrame(
+    df = pl.DataFrame(
         data=[
             [
                 data["Root"],
@@ -143,10 +169,11 @@ def show_solution(n_clicks, data):
                 en_to_fr["Number"].get(data["Number"], "N/A"),
             ]
         ],
-        columns=["Racine", "Binyan", "Temps", "Personne", "Genre", "Nombre"],
+        schema=["Racine", "Binyan", "Temps", "Personne", "Genre", "Nombre"],
+        orient="row",
     )
     return [
-        df.to_dict("records"),
+        df.to_dicts(),
         [{"name": c, "id": c} for c in df.columns],
         {"display": "block"},
     ]

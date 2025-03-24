@@ -22,7 +22,7 @@ app = Dash(
     title="Hegram",
     server=server,
     use_pages=True,
-    external_stylesheets=[dmc.styles.CHARTS, dmc.styles.ALL],
+    external_stylesheets=[dmc.styles.CHARTS, dmc.styles.NOTIFICATIONS, dmc.styles.ALL],
 )
 
 
@@ -43,6 +43,8 @@ icons = {
 app.layout = dmc.MantineProvider(
     dmc.AppShell(
         children=[
+            dmc.NotificationProvider(),
+            html.Div(id="notification"),
             dmc.AppShellNavbar(
                 children=[
                     html.H1("Hegram by ניקולא לינדן", style={"textAlign": "center"}),
