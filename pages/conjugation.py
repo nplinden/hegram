@@ -1,6 +1,6 @@
 import dash
 import dash_mantine_components as dmc
-from dash import html
+from dash import html, dash_table
 import pandas as pd
 from random import randint
 from bs4 import BeautifulSoup
@@ -75,10 +75,9 @@ def passage(element_id: int):
     Output("weblink-span", "children"),
     Output("word-div", "children"),
     Output("solution-storage", "data"),
-    Output("solution-body", "children", allow_duplicate=True),
-    Output("solution-table", "style", allow_duplicate=True),
     Output("analyze-div", "style"),
     Output("fullverse-div", "style"),
+    Output("solution-datatable-div", "style", allow_duplicate=True),
     Input("clause-btn", "n_clicks"),
     State("root-number", "value"),
     State("conjugation-book-dropdown", "value"),
@@ -116,25 +115,16 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
         passage(word),
         get_verse(word),
         row.to_dict(),
-        dmc.TableTr(
-            [
-                dmc.TableTd(""),
-                dmc.TableTd(""),
-                dmc.TableTd(""),
-                dmc.TableTd(""),
-                dmc.TableTd(""),
-                dmc.TableTd(""),
-            ]
-        ),
+        {"display": "block"},
+        {"display": "block"},
         {"display": "none"},
-        {"display": "block"},
-        {"display": "block"},
     )
 
 
 @callback(
-    Output("solution-body", "children", allow_duplicate=True),
-    Output("solution-table", "style", allow_duplicate=True),
+    Output("solution-datatable", "data"),
+    Output("solution-datatable", "columns"),
+    Output("solution-datatable-div", "style", allow_duplicate=True),
     Input("solution-btn", "n_clicks"),
     State("solution-storage", "data"),
     prevent_initial_call=True,
@@ -142,17 +132,22 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
 def show_solution(n_clicks, data):
     if not n_clicks:
         raise PreventUpdate
-    return [
-        dmc.TableTr(
+    df = pd.DataFrame(
+        data=[
             [
-                dmc.TableTd(data["Root"]),
-                dmc.TableTd(data["Binyan"]),
-                dmc.TableTd(en_to_fr["Tense"][data["Tense"]]),
-                dmc.TableTd(en_to_fr["Person"].get(data["Person"], "N/A")),
-                dmc.TableTd(en_to_fr["Gender"].get(data["Gender"], "N/A")),
-                dmc.TableTd(en_to_fr["Number"].get(data["Number"], "N/A")),
+                data["Root"],
+                data["Binyan"],
+                en_to_fr["Tense"][data["Tense"]],
+                en_to_fr["Person"].get(data["Person"], "N/A"),
+                en_to_fr["Gender"].get(data["Gender"], "N/A"),
+                en_to_fr["Number"].get(data["Number"], "N/A"),
             ]
-        ),
+        ],
+        columns=["Racine", "Binyan", "Temps", "Personne", "Genre", "Nombre"],
+    )
+    return [
+        df.to_dict("records"),
+        [{"name": c, "id": c} for c in df.columns],
         {"display": "block"},
     ]
 
@@ -238,6 +233,7 @@ solution_body = dmc.TableTbody(
     id="solution-body",
 )
 
+df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/solar.csv")
 
 layout = dmc.MantineProvider(
     dash.html.Div(
@@ -259,7 +255,7 @@ layout = dmc.MantineProvider(
                                 children=[
                                     html.H1("Exercice de conjugaison"),
                                     html.P(
-                                        "Une application d'exercice à la conjugaison en hébreu biblique. Cliquez sur \"Trouver un verbe\" pour choisir aléatoirement une forme verbale dans le corpus biblique. Essayez d'analyser la conjugaison de ce verbe! Le verset correspondant est également fourni pour plus de contexte."
+                                        "Une application d'exercice à la conjugaison en hébreu biblique. Cliquez sur \"Trouver un verbe\" pour choisir aléatoirement une forme verbale dans le corpus biblique. Essayez d'analyser la conjugaison de ce verbe ! Le verset correspondant est également fourni pour plus de contexte."
                                     ),
                                     html.P(
                                         'Le menu "Paramètres" ci-dessous permet de restreindre le choix des formes verbales.'
@@ -340,17 +336,12 @@ layout = dmc.MantineProvider(
             ),
             html.Div(children=[], id="clause-div", style={}),
             dcc.Store(id="solution-storage", storage_type="local"),
-            dmc.Flex(
-                [
-                    dmc.Table(
-                        [solution_head, solution_body],
-                        className="conjugation-table",
-                        style={"display": "none"},
-                        id="solution-table",
-                    ),
-                ],
-                justify={"sm": "center"},
-                className="conjugation-container",
+            html.Div(
+                dash_table.DataTable(
+                    id="solution-datatable", style_cell={"fontSize": "2.5rem", "font-family": "serif"}
+                ),
+                id="solution-datatable-div",
+                style={"display": "none"},
             ),
         ],
         className="container",
