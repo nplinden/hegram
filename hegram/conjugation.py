@@ -93,5 +93,5 @@ if not Path("conjugation.parquet").exists():
     conjugation.to_parquet("conjugation.parquet")
 
 
-A = use("ETCBC/bhsa-min")
+A = use("ETCBC/bhsa")
 conjugation = pd.read_parquet("conjugation.parquet")
