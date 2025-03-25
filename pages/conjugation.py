@@ -41,9 +41,9 @@ def convert_html_to_dash(html_code):
 def build_verse(verse_id, word_id):
     df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
     word_df = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect()
-    word = BeautifulSoup(word_df.to_dicts()[0]["html"]).find("span").string
+    word = BeautifulSoup(word_df.to_dicts()[0]["html"], features="html.parser").find("span").string
 
-    html = BeautifulSoup(df["html"])
+    html = BeautifulSoup(df["html"], features="html.parser")
     html.find("span", string=word)["class"].append("hl")
     return convert_html_to_dash(str(html))
 
