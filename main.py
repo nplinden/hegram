@@ -21,6 +21,7 @@ app = Dash(
     __name__,
     title="Hegram",
     server=server,
+    url_base_pathname="/hegram/",
     use_pages=True,
     external_stylesheets=[dmc.styles.CHARTS, dmc.styles.NOTIFICATIONS, dmc.styles.ALL],
 )
