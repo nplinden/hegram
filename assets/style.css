@@ -6,6 +6,7 @@ h1 {
 .link a:visited,
 .link a:link {
   text-decoration: underline;
+  text-decoration-color: black;
   font-style: italic;
   color: var(--text-color);
 }
