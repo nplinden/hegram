@@ -5,10 +5,13 @@ from dash import (
     Dash,
     _dash_renderer,
     html,
+    dcc,
     page_registry,
     page_container,
     Output,
     Input,
+    State,
+    callback,
     ALL,
     callback_context,
 )
@@ -41,14 +44,40 @@ icons = {
     "Learning": DashIconify(icon="material-symbols:book-ribbon", height=16),
 }
 
+buttons = [
+    dmc.Button("Home", variant="subtle", color="gray"),
+    dmc.Button("Blog", variant="subtle", color="gray"),
+    dmc.Button("Contacts", variant="subtle", color="gray"),
+    dmc.Button("Support", variant="subtle", color="gray"),
+]
+
+
 app.layout = dmc.MantineProvider(
     dmc.AppShell(
         children=[
+            dcc.Location(id="url", refresh=False),
+            dmc.AppShellHeader(
+                dmc.Group(
+                    [
+                        dmc.Group(
+                            [
+                                dmc.Burger(id="burger", size="sm", opened=False, hiddenFrom="sm"),
+                                html.A(
+                                    html.H1("Hegram by ניקולא לינדן", style={"textAlign": "center"}), href="/hegram"
+                                ),
+                            ]
+                        ),
+                    ],
+                    justify="space-between",
+                    style={"flex": 1},
+                    h="100%",
+                    px="md",
+                ),
+            ),
             dmc.NotificationProvider(),
             html.Div(id="notification"),
             dmc.AppShellNavbar(
                 children=[
-                    html.A(html.H1("Hegram by ניקולא לינדן", style={"textAlign": "center"}), href="/hegram"),
                     dmc.NavLink(
                         label="Statistiques",
                         color="black",
@@ -171,13 +200,31 @@ app.layout = dmc.MantineProvider(
             dmc.AppShellMain(children=[page_container]),
         ],
         padding="md",
+        header={"height": 92.48},
         navbar={
             "width": 300,
             "breakpoint": "sm",
-            "collapsed": {"mobile": True},
+            "collapsed": {"mobile": True, "desktop": "False"},
         },
+        id="appshell",
     )
 )
+
+
+@callback(
+    Output("appshell", "navbar"),
+    Input("burger", "opened"),
+    State("appshell", "navbar"),
+)
+def toggle_navbar(opened, navbar):
+    navbar["collapsed"] = {"mobile": not opened, "desktop": False}
+    return navbar
+
+
+@callback(Output("burger", "opened"), Input("url", "pathname"))
+def change_url(pathname):
+    return False
+
 
 if __name__ == "__main__":
     if sys.argv[-1] == "debug":
