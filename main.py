@@ -63,7 +63,8 @@ app.layout = dmc.MantineProvider(
                             [
                                 dmc.Burger(id="burger", size="sm", opened=False, hiddenFrom="sm"),
                                 html.A(
-                                    html.H1("Hegram by ניקולא לינדן", style={"textAlign": "center"}), href="/hegram"
+                                    html.H1("Hegram by ניקולא לינדן", style={"textAlign": "center"}, id="title"),
+                                    href="/hegram",
                                 ),
                             ]
                         ),

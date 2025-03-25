@@ -52,6 +52,13 @@ a:link h1 {
   }
 }
 
+@media (width < 600px) {
+  #title {
+    font-family: serif;
+    font-size: 1rem;
+  }
+}
+
 .graph {
   inline-size: auto;
   padding-inline: 10px;
