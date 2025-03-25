@@ -48,21 +48,24 @@ app.layout = dmc.MantineProvider(
             html.Div(id="notification"),
             dmc.AppShellNavbar(
                 children=[
-                    html.H1("Hegram by ניקולא לינדן", style={"textAlign": "center"}),
+                    html.A(html.H1("Hegram by ניקולא לינדן", style={"textAlign": "center"}), href="/hegram"),
                     dmc.NavLink(
                         label="Statistiques",
+                        color="black",
                         href=page_registry["pages.statistics"]["relative_path"],
                         id={"type": "navlink", "index": page_registry["pages.statistics"]["relative_path"]},
                         leftSection=DashIconify(icon="material-symbols:bar-chart", height=16),
                     ),
                     dmc.NavLink(
                         label="Exercices",
+                        color="black",
                         href=page_registry["pages.conjugation"]["relative_path"],
                         id={"type": "navlink", "index": page_registry["pages.conjugation"]["relative_path"]},
                         leftSection=DashIconify(icon="material-symbols:exercise", height=16),
                     ),
                     dmc.NavLink(
                         label="Ressources",
+                        color="black",
                         leftSection=DashIconify(icon="material-symbols:book-ribbon", height=16),
                         childrenOffset=28,
                         children=[

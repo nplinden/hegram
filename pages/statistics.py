@@ -328,6 +328,7 @@ layout = dmc.MantineProvider(
                                 html.A(
                                     "dépot github openscriptures",
                                     href="https://github.com/openscriptures/strongs/",
+                                    className="link",
                                 ),
                             ]
                         ),

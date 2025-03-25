@@ -127,7 +127,9 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
                 title="Erreur",
                 action="show",
                 message="Aucun verbe ne satisfait ces filtres !",
-                icon=DashIconify(icon="material-symbols:error-outline-rounded"),
+                icon=DashIconify(
+                    icon="material-symbols:error-outline-rounded", color=dmc.DEFAULT_THEME["colors"]["dark"][6]
+                ),
             ),
         )
     else:
@@ -272,7 +274,7 @@ layout = dmc.MantineProvider(
                                 "Introduction",
                                 icon=DashIconify(
                                     icon="material-symbols:text-snippet",
-                                    color=dmc.DEFAULT_THEME["colors"]["blue"][6],
+                                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                                     width=20,
                                 ),
                             ),
@@ -303,7 +305,7 @@ layout = dmc.MantineProvider(
                                 "Paramètres",
                                 icon=DashIconify(
                                     icon="material-symbols:settings",
-                                    color=dmc.DEFAULT_THEME["colors"]["blue"][6],
+                                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                                     width=20,
                                 ),
                             ),
@@ -330,8 +332,8 @@ layout = dmc.MantineProvider(
             ),
             dmc.Flex(
                 [
-                    dmc.Button("Trouver un verbe", id="clause-btn"),
-                    dmc.Button("Afficher la solution", id="solution-btn"),
+                    dmc.Button("Trouver un verbe", id="clause-btn", color=dmc.DEFAULT_THEME["colors"]["dark"][6]),
+                    dmc.Button("Afficher la solution", id="solution-btn", color=dmc.DEFAULT_THEME["colors"]["dark"][6]),
                 ],
                 direction={"base": "column", "sm": "row"},
                 gap={"base": "sm", "sm": "lg"},

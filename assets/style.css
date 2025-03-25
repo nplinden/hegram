@@ -2,6 +2,20 @@ h1 {
   font-family: serif;
 }
 
+.link,
+.link a:visited,
+.link a:link {
+  text-decoration: underline;
+  font-style: italic;
+  color: var(--text-color);
+}
+
+a h1,
+a:visited h1,
+a:link h1 {
+  color: var(--text-color);
+}
+
 .textbox-container {
   padding: 40px;
   margin: 16px 0;
