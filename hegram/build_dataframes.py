@@ -1,10 +1,38 @@
+import polars as pl
 from tf.app import use
-from pathlib import Path
-import pandas as pd
 
-p = Path("data/conjugation.parquet")
-p.parent.mkdir(exist_ok=True)
-if not p.exists():
+
+def build_verses():
+    A = use("ETCBC/bhsa")
+    handles = {}
+    A.hoist(handles)
+    F = handles["F"]
+    L = handles["L"]
+
+    htmls = []
+    for v in F.otype.s("verse"):
+        html = A.plain(v, _asString=True, withPassage=False)
+        section = A.sectionStrFromNode(v)
+        book = section.split()[0]
+        chapter, verse = section.split()[1].split(":")
+        htmls.append([v, book, int(chapter), int(verse), html])
+    df = pl.DataFrame(data=htmls, schema=["id", "book", "chapter", "verse", "html"], orient="row")
+
+    data = []
+    for w in F.otype.s("word"):
+        verse_id = [u for u in L.u(w) if F.otype.v(u) == "verse"][0]
+        data.append([w, verse_id])
+    word_df = (
+        pl.DataFrame(data=data, schema=["WordId", "VerseId"], orient="row")
+        .group_by("VerseId")
+        .agg([pl.col("WordId").min().name.suffix("_min"), pl.col("WordId").max().name.suffix("_max")])
+        .sort("VerseId", descending=False)
+    )
+    complete = pl.concat([df, word_df], how="horizontal")
+    complete.write_parquet("data/verses.parquet")
+
+
+def build_conjugation():
     A = use("ETCBC/bhsa")
     handles = {}
     A.hoist(handles)
@@ -91,9 +119,24 @@ if not p.exists():
                 F.g_word_utf8.v(i),
             ]
         )
-    conjugation = pd.DataFrame(data, columns=header)
-    conjugation.to_parquet(p)
+    conjugation = pl.DataFrame(data, schema=header)
+    conjugation.to_parquet("data/conjugation.parquet")
 
 
-A = use("ETCBC/bhsa")
-conjugation = pd.read_parquet(p)
+def build_words():
+    A = use("ETCBC/bhsa")
+    handles = {}
+    A.hoist(handles)
+    F = handles["F"]
+    htmls = []
+    for v in F.otype.s("word"):
+        html = A.plain(v, _asString=True, withPassage=False)
+        htmls.append([v, html])
+    df = pl.DataFrame(data=htmls, schema=["id", "html"], orient="row")
+    df.write_parquet("data/words.parquet")
+
+
+if __name__ == "__main__":
+    build_verses()
+    build_conjugation()
+    build_words()

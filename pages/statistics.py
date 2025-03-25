@@ -2,11 +2,11 @@ import dash
 from dash import callback, Output, Input
 from dash.exceptions import PreventUpdate
 from hegram.definitions import definitions
-from hegram.occurences import occurences
 from loguru import logger
 from hebrew import Hebrew
 from typing import Dict, List, Set, Any, Tuple
 import plotly.graph_objects as go
+import polars as pl
 
 import dash_mantine_components as dmc
 from dash import html, dcc, dash_table
@@ -15,6 +15,33 @@ dash.register_page(__name__, path="/statistics")
 
 DataList = List[Dict[str, Any]]
 Data = Dict[str, str | int]
+
+COMMON_BINYANIM = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
+
+
+def binyanim_barchart(radio, roots=None):
+    df = pl.scan_parquet("data/conjugation.parquet").filter(
+        pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
+        & pl.col("Binyan").is_in(COMMON_BINYANIM)
+    )
+    if radio in ["Binyan-Tense", "Tense-Binyan"]:
+        df = (
+            df.select(["Binyan", "Tense"])
+            .collect()
+            .to_struct(name="Struct")
+            .value_counts()
+            .unnest("Struct")
+            .sort("count", descending=True)
+        )
+        if radio == "Binyan-Tense":
+            return df.pivot(["Tense"], index="Binyan", values="count").fill_null(0).to_dicts()
+        else:
+            return df.pivot(["Binyan"], index="Tense", values="count").fill_null(0).to_dicts()
+    elif radio == "Binyan":
+        df = df.select(["Binyan"])
+    elif radio == "Tense":
+        df = df.select(["Tense"])
+    return df.collect().to_series().value_counts(name="Occurences").sort("Occurences", descending=True).to_dicts()
 
 
 @callback(
@@ -67,9 +94,7 @@ def update_barchart_series(radio):
         Input("radiogroup", "value"),
     ],
 )
-def update_binyanim_bar_graph(
-    data: DataList, selected_cells: DataList, radio
-) -> go.Figure:
+def update_binyanim_bar_graph(data: DataList, selected_cells: DataList, radio) -> go.Figure:
     """Trigger figure update on cell selection
 
     Args:
@@ -84,14 +109,14 @@ def update_binyanim_bar_graph(
     """
     logger.info("Triggering table_select callback")
     if selected_cells is None:
-        return occurences.binyanim_bar_graph(radio)
+        return binyanim_barchart(radio)
     roots = set()
     for cell in selected_cells:
         roots |= get_roots_from_cell(data, cell)
     if roots:
         logger.info(roots)
-        return occurences.binyanim_bar_graph(radio, list(roots))
-    return occurences.binyanim_bar_graph(radio)
+        return binyanim_barchart(radio, list(roots))
+    return binyanim_barchart(radio)
 
 
 def get_roots_from_cell(data: DataList, cell: Data) -> Set[str]:
@@ -116,7 +141,6 @@ def get_roots_from_cell(data: DataList, cell: Data) -> Set[str]:
     [
         Output("table", "data"),
         Output("table", "columns"),
-        Output("table", "tooltip_data"),
     ],
     Input("table", "page_current"),
     Input("table", "page_size"),
@@ -138,37 +162,32 @@ def update_table(
     Returns:
         Tuple[DataList, DataList, DataList]: The table data, list of columns, and tooltip data
     """
-    logger.info("sort_by={}", sort_by)
+    df = (
+        pl.scan_parquet("data/conjugation.parquet")
+        .select(["Root", "Binyan"])
+        .collect()
+        .to_struct("Struct")
+        .value_counts()
+        .unnest("Struct")
+        .pivot("Binyan", index="Root", values="count")
+        .fill_null(0)
+        .select(["Root"] + COMMON_BINYANIM)
+        .with_columns(Total=pl.sum_horizontal(COMMON_BINYANIM))
+        .sort("Total", descending=True)
+        .filter(pl.col("Total") > 0)
+    )
     if len(sort_by):
         key = sort_by[0]["column_id"]
         asc = sort_by[0]["direction"] == "asc"
-        _df = (
-            occurences.rbo_frame()
-            .reset_index("Root")
-            .sort_values(by=[key], ascending=asc, inplace=False)
-            .iloc[page_current * page_size : (page_current + 1) * page_size]
-        )
+        df = df.sort(key, descending=not asc)
+
+    if dropdown_values is None:
+        df = df.select(["Root"])
     else:
-        _df = (
-            occurences.rbo_frame()
-            .reset_index("Root")
-            .iloc[page_current * page_size : (page_current + 1) * page_size]
-        )
-    columns = ["Root"]
-    if dropdown_values is not None:
-        columns += dropdown_values
-    tooltip_data = [
-        {"Root": {"value": row["Root"], "type": "markdown"}}
-        for row in _df.to_dict("records")
-    ]
-    tooltip_data = []
-    for row in _df.to_dict("records"):
-        root = Hebrew(row["Root"]).text_only()
-        definition = definitions.get(str(root), [["No definition found"]])
-        val = f"# {root}\n\n"
-        val += "\n\n".join(definition[0])
-        tooltip_data.append({"Root": {"value": val, "type": "markdown"}})
-    return _df.to_dict("records"), [{"name": c, "id": c} for c in columns], tooltip_data
+        df = df.select(["Root"] + dropdown_values)
+
+    rows = df.to_dicts()[page_current * page_size : (page_current + 1) * page_size]
+    return rows, [{"name": c, "id": c} for c in df.columns]
 
 
 @callback(
@@ -203,8 +222,22 @@ def update_table_page_number(page_size: int) -> int:
     Returns:
         int: The total number of pages
     """
-    _df = occurences.rbo_frame()
-    return len(_df) // page_size + int((len(_df) % page_size) != 0)
+    df = (
+        pl.scan_parquet("data/conjugation.parquet")
+        .select(["Root", "Binyan"])
+        .collect()
+        .to_struct("Struct")
+        .value_counts()
+        .unnest("Struct")
+        .pivot("Binyan", index="Root", values="count")
+        .fill_null(0)
+        .select(["Root"] + COMMON_BINYANIM)
+        .with_columns(Total=pl.sum_horizontal(COMMON_BINYANIM))
+        .sort("Total", descending=True)
+        .filter(pl.col("Total") > 0)
+    )
+    nroot = len(df)
+    return nroot // page_size + int((nroot % page_size) != 0)
 
 
 table = dash_table.DataTable(
@@ -235,10 +268,7 @@ table = dash_table.DataTable(
 
 
 dropdown = dmc.MultiSelect(
-    data=[
-        {"value": k, "label": k}
-        for k in ["Total", "Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
-    ],
+    data=[{"value": k, "label": k} for k in ["Total", "Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]],
     value=["Total"],
     id="dropdown",
     mb=10,
@@ -280,23 +310,23 @@ layout = dmc.MantineProvider(
     children=[
         html.Div(
             [
-                html.H1("Verbal Root Statistics"),
+                html.H1("Statistiques sur les racines verbales"),
                 html.P(
-                    "This page gives an insight into the number of occurences of each verbal root in the Hebrew Bible, with a breakdown on binyanim and tenses. There are three components to this page:"
+                    "Vous trouverez ici un aperçu du nombre d'occurrences de chaque racine verbale dans la Bible hébraïque, avec une ventilation selon les binyanim et les temps. Cette page comporte trois volets :"
                 ),
                 dmc.List(
                     [
                         dmc.ListItem(
-                            "A table of all existing verbal roots and their total number of occurences. By selecting a binyan in the dropdown menu, you can add the corresponding column to the table. By clicking the arrows in the column header, you can sort the table by number of occurences for the corresponding binyan. Clicking the arrow in the Root column sorts the roots alphabetically."
+                            "Un tableau de toutes les racines verbales existantes et de leur nombre total d'occurrences. Sélectionnez un binyan dans le menu déroulant ajouter la colonne correspondante au tableau. En cliquant sur les flèches dans l'en-tête de la colonne. vous pouvez trier le tableau par nombre d'occurrences pour le binôme correspondant."
                         ),
                         dmc.ListItem(
-                            "The bar chart shows the repartition of binyan and tense occurences in the Hebrew Bible. By default, it show an aggregation of all verbal root occurences. By selecting one or multiple roots in the table, you can restrict the roots counted in the chart."
+                            "Le diagramme à barres montre la répartition des occurrences de binyan et de temps dans la Bible hébraïque. Par défaut, il montre une agrégation de toutes les occurrences de racines verbales. En sélectionnant une ou plusieurs racines dans le tableau, vous pouvez restreindre les racines prises en compte dans le graphique."
                         ),
                         dmc.ListItem(
                             [
-                                "When a root is selected in the table, a definition section appears below the chart. The definitions are taken from the ",
+                                "Lorsqu'une racine est sélectionnée dans le tableau, une section de définition apparaît sous le graphique. Les définitions sont tirées du ",
                                 html.A(
-                                    "openscripture github repository.",
+                                    "dépot github openscriptures",
                                     href="https://github.com/openscriptures/strongs/",
                                 ),
                             ]

@@ -3,7 +3,6 @@ import dash_mantine_components as dmc
 from dash import html, dash_table, no_update
 import polars as pl
 from bs4 import BeautifulSoup
-from hegram.conjugation import A
 from xml.etree import ElementTree
 from dash import callback, Input, Output, State, dcc
 from dash.exceptions import PreventUpdate
@@ -39,24 +38,25 @@ def convert_html_to_dash(html_code):
     return _convert(et)
 
 
-def get_verse(verse_id, word_id=None):
-    if word_id is not None:
-        html = BeautifulSoup(
-            A.plain(verse_id, highlights={word_id}, _asString=True, withPassage=False),
-            features="html.parser",
-        )
-    else:
-        html = BeautifulSoup(
-            A.plain(verse_id, _asString=True, withPassage=False),
-            features="html.parser",
-        )
+def build_verse(verse_id, word_id):
+    df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
+    word_df = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect()
+    word = BeautifulSoup(word_df.to_dicts()[0]["html"]).find("span").string
+
+    html = BeautifulSoup(df["html"])
+    html.find("span", string=word)["class"].append("hl")
     return convert_html_to_dash(str(html))
 
 
-def passage(element_id: int):
-    section = A.sectionStrFromNode(element_id)
-    book = en_to_fr_books[section.split()[0]]
-    chapter, verse = section.split()[1].split(":")
+def build_word(word_id):
+    word_df = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect().to_dicts()[0]
+    return convert_html_to_dash(word_df["html"])
+
+
+def passage(verse_id: int):
+    df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
+    book = en_to_fr_books[df["book"]]
+    chapter, verse = df["chapter"], df["verse"]
     name = f"{book} {chapter}:{verse}"
     url = verse_to_url(book, int(chapter))
 
@@ -135,9 +135,9 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
         print(sample)
         verse, word = sample["VerseId"], sample["WordId"]
         return (
-            get_verse(verse, word),
-            passage(word),
-            get_verse(word),
+            build_verse(verse, word),
+            passage(verse),
+            build_word(word),
             sample,
             {"display": "block"},
             {"display": "block"},
