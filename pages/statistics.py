@@ -317,7 +317,7 @@ layout = dmc.MantineProvider(
                 dmc.List(
                     [
                         dmc.ListItem(
-                            "Un tableau de toutes les racines verbales existantes et de leur nombre total d'occurrences. Sélectionnez un binyan dans le menu déroulant ajouter la colonne correspondante au tableau. En cliquant sur les flèches dans l'en-tête de la colonne. vous pouvez trier le tableau par nombre d'occurrences pour le binôme correspondant."
+                            "Un tableau de toutes les racines verbales existantes et de leur nombre total d'occurrences. Sélectionnez un binyan dans le menu déroulant ajouter la colonne correspondante au tableau. En cliquant sur les flèches dans l'en-tête de la colonne. Vous pouvez trier le tableau par nombre d'occurrences pour le binôme correspondant."
                         ),
                         dmc.ListItem(
                             "Le diagramme à barres montre la répartition des occurrences de binyan et de temps dans la Bible hébraïque. Par défaut, il montre une agrégation de toutes les occurrences de racines verbales. En sélectionnant une ou plusieurs racines dans le tableau, vous pouvez restreindre les racines prises en compte dans le graphique."
@@ -326,7 +326,7 @@ layout = dmc.MantineProvider(
                             [
                                 "Lorsqu'une racine est sélectionnée dans le tableau, une section de définition apparaît sous le graphique. Les définitions sont tirées du ",
                                 html.A(
-                                    "dépot github openscriptures",
+                                    "dépôt GitHub openscriptures",
                                     href="https://github.com/openscriptures/strongs/",
                                     className="link",
                                 ),
@@ -362,7 +362,7 @@ layout = dmc.MantineProvider(
                             ],
                         ),
                     ],
-                    className="occurence-grid textbox-container",
+                    className="occurrence-grid textbox-container",
                 ),
                 html.Div([definition_markdown], className="textbox-container"),
             ],

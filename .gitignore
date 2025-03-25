@@ -1,6 +1,7 @@
 *.ipynb
 .vscode/*
 data/*
+.DS_store
 
 # Python-generated files
 __pycache__/

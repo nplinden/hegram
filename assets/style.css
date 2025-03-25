@@ -29,7 +29,7 @@ a:link h1 {
 }
 
 @media (width > 1700px) {
-  .occurence-grid {
+  .occurrence-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
   }

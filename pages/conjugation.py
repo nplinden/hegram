@@ -312,7 +312,7 @@ layout = dmc.MantineProvider(
                             dmc.AccordionPanel(
                                 children=[
                                     dmc.NumberInput(
-                                        label="Niveau d'occurence maximum autorisé (e.g. 50 n'autorise que les 50 racines les plus courantes)",
+                                        label="Niveau d'occurrence maximum autorisé (e.g. 50 n'autorise que les 50 racines les plus courantes)",
                                         min=0,
                                         id="root-number",
                                     ),

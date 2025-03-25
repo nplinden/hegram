@@ -35,7 +35,7 @@ layout = dmc.MantineProvider(
         ),
         html.P(
             children=[
-                "Les définitions sont issues du dépot github ",
+                "Les définitions sont issues du dépôt GitHub ",
                 html.A("openscriptures/strongs", href="https://github.com/openscriptures/strongs/", className="link"),
                 ".",
             ]
