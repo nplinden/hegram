@@ -1,11 +1,6 @@
 @font-face {
-  font-family: EzraSILW;
+  font-family: "Ezra SIL";
   src: url(SILEOT.woff);
-}
-
-@font-face {
-  font-family: EzraSILSRW;
-  src: url(SILEOTSR.woff);
 }
 
 body {
