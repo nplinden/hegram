@@ -14,7 +14,7 @@ body {
 .link,
 .link a:visited,
 .link a:link {
-  text-decoration: underline;
+  text-decoration: underline !important;
   text-decoration-color: black;
   font-style: italic;
   color: var(--text-color);
@@ -64,7 +64,6 @@ a:link h1 {
 
 @media (width < 600px) {
   #title {
-    /* font-family: serif; */
     font-size: 1rem;
   }
 }
