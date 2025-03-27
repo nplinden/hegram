@@ -1,5 +1,19 @@
-h1 {
+@font-face {
+  font-family: EzraSILW;
+  src: url(SILEOT.woff);
+}
+
+@font-face {
+  font-family: EzraSILSRW;
+  src: url(SILEOTSR.woff);
+}
+
+body {
   font-family: serif;
+}
+
+.nikkud {
+  font-family: EzraSILSRW, sans-serif;
 }
 
 .link,
@@ -55,7 +69,7 @@ a:link h1 {
 
 @media (width < 600px) {
   #title {
-    font-family: serif;
+    /* font-family: serif; */
     font-size: 1rem;
   }
 }
