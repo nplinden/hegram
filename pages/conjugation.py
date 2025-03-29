@@ -400,7 +400,7 @@ layout = dmc.MantineProvider(
                 color="green",
                 id="solution-alert",
                 style={"display": "none"},
-                styles={"title": {"fontFamily": "serif", "fontSize": "3rem"}, "message": {"fontSize": "1.5rem"}},
+                styles={"title": {"fontFamily": "serif", "fontSize": "3rem"}, "message": {"fontSize": "1rem"}},
             ),
         ],
         className="container",
