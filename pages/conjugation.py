@@ -1,41 +1,17 @@
 import dash
 import dash_mantine_components as dmc
-from dash import html, dash_table, no_update
+from dash import html, no_update
 import polars as pl
 from bs4 import BeautifulSoup
-from xml.etree import ElementTree
 from dash import callback, Input, Output, State, dcc
 from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
 from hegram.mechon_mamre import verse_to_url, en_to_fr_books
 from hegram.data import dropdown_data, en_to_fr
+from hegram.utils import convert_html_to_dash
 
 
 dash.register_page(__name__, path="/conjugation")
-
-
-def convert_html_to_dash(html_code):
-    """Convert standard html to Dash components"""
-
-    def parse_css(css):
-        """Convert a style in ccs format to dictionary accepted by Dash"""
-        return {k: v for style in css.strip(";").split(";") for k, v in [style.split(":")]}
-
-    def _convert(elem):
-        comp = getattr(html, elem.tag.capitalize())
-        children = [_convert(child) for child in elem]
-        if not children:
-            children = elem.text
-        attribs = elem.attrib.copy()
-        if "class" in attribs:
-            attribs["className"] = attribs.pop("class")
-        attribs = {k: (parse_css(v) if k == "style" else v) for k, v in attribs.items()}
-
-        return comp(children=children, **attribs)
-
-    et = ElementTree.fromstring(html_code)
-
-    return _convert(et)
 
 
 def build_verse(verse_id, word_id):

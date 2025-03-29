@@ -2,6 +2,7 @@ import dash
 from dash import callback, Output, Input
 from dash.exceptions import PreventUpdate
 from hegram.definitions import definitions
+from hegram.utils import htmlify, convert_html_to_dash
 from loguru import logger
 from hebrew import Hebrew
 from typing import Dict, List, Set, Any, Tuple
@@ -191,7 +192,7 @@ def update_table(
 
 
 @callback(
-    Output("definition", "children"),
+    Output("definition-div", "children"),
     Input("table", "active_cell"),
     Input("table", "data"),
 )
@@ -204,11 +205,13 @@ def update_definition(active_cell: Data, data: DataList):
 
     root = Hebrew(list(get_roots_from_cell(data, active_cell))[0]).text_only()
     logger.info("root={}", root)
-    definition = definitions.get(str(root), [["No definition found"]])
-
-    val = f"# {root}\n\n"
-    val += "\n\n".join(definition[0])
-    return val
+    definition = definitions.get(str(root), [["No definition found"]])[0]
+    html = ["<div>", f"<h2 class='consonantal definition-title'>{root}</h2>"]
+    for d in definition:
+        html.append(htmlify(d))
+    html.append("</div>")
+    html = "\n".join(html)
+    return convert_html_to_dash(html)
 
 
 @callback(Output("table", "page_count"), Input("table", "page_size"))
@@ -272,13 +275,6 @@ dropdown = dmc.MultiSelect(
     value=["Total"],
     id="dropdown",
     mb=10,
-)
-
-definition_markdown = dcc.Markdown(
-    """
-    # Select a root in the table!
-""",
-    id="definition",
 )
 
 
@@ -369,7 +365,7 @@ layout = dmc.MantineProvider(
                     ],
                     className="occurrence-grid container",
                 ),
-                html.Div([definition_markdown], className="container"),
+                html.Div([], className="container", id="definition-div"),
             ],
         )
     ]
