@@ -4,7 +4,7 @@
 }
 
 body {
-  font-family: serif;
+  font-family: sans-serif;
 }
 
 .nikkud {
@@ -14,8 +14,8 @@ body {
 .link,
 .link a:visited,
 .link a:link {
-  text-decoration: underline !important;
-  text-decoration-color: black;
+  text-decoration: underline;
+  text-decoration-color: black !important;
   font-style: italic;
   color: var(--text-color);
 }
@@ -23,6 +23,10 @@ body {
 a h1,
 a:visited h1,
 a:link h1 {
+  font-family: serif;
+  font-weight: bold;
+  text-decoration: underline;
+  text-decoration-color: black !important;
   color: var(--text-color);
 }
 
