@@ -78,6 +78,7 @@ def passage(verse_id: int):
     Output("fullverse-div", "style"),
     Output("solution-alert", "style", allow_duplicate=True),
     Output("notification", "children"),
+    Output("accordion", "value"),
     Input("clause-btn", "n_clicks"),
     State("root-number", "value"),
     State("conjugation-book-dropdown", "value"),
@@ -131,6 +132,7 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
                     icon="material-symbols:error-outline-rounded", color=dmc.DEFAULT_THEME["colors"]["dark"][6]
                 ),
             ),
+            "",
         )
     else:
         sample = filtered.sample(n=1).to_dicts()[0]
@@ -145,6 +147,7 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
             {"display": "block"},
             {"display": "none"},
             no_update,
+            "",
         )
 
 
@@ -298,13 +301,6 @@ layout = dmc.MantineProvider(
                         ],
                         value="introduction",
                     ),
-                ],
-                mb=10,
-                value="introduction",
-            ),
-            dmc.Accordion(
-                disableChevronRotation=False,
-                children=[
                     dmc.AccordionItem(
                         [
                             dmc.AccordionControl(
@@ -335,6 +331,8 @@ layout = dmc.MantineProvider(
                     ),
                 ],
                 mb=10,
+                value="introduction",
+                id="accordion",
             ),
             dmc.Flex(
                 [
