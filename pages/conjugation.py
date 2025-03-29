@@ -76,7 +76,7 @@ def passage(verse_id: int):
     Output("solution-storage", "data"),
     Output("analyze-div", "style"),
     Output("fullverse-div", "style"),
-    Output("solution-datatable-div", "style", allow_duplicate=True),
+    Output("solution-alert", "style", allow_duplicate=True),
     Output("notification", "children"),
     Input("clause-btn", "n_clicks"),
     State("root-number", "value"),
@@ -149,9 +149,9 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
 
 
 @callback(
-    Output("solution-datatable", "data"),
-    Output("solution-datatable", "columns"),
-    Output("solution-datatable-div", "style", allow_duplicate=True),
+    Output("solution-alert", "children"),
+    Output("solution-alert", "title"),
+    Output("solution-alert", "style", allow_duplicate=True),
     Input("solution-btn", "n_clicks"),
     State("solution-storage", "data"),
     prevent_initial_call=True,
@@ -174,11 +174,17 @@ def show_solution(n_clicks, data):
         schema=["Racine", "Binyan", "Temps", "Personne", "Genre", "Nombre"],
         orient="row",
     )
-    return [
-        df.to_dicts(),
-        [{"name": c, "id": c} for c in df.columns],
-        {"display": "block"},
-    ]
+
+    root = data["Root"]
+    tense = en_to_fr["Tense"][data["Tense"]]
+    binyan = data["Binyan"]
+    number = {"Singular": "S", "Plural": "P"}.get(data["Number"], "")
+    person = {"1": "1", "2": "2", "3": "3"}.get(data.get("Person", ""), "")
+    gender = {"M": "M", "F": "F"}.get(data.get("Gender", ""), "")
+    rest = f"{person}{gender}{number}"
+
+    solution = [f"{binyan} {tense} {rest}"]
+    return [solution, root, {"display": "block"}]
 
 
 def data_from_list(items):
@@ -364,11 +370,21 @@ layout = dmc.MantineProvider(
             html.Div(children=[], id="clause-div", style={}),
             dcc.Store(id="solution-storage", storage_type="local"),
             html.Div(
-                dash_table.DataTable(
-                    id="solution-datatable", style_cell={"fontSize": "2.5rem", "font-family": "serif"}
-                ),
-                id="solution-datatable-div",
+                [
+                    html.P(children=[], id="solution-p-root", style={"font-family": "serif"}),
+                    html.P(
+                        children=[],
+                        id="solution-p-rest",
+                    ),
+                ]
+            ),
+            dmc.Alert(
+                "",
+                title="",
+                color="green",
+                id="solution-alert",
                 style={"display": "none"},
+                styles={"title": {"font-family": "serif", "font-size": "2rem"}, "message": {"font-size": "1.5rem"}},
             ),
         ],
         className="container",
