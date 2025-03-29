@@ -299,7 +299,7 @@ chart = dmc.BarChart(
     type="stacked",
     barProps={"isAnimationActive": True},
     xAxisLabel="Binyan",
-    yAxisLabel="Occurences",
+    orientation="vertical",
     id="mantine-bargraph",
     className="mantine-barchart",
     px=25,
@@ -367,9 +367,9 @@ layout = dmc.MantineProvider(
                             ],
                         ),
                     ],
-                    className="occurrence-grid wide-container",
+                    className="occurrence-grid container",
                 ),
-                html.Div([definition_markdown], className="wide-container"),
+                html.Div([definition_markdown], className="container"),
             ],
         )
     ]

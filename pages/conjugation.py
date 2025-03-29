@@ -39,18 +39,22 @@ def convert_html_to_dash(html_code):
 
 
 def build_verse(verse_id, word_id):
+    print(verse_id, word_id)
     df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
     word_df = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect()
     word = BeautifulSoup(word_df.to_dicts()[0]["html"], features="html.parser").find("span").string
 
     html = BeautifulSoup(df["html"], features="html.parser")
     html.find("span", string=word)["class"].append("hl")
+    html.find("div")["class"] = ["fullverse"]
     return convert_html_to_dash(str(html))
 
 
 def build_word(word_id):
     word_df = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect().to_dicts()[0]
-    return convert_html_to_dash(word_df["html"])
+    html = BeautifulSoup(word_df["html"], features="html.parser")
+    html.find("div")["class"] = ["singleword"]
+    return convert_html_to_dash(str(html))
 
 
 def passage(verse_id: int):
@@ -65,7 +69,7 @@ def passage(verse_id: int):
         children=[name],
         href=url,
         target="_blank",
-        className="manual-link",
+        style={"color": "black", "font-style": "italic"},
     )
 
 
@@ -365,11 +369,11 @@ layout = dmc.MantineProvider(
                 style={"display": "none"},
                 id="fullverse-div",
             ),
-            html.Div(children=[], id="clause-div", style={}),
+            html.Div(children=[], id="clause-div", className="fullverse"),
             dcc.Store(id="solution-storage", storage_type="local"),
             html.Div(
                 [
-                    html.P(children=[], id="solution-p-root", style={"font-family": "serif"}),
+                    html.P(children=[], id="solution-p-root", style={"fontFamily": "serif"}),
                     html.P(
                         children=[],
                         id="solution-p-rest",
@@ -382,7 +386,7 @@ layout = dmc.MantineProvider(
                 color="green",
                 id="solution-alert",
                 style={"display": "none"},
-                styles={"title": {"font-family": "serif", "font-size": "2rem"}, "message": {"font-size": "1.5rem"}},
+                styles={"title": {"fontFamily": "serif", "fontSize": "2rem"}, "message": {"fontSize": "1.5rem"}},
             ),
         ],
         className="container",

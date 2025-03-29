@@ -1,3 +1,10 @@
+:root {
+  --fs-xl: 5rem;
+  --fs-600: 1.5rem;
+  --fs-500: 1.25rem;
+  --fs-400: 1rem;
+}
+
 @font-face {
   font-family: "Ezra SIL";
   src: url(SILEOT.woff);
@@ -7,8 +14,8 @@ body {
   font-family: sans-serif;
 }
 
-.nikkud {
-  font-family: EzraSILSRW, sans-serif;
+.consonantal {
+  font-family: serif;
 }
 
 .link,
@@ -17,7 +24,7 @@ body {
   text-decoration: underline;
   text-decoration-color: black !important;
   font-style: italic;
-  color: var(--text-color);
+  color: black;
 }
 
 a h1,
@@ -27,42 +34,18 @@ a:link h1 {
   font-weight: bold;
   text-decoration: underline;
   text-decoration-color: black !important;
-  color: var(--text-color);
-}
-
-.textbox-container {
-  padding: 40px;
-  margin: 16px 0;
-  border-radius: 8px;
-  border-style: solid;
-  border-width: 1px;
+  color: black;
 }
 
 .container {
-  margin-inline: 15%;
-}
-
-.wide-container {
-  padding: 10px;
-  margin-block: 10px;
   margin-inline: 5%;
-  border-radius: 8px;
-  border-style: solid;
-  border-width: 1px;
+  margin-block-end: 10px;
 }
 
-@media (width > 1700px) {
+@media (width > 1200px) {
   .occurrence-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-  }
-  .wide-container {
-    padding: 10px;
-    margin-block: 10px;
-    margin-inline: 15%;
-    border-radius: 8px;
-    border-style: solid;
-    border-width: 1px;
   }
 }
 
@@ -72,45 +55,14 @@ a:link h1 {
   }
 }
 
-.graph {
-  inline-size: auto;
-  padding-inline: 10px;
-}
-
-.manual-link {
-  color: black;
-  /* font-weight: bold; */
-  font-style: italic;
-}
-
-.hidden {
-  display: none;
-}
-
-.conjugation-container {
-  margin-inline: 5%;
-}
-
-.conjugation-table {
-  display: block;
-  font-family: SBLHebrew;
+.fullverse {
+  font-family: "Ezra SIL", sans-serif;
   font-size: 2rem;
-}
-.conjugation-table td {
-  direction: rtl;
-}
-.conjugation-table th {
-  text-align: right;
+  direction: rtl !important;
 }
 
-@media (width > 2500px) {
-  .conjugation-table {
-    font-size: 2.9rem;
-  }
-}
-
-@media (width < 1400px) {
-  .conjugation-table {
-    font-size: 1rem;
-  }
+.singleword {
+  font-family: "Ezra SIL", sans-serif;
+  font-size: 3rem;
+  direction: rtl !important;
 }
