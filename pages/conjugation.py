@@ -7,8 +7,13 @@ from dash import callback, Input, Output, State, dcc
 from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
 from hegram.mechon_mamre import verse_to_url, en_to_fr_books
+
 from hegram.data import dropdown_data, en_to_fr
-from hegram.utils import convert_html_to_dash
+from hegram.definitions import definitions
+from hegram.utils import convert_html_to_dash, htmlify
+from hebrew import Hebrew
+
+COMMON_BINYANIM = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
 
 
 dash.register_page(__name__, path="/conjugation")
@@ -131,6 +136,21 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
         )
 
 
+def barchart(root):
+    df = pl.scan_parquet("data/conjugation.parquet").filter(
+        (pl.col("Root") == root) & (pl.col("Binyan").is_in(COMMON_BINYANIM))
+    )
+    df = (
+        df.select(["Binyan", "Tense"])
+        .collect()
+        .to_struct(name="Struct")
+        .value_counts()
+        .unnest("Struct")
+        .sort("count", descending=True)
+    )
+    return df.pivot(["Tense"], index="Binyan", values="count").fill_null(0).to_dicts()
+
+
 @callback(
     Output("solution-alert", "children"),
     Output("solution-alert", "title"),
@@ -143,20 +163,6 @@ def show_solution(n_clicks, data):
     print(data)
     if not n_clicks:
         raise PreventUpdate
-    df = pl.DataFrame(
-        data=[
-            [
-                data["Root"],
-                data["Binyan"],
-                en_to_fr["Tense"][data["Tense"]],
-                en_to_fr["Person"].get(data["Person"], "N/A"),
-                en_to_fr["Gender"].get(data["Gender"], "N/A"),
-                en_to_fr["Number"].get(data["Number"], "N/A"),
-            ]
-        ],
-        schema=["Racine", "Binyan", "Temps", "Personne", "Genre", "Nombre"],
-        orient="row",
-    )
 
     root = data["Root"]
     tense = en_to_fr["Tense"][data["Tense"]]
@@ -166,8 +172,39 @@ def show_solution(n_clicks, data):
     gender = {"M": "M", "F": "F"}.get(data.get("Gender", ""), "")
     rest = f"{person}{gender}{number}"
 
-    solution = [f"{binyan} {tense} {rest}"]
-    return [solution, root, {"display": "block"}]
+    root_nodiacr = Hebrew(root).text_only()
+    definition = definitions.get(str(root_nodiacr), [["No definition found"]])[0]
+    html = ["<div>", "<p>Définition :</p>"]
+    for d in definition:
+        html.append(htmlify(d))
+    html.append("</div>")
+    html = "\n".join(html)
+
+    solution = f"{binyan} {tense} {rest}"
+
+    chart = dmc.BarChart(
+        h=450,
+        dataKey="Binyan",
+        data=barchart(root),
+        series=[
+            {"name": "Qatal", "color": "red.6"},
+            {"name": "Yiqtol", "color": "green.6"},
+            {"name": "Wayyiqtol", "color": "indigo.6"},
+            {"name": "Imperative", "color": "grape.6"},
+            {"name": "Infinitive (abslute)", "color": "teal.6"},
+            {"name": "Infinitive (construct)", "color": "yellow.6"},
+            {"name": "Participle", "color": "pink.6"},
+            {"name": "Participle (passive)", "color": "lime.6"},
+        ],
+        type="stacked",
+        barProps={"isAnimationActive": True},
+        xAxisLabel="Binyan",
+        orientation="vertical",
+        id="solution-bargraph",
+        className="mantine-barchart",
+        px=25,
+    )
+    return [solution, convert_html_to_dash(html), chart], root, {"display": "block"}
 
 
 def data_from_list(items):
@@ -250,6 +287,7 @@ solution_body = dmc.TableTbody(
     ],
     id="solution-body",
 )
+
 
 layout = dmc.MantineProvider(
     dash.html.Div(
@@ -362,7 +400,7 @@ layout = dmc.MantineProvider(
                 color="green",
                 id="solution-alert",
                 style={"display": "none"},
-                styles={"title": {"fontFamily": "serif", "fontSize": "2rem"}, "message": {"fontSize": "1.5rem"}},
+                styles={"title": {"fontFamily": "serif", "fontSize": "3rem"}, "message": {"fontSize": "1.5rem"}},
             ),
         ],
         className="container",
