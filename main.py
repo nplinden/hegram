@@ -73,6 +73,7 @@ app.layout = dmc.MantineProvider(
                     h="100%",
                     px="md",
                 ),
+                className="mantine-header",
             ),
             dmc.NotificationProvider(),
             html.Div(id="notification"),
@@ -201,6 +202,7 @@ app.layout = dmc.MantineProvider(
         ],
         padding="md",
         header={"height": 92.48},
+        # header={"height": "10%"},
         navbar={
             "width": 300,
             "breakpoint": "sm",

@@ -192,7 +192,8 @@ def update_table(
 
 
 @callback(
-    Output("definition-div", "children"),
+    Output("definition-alert", "children"),
+    Output("definition-alert", "style"),
     Input("table", "active_cell"),
     Input("table", "data"),
 )
@@ -211,7 +212,7 @@ def update_definition(active_cell: Data, data: DataList):
         html.append(htmlify(d))
     html.append("</div>")
     html = "\n".join(html)
-    return convert_html_to_dash(html)
+    return convert_html_to_dash(html), {"display": "block"}
 
 
 @callback(Output("table", "page_count"), Input("table", "page_size"))
@@ -366,6 +367,15 @@ layout = dmc.MantineProvider(
                     className="occurrence-grid container",
                 ),
                 html.Div([], className="container", id="definition-div"),
+                dmc.Alert(
+                    "",
+                    title="",
+                    color="gray",
+                    id="definition-alert",
+                    style={"display": "none"},
+                    styles={"title": {"fontFamily": "serif", "fontSize": "3rem"}, "message": {"fontSize": "1rem"}},
+                    className="container",
+                ),
             ],
         )
     ]
