@@ -73,7 +73,6 @@ app.layout = dmc.MantineProvider(
                     h="100%",
                     px="md",
                 ),
-                className="mantine-header",
             ),
             dmc.NotificationProvider(),
             html.Div(id="notification"),
