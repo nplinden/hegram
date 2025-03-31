@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 dropdown_data = {
     "Book": [
         {
@@ -105,6 +107,22 @@ dropdown_data = {
         {"value": "Plural", "label": "Pluriel"},
     ],
 }
+
+
+answer_data = [
+    {"label": "1S", "value": "1S"},
+    {"label": "2MS", "value": "2MS"},
+    {"label": "2FS", "value": "2FS"},
+    {"label": "3MS", "value": "3MS"},
+    {"label": "3FS", "value": "3FS"},
+    {"label": "1P", "value": "1P"},
+    {"label": "2MP", "value": "2MP"},
+    {"label": "2FP", "value": "2FP"},
+    {"label": "3P", "value": "3P"},
+    {"label": "3MP", "value": "3MP"},
+    {"label": "3FP", "value": "3FP"},
+    {"label": "", "value": ""},
+]
 
 en_to_fr = {
     "Tense": {

@@ -35,7 +35,7 @@ def char_to_ordinal(ch: str):
 def strong_to_markdown(definition):
     full = ""
     for line in definition:
-        print(line)
+        # print(line)
         try:
             level = re.match("(^[1-9a-z]+)\\)", line).groups()[0]
         except AttributeError:

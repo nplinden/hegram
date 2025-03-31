@@ -8,7 +8,7 @@ from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
 from hegram.mechon_mamre import verse_to_url, en_to_fr_books
 
-from hegram.data import dropdown_data, en_to_fr
+from hegram.data import dropdown_data, en_to_fr, answer_data
 from hegram.definitions import definitions
 from hegram.utils import convert_html_to_dash, htmlify
 from hebrew import Hebrew
@@ -20,7 +20,7 @@ dash.register_page(__name__, path="/conjugation")
 
 
 def build_verse(verse_id, word_id):
-    print(verse_id, word_id)
+    # print(verse_id, word_id)
     df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
     word_df = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect()
     word = BeautifulSoup(word_df.to_dicts()[0]["html"], features="html.parser").find("span").string
@@ -45,7 +45,7 @@ def passage(verse_id: int):
     name = f"{book} {chapter}:{verse}"
     url = verse_to_url(book, int(chapter))
 
-    print(name, url)
+    # print(name, url)
     return html.A(
         children=[name],
         href=url,
@@ -64,6 +64,7 @@ def passage(verse_id: int):
     Output("solution-alert", "style", allow_duplicate=True),
     Output("notification", "children"),
     Output("accordion", "value"),
+    Output("answer-div", "style"),
     Input("clause-btn", "n_clicks"),
     State("root-number", "value"),
     State("conjugation-book-dropdown", "value"),
@@ -118,10 +119,11 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
                 ),
             ),
             "",
+            no_update,
         )
     else:
         sample = filtered.sample(n=1).to_dicts()[0]
-        print(sample)
+        # print(sample)
         verse, word = sample["VerseId"], sample["WordId"]
         return (
             build_verse(verse, word),
@@ -133,6 +135,7 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
             {"display": "none"},
             no_update,
             "",
+            {"display": "flex"},
         )
 
 
@@ -155,12 +158,16 @@ def barchart(root):
     Output("solution-alert", "children"),
     Output("solution-alert", "title"),
     Output("solution-alert", "style", allow_duplicate=True),
+    Output("solution-alert", "color"),
     Input("solution-btn", "n_clicks"),
     State("solution-storage", "data"),
+    State("root-answer", "value"),
+    State("binyan-answer", "value"),
+    State("tense-answer", "value"),
+    State("person-answer", "value"),
     prevent_initial_call=True,
 )
-def show_solution(n_clicks, data):
-    print(data)
+def show_solution(n_clicks, data, root_answer, binyan_answer, tense_answer, person_answer):
     if not n_clicks:
         raise PreventUpdate
 
@@ -204,11 +211,31 @@ def show_solution(n_clicks, data):
         className="mantine-barchart",
         px=25,
     )
-    return [solution, convert_html_to_dash(html), chart], root, {"display": "block"}
+
+    results = True
+    if binyan_answer is None or binyan_answer != binyan:
+        results = False
+    if root_answer is None or root_answer != root:
+        results = False
+    if tense_answer is None or tense_answer != data["Tense"]:
+        results = False
+    if person_answer is None:
+        person_answer = ""
+    if person_answer != rest:
+        results = False
+
+    color = "green" if results else "red"
+    return [solution, convert_html_to_dash(html), chart], root, {"display": "block"}, color
 
 
 def data_from_list(items):
     return [{"value": k, "label": k} for k in items]
+
+
+def get_root_select_data():
+    roots = pl.scan_parquet("data/conjugation.parquet").select(["Root"]).unique().sort(["Root"]).collect().to_series()
+    data = [{"label": v, "value": v} for v in roots]
+    return data
 
 
 book_select = dmc.MultiSelect(
@@ -355,7 +382,6 @@ layout = dmc.MantineProvider(
             dmc.Flex(
                 [
                     dmc.Button("Trouver un verbe", id="clause-btn", color=dmc.DEFAULT_THEME["colors"]["dark"][6]),
-                    dmc.Button("Afficher la solution", id="solution-btn", color=dmc.DEFAULT_THEME["colors"]["dark"][6]),
                 ],
                 direction={"base": "column", "sm": "row"},
                 gap={"base": "sm", "sm": "lg"},
@@ -383,7 +409,28 @@ layout = dmc.MantineProvider(
                 style={"display": "none"},
                 id="fullverse-div",
             ),
-            html.Div(children=[], id="clause-div", className="fullverse"),
+            dmc.Flex(children=[], id="clause-div", className="fullverse", mb=10),
+            dmc.Flex(
+                children=[
+                    dmc.Select(
+                        placeholder="Racine", value=None, data=get_root_select_data(), searchable=True, id="root-answer"
+                    ),
+                    dmc.Select(placeholder="Binyan", value=None, data=dropdown_data["Binyan"], id="binyan-answer"),
+                    dmc.Select(placeholder="Temps", value=None, data=dropdown_data["Tense"], id="tense-answer"),
+                    dmc.Select(placeholder="Personne", value=None, data=answer_data, id="person-answer"),
+                    dmc.Button(
+                        "Ok",
+                        id="solution-btn",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                    ),
+                ],
+                style={"display": "none"},
+                direction={"base": "column", "sm": "row"},
+                gap={"base": "sm", "sm": "lg"},
+                justify={"sm": "center"},
+                mb=10,
+                id="answer-div",
+            ),
             dcc.Store(id="solution-storage", storage_type="local"),
             html.Div(
                 [
@@ -397,7 +444,7 @@ layout = dmc.MantineProvider(
             dmc.Alert(
                 "",
                 title="",
-                color="green",
+                color="red",
                 id="solution-alert",
                 style={"display": "none"},
                 styles={"title": {"fontFamily": "serif", "fontSize": "3rem"}, "message": {"fontSize": "1rem"}},

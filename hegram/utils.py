@@ -43,7 +43,6 @@ def convert_html_to_dash(html_code):
 
         return comp(children=children, **attribs)
 
-    print(html_code)
     et = ElementTree.fromstring(html_code)
 
     return _convert(et)
