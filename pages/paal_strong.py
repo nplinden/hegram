@@ -9,7 +9,8 @@ dash.register_page(__name__, path="/paal_strong")
 accompli = pd.DataFrame(
     {
         "Personne": ["1S", "2MS", "2FS", "3MS", "3FS", "1P", "2MP", "2FP", "3MP", "3FS"],
-        "Accompli": ["שָׁמַרְתִּי", "שָׁמַרְתָּ", "שָׁמַרְתְּ", "שָׁמַר", "שָׁמְרָה", "שָׁמַרְנוּ", "שָׁמַרְתֶּם", "שָׁמַרְתֶּן", "שָׁמְרוּ", "שָׁמְרוּ"],
+        "Accompli": ["שָׁמַרְתִּי", "שָׁמַרְתָּ", "שָׁמַרְתְּ", "שָׁמַר", "שָׁמְרָה", "שָׁמַרְנוּ", "שָׁמַרְתֶּם",
+                     "שָׁמַרְתֶּן", "שָׁמְרוּ", "שָׁמְרוּ"],
     }
 )
 inaccompli = pd.DataFrame(
@@ -96,7 +97,7 @@ layout = dmc.MantineProvider(
         dash.html.Div(
             children=[
                 dash.html.H1(
-                    "Les verbes forts au paal",
+                    "Les verbes forts au paal: שׁמר",
                 ),
                 dmc.Button("Télécharger en pdf", color="black", mb=10, id="button-paal-strong"),
                 dcc.Download(id="download-paal-strong"),
