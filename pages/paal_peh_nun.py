@@ -17,10 +17,8 @@ accompli = pd.DataFrame(
 inaccompli = pd.DataFrame(
     {
         "Personne": ["1S", "2MS", "2FS", "3MS", "3FS", "1P", "2MP", "2FP", "3MP", "3FS"],
-        "Inaccompli": [
-            "אֶפֹּל", "תִּפֹּל", "תִּפְּלִי", "יִפֹּל", "תִּפֹּל", "נִפֹּל", "תִּפְּלוּ", "תִּפֹּלְנָה", "יִפְּלוּ",
-            "תִּפֹּלְנָה"
-        ],
+        "Inaccompli": ["אֶפֹּל", "תִּפֹּל", "תִּפְּלִי", "יִפֹּל", "תִּפֹּל", "נִפֹּל", "תִּפְּלוּ", "תִּפֹּלְנָה",
+                       "יִפְּלוּ", "תִּפֹּלְנָה"],
     }
 )
 
@@ -50,9 +48,7 @@ participe = pd.DataFrame(
 
 absolu = pd.DataFrame(
     {
-        "Infinitif absolu": [
-            "נָפוֹל"
-        ],
+        "Infinitif absolu": ["נָפוֹל"],
     }
 )
 
@@ -77,22 +73,12 @@ style = {
     ],
 }
 
-
-@callback(
-    Output("download-paal-peh-nun", "data"),
-    Input("button-paal-peh-nun", "n_clicks"),
-    prevent_initial_call=True,
-)
-def func(n_clicks):
-    return dcc.send_file("assets/paal_peh_nun.svg")
-
-
 layout = dmc.MantineProvider(
     [
         dash.html.Div(
             children=[
                 dash.html.H1(
-                    "Les verbes פ’’נ au paal",
+                    "Un verbe פ’’נ au paal : נפל",
                 ),
                 dmc.Button("Télécharger en pdf", color="black", mb=10, id="button-paal-peh-nun"),
                 dcc.Download(id="download-paal-peh-nun"),
@@ -135,3 +121,12 @@ layout = dmc.MantineProvider(
         )
     ]
 )
+
+
+@callback(
+    Output("download-paal-peh-nun", "data"),
+    Input("button-paal-peh-nun", "n_clicks"),
+    prevent_initial_call=True,
+)
+def func(n_clicks):
+    return dcc.send_file("assets/paal_peh_nun.svg")

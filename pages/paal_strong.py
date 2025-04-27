@@ -9,8 +9,7 @@ dash.register_page(__name__, path="/paal_strong")
 accompli = pd.DataFrame(
     {
         "Personne": ["1S", "2MS", "2FS", "3MS", "3FS", "1P", "2MP", "2FP", "3MP", "3FS"],
-        "Accompli": ["שָׁמַרְתִּי", "שָׁמַרְתָּ", "שָׁמַרְתְּ", "שָׁמַר", "שָׁמְרָה", "שָׁמַרְנוּ", "שָׁמַרְתֶּם",
-                     "שָׁמַרְתֶּן", "שָׁמְרוּ", "שָׁמְרוּ"],
+        "Accompli": ["שָׁמַרְתִּי", "שָׁמַרְתָּ", "שָׁמַרְתְּ", "שָׁמַר", "שָׁמְרָה", "שָׁמַרְנוּ", "שָׁמַרְתֶּם", "שָׁמַרְתֶּן", "שָׁמְרוּ", "שָׁמְרוּ"],
     }
 )
 inaccompli = pd.DataFrame(
@@ -82,22 +81,12 @@ style = {
     ],
 }
 
-
-@callback(
-    Output("download-paal-strong", "data"),
-    Input("button-paal-strong", "n_clicks"),
-    prevent_initial_call=True,
-)
-def func(n_clicks):
-    return dcc.send_file("assets/paal_strong.svg")
-
-
 layout = dmc.MantineProvider(
     [
         dash.html.Div(
             children=[
                 dash.html.H1(
-                    "Les verbes forts au paal: שׁמר",
+                    "Un verbe fort au paal: שׁמר",
                 ),
                 dmc.Button("Télécharger en pdf", color="black", mb=10, id="button-paal-strong"),
                 dcc.Download(id="download-paal-strong"),
@@ -140,3 +129,12 @@ layout = dmc.MantineProvider(
         )
     ]
 )
+
+
+@callback(
+    Output("download-paal-strong", "data"),
+    Input("button-paal-strong", "n_clicks"),
+    prevent_initial_call=True,
+)
+def func(n_clicks):
+    return dcc.send_file("assets/paal_strong.svg")
