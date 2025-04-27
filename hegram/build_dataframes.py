@@ -120,7 +120,7 @@ def build_conjugation():
             ]
         )
     conjugation = pl.DataFrame(data, schema=header)
-    conjugation.to_parquet("data/conjugation.parquet")
+    conjugation.write_parquet("data/conjugation.parquet")
 
 
 def build_words():

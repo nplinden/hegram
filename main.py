@@ -235,4 +235,4 @@ if __name__ == "__main__":
             dev_tools_hot_reload=True,
         )
     else:
-        app.run_server(port=7777, host="0.0.0.0")
+        app.run(port=7777, host="0.0.0.0")
