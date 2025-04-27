@@ -26,6 +26,18 @@ class Entry:
 
 
 def char_to_ordinal(ch: str):
+    """
+    Converts a character to its corresponding ordinal value, where digits are
+    converted to their integer form and alphabetic characters are converted
+    to their positional value in the alphabet (a=1, b=2, ..., z=26).
+
+    Args:
+        ch (str): Input character. Can be a digit or an alphabetic character.
+
+    Returns:
+        int: The integer equivalent of the input character - either the digit
+        itself or the positional value in the alphabet for alphabetic input.
+    """
     if ch.isdigit():
         return int(ch)
     else:
