@@ -50,7 +50,6 @@ buttons = [
     dmc.Button("Support", variant="subtle", color="gray"),
 ]
 
-
 app.layout = dmc.MantineProvider(
     dmc.AppShell(
         children=[
@@ -93,7 +92,7 @@ app.layout = dmc.MantineProvider(
                         leftSection=DashIconify(icon="material-symbols:exercise", height=16),
                     ),
                     dmc.NavLink(
-                        label="Ressources",
+                        label="Conjugaison",
                         color="black",
                         leftSection=DashIconify(icon="material-symbols:book-ribbon", height=16),
                         childrenOffset=28,
@@ -111,7 +110,7 @@ app.layout = dmc.MantineProvider(
                                         },
                                     ),
                                     dmc.NavLink(
-                                        label="פ’’נ Verb",
+                                        label="Verbe פ’’נ",
                                         href=page_registry["pages.paal_peh_nun"]["relative_path"],
                                         id={
                                             "type": "navlink",
@@ -119,7 +118,7 @@ app.layout = dmc.MantineProvider(
                                         },
                                     ),
                                     dmc.NavLink(
-                                        label="פ’’יו Verb",
+                                        label="Verbe פ’’יו",
                                         href=page_registry["pages.paal_peh_yodvav"]["relative_path"],
                                         id={
                                             "type": "navlink",
@@ -155,7 +154,7 @@ app.layout = dmc.MantineProvider(
                                         },
                                     ),
                                     dmc.NavLink(
-                                        label="פ’’יו",
+                                        label="Verbe פ’’יו",
                                         href=page_registry["pages.niphal_peh_yodvav"]["relative_path"],
                                         id={
                                             "type": "navlink",
