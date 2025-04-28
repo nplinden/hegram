@@ -59,7 +59,7 @@ layout = dmc.MantineProvider(
         dash.html.Div(
             children=[
                 dash.html.H1(
-                    "Un verbe fort au pual: דבר",
+                    "Un verbe fort au pual: ילד",
                 ),
                 dmc.Button("Télécharger en pdf", color="black", mb=10, id="button-pual-strong"),
                 dcc.Download(id="download-pual-strong"),
