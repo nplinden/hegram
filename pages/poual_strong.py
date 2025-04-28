@@ -5,7 +5,7 @@ from dash.dash_table import DataTable
 from dash import dcc, Input, Output, callback
 from pages.datatable_style import style
 
-dash.register_page(__name__, path="/pual_strong")
+dash.register_page(__name__, path="/poual_strong")
 
 accompli = pd.DataFrame(
     {
@@ -59,10 +59,10 @@ layout = dmc.MantineProvider(
         dash.html.Div(
             children=[
                 dash.html.H1(
-                    "Un verbe fort au pual: ילד",
+                    "Un verbe fort au poual: ילד",
                 ),
-                dmc.Button("Télécharger en pdf", color="black", mb=10, id="button-pual-strong"),
-                dcc.Download(id="download-pual-strong"),
+                dmc.Button("Télécharger en pdf", color="black", mb=10, id="button-poual-strong"),
+                dcc.Download(id="download-poual-strong"),
                 dash.html.Div(
                     [
                         DataTable(
@@ -90,9 +90,9 @@ layout = dmc.MantineProvider(
 
 
 @callback(
-    Output("download-pual-strong", "data"),
-    Input("button-pual-strong", "n_clicks"),
+    Output("download-poual-strong", "data"),
+    Input("button-poual-strong", "n_clicks"),
     prevent_initial_call=True,
 )
 def func(n_clicks):
-    return dcc.send_file("assets/pual_strong.svg")
+    return dcc.send_file("assets/poual_strong.svg")
