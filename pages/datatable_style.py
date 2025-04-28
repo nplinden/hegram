@@ -9,6 +9,7 @@ style = {
         "font-size": "1.8rem",
         "direction": "rtl",
         "userSelect": "text",
+        'whiteSpace': 'pre-line'
     },
     "style_header": {"backgroundColor": "#f2f2f2", "fontWeight": "bold"},
     "cell_selectable": False,
