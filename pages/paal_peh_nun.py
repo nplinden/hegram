@@ -3,22 +3,21 @@ import dash_mantine_components as dmc
 import pandas as pd
 from dash.dash_table import DataTable
 from dash import dcc, Input, Output, callback
+from pages.datatable_style import style
 
 dash.register_page(__name__, path="/paal_peh_nun")
 
 accompli = pd.DataFrame(
     {
         "Personne": ["1S", "2MS", "2FS", "3MS", "3FS", "1P", "2MP", "2FP", "3M"],
-        "Accompli": ["נָפַ֫לְתִּי", "נָפַ֫לְתָּ", "נָפַלְתְּ", "נָפַל", "נָֽפְלָה", "נָפַ֫לְנוּ", "נְפַלְתֶּם",
-                     "נְפַלְתֶּן", "נָֽפְלוּ"],
+        "Accompli": ["נָפַ֫לְתִּי", "נָפַ֫לְתָּ", "נָפַלְתְּ", "נָפַל", "נָֽפְלָה", "נָפַ֫לְנוּ", "נְפַלְתֶּם", "נְפַלְתֶּן", "נָֽפְלוּ"],
     }
 )
 
 inaccompli = pd.DataFrame(
     {
         "Personne": ["1S", "2MS", "2FS", "3MS", "3FS", "1P", "2MP", "2FP", "3MP", "3FS"],
-        "Inaccompli": ["אֶפֹּל", "תִּפֹּל", "תִּפְּלִי", "יִפֹּל", "תִּפֹּל", "נִפֹּל", "תִּפְּלוּ", "תִּפֹּלְנָה",
-                       "יִפְּלוּ", "תִּפֹּלְנָה"],
+        "Inaccompli": ["אֶפֹּל", "תִּפֹּל", "תִּפְּלִי", "יִפֹּל", "תִּפֹּל", "נִפֹּל", "תִּפְּלוּ", "תִּפֹּלְנָה", "יִפְּלוּ", "תִּפֹּלְנָה"],
     }
 )
 
@@ -53,25 +52,6 @@ absolu = pd.DataFrame(
 )
 
 construit = pd.DataFrame({"Infinitif construit": ["לִנְפֹּל"]})
-
-style = {
-    "style_table": {"maxWidth": "800px", "margin": "auto", "padding": "5px"},
-    "style_cell": {
-        "textAlign": "center",
-        "padding-left": "8px",
-        "padding-right": "8px",
-        "border": "1px solid black",
-        "font-family": "Ezra SIL",
-        "font-size": "2rem",
-        "direction": "rtl",
-        "userSelect": "text",
-    },
-    "style_header": {"backgroundColor": "#f2f2f2", "fontWeight": "bold"},
-    "cell_selectable": False,
-    "style_cell_conditional": [
-        {"if": {"column_id": "Personne"}, "width": "20%"},
-    ],
-}
 
 layout = dmc.MantineProvider(
     [

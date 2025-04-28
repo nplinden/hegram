@@ -77,6 +77,7 @@ app.layout = dmc.MantineProvider(
             html.Div(id="notification"),
             dmc.AppShellNavbar(
                 children=[
+                    # html.H1("Hegram by ניקולא לינדן", id="title"),
                     dmc.NavLink(
                         label="Statistiques",
                         color="black",
@@ -199,12 +200,16 @@ app.layout = dmc.MantineProvider(
             dmc.AppShellMain(children=[page_container]),
         ],
         padding="md",
-        header={"height": 92.48},
-        # header={"height": "10%"},
+        header={
+            "height": 70,
+            # "breakpoint": "sm",
+            # "collapsed": {"mobile": False, "desktop": False},
+            "collapsed": False
+        },
         navbar={
             "width": 300,
             "breakpoint": "sm",
-            "collapsed": {"mobile": True, "desktop": "False"},
+            "collapsed": {"mobile": True, "desktop": False},
         },
         id="appshell",
     )

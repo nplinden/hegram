@@ -3,6 +3,7 @@ import dash_mantine_components as dmc
 import pandas as pd
 from dash.dash_table import DataTable
 from dash import dcc, Input, Output, callback
+from pages.datatable_style import style
 
 dash.register_page(__name__, path="/paal_strong")
 
@@ -61,25 +62,6 @@ absolu = pd.DataFrame(
 )
 
 construit = pd.DataFrame({"Infinitif construit": ["(לִ)" + "שְׁמֹר"]})
-
-style = {
-    "style_table": {"maxWidth": "800px", "margin": "auto", "padding": "5px"},
-    "style_cell": {
-        "textAlign": "center",
-        "padding-left": "8px",
-        "padding-right": "8px",
-        "border": "1px solid black",
-        "font-family": "Ezra SIL",
-        "font-size": "2rem",
-        "direction": "rtl",
-        "userSelect": "text",
-    },
-    "style_header": {"backgroundColor": "#f2f2f2", "fontWeight": "bold"},
-    "cell_selectable": False,
-    "style_cell_conditional": [
-        {"if": {"column_id": "Personne"}, "width": "20%"},
-    ],
-}
 
 layout = dmc.MantineProvider(
     [
