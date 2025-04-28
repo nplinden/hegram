@@ -11,7 +11,6 @@ accompli = pd.DataFrame(
     {
         "Personne": ["1S", "2MS", "2FS", "3MS", "3FS", "1P", "2MP", "2FP", "3MP", "3FS"],
         "Accompli": [
-
             "הִמְלַכְתִּי",
             "הִמְלַכְתָּ",
             "הִמְלַכְתְּ",
@@ -22,7 +21,6 @@ accompli = pd.DataFrame(
             "הִמְלַכְתֶּן",
             "הִמְלִיכוּ",
             "הִמְלִיכוּ",
-
         ],
     }
 )
@@ -30,7 +28,6 @@ inaccompli = pd.DataFrame(
     {
         "Personne": ["1S", "2MS", "2FS", "3MS", "3FS", "1P", "2MP", "2FP", "3MP", "3FS"],
         "Inaccompli": [
-
             "אַמְלִיךְ",
             "תַּמְלִיךְ",
             "תַּמְלִיכִי",
@@ -41,7 +38,6 @@ inaccompli = pd.DataFrame(
             "תַּמְלֵכְנָה",
             "יַמְלִיכוּ",
             "תַּמְלֵכְנָה",
-
         ],
     }
 )
@@ -50,12 +46,10 @@ imperatif = pd.DataFrame(
     {
         "Personne": ["2MS", "2FS", "2MP", "2FP"],
         "Impératif": [
-
             "הַמְלֵךְ",
             "הַמְלִיכִי",
             "הַמְלִיכוּ",
             "הַמְלֵכְנָה",
-
         ],
     }
 )
@@ -64,27 +58,21 @@ participe = pd.DataFrame(
     {
         "Personne": ["MS", "FS", "MP", "FP"],
         "P. Présent": [
-
             "מַמְלִיךְ",
             "מַמְלִיכָה",
             "מַמְלִיכִים",
             "מַמְלִיכוֹת",
-
         ],
     }
 )
 
 absolu = pd.DataFrame(
     {
-        "Infinitif absolu": [
-            "הַמְלֵךְ"
-        ],
+        "Infinitif absolu": ["הַמְלֵךְ"],
     }
 )
 
-construit = pd.DataFrame({"Infinitif construit": [
-    "לְהַמְלִיךְ"
-]})
+construit = pd.DataFrame({"Infinitif construit": ["לְהַמְלִיךְ"]})
 
 layout = dmc.MantineProvider(
     [
