@@ -7,6 +7,7 @@ from dash import callback, Input, Output, State, dcc
 from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
 from hegram.mechon_mamre import verse_to_url, en_to_fr_books
+import requests
 
 from hegram.data import dropdown_data, en_to_fr, answer_data
 from hegram.definitions import definitions
@@ -14,7 +15,6 @@ from hegram.utils import convert_html_to_dash, htmlify
 from hebrew import Hebrew
 
 COMMON_BINYANIM = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
-
 
 dash.register_page(__name__, path="/conjugation")
 
@@ -44,8 +44,6 @@ def passage(verse_id: int):
     chapter, verse = df["chapter"], df["verse"]
     name = f"{book} {chapter}:{verse}"
     url = verse_to_url(book, int(chapter))
-
-    # print(name, url)
     return html.A(
         children=[name],
         href=url,
@@ -54,17 +52,30 @@ def passage(verse_id: int):
     )
 
 
+def french_passage(verse_id: int):
+    df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
+    book = en_to_fr_books[df["book"]]
+    chapter, verse = df["chapter"], df["verse"]
+    url = verse_to_url(book, int(chapter))
+    response = requests.get(url)
+    if response.status_code != 200:
+        return html.P([html.Em(["Can't retrieve french passage"])])
+    else:
+        soup = BeautifulSoup(response.content, "html.parser")
+        text = soup.find_all("table")[1].find("b", string=str(verse)).next_element.next_element.strip()
+        return html.P([passage(verse_id), f" : {text}"])
+
+
 @callback(
     Output("clause-div", "children"),
-    Output("weblink-span", "children"),
     Output("word-div", "children"),
     Output("solution-storage", "data"),
-    Output("analyze-div", "style"),
     Output("fullverse-div", "style"),
     Output("solution-alert", "style", allow_duplicate=True),
     Output("notification", "children"),
     Output("accordion", "value"),
     Output("answer-div", "style"),
+    Output("frenchverse-div", "style"),
     Input("clause-btn", "n_clicks"),
     State("root-number", "value"),
     State("conjugation-book-dropdown", "value"),
@@ -108,8 +119,6 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
             no_update,
             no_update,
             no_update,
-            no_update,
-            no_update,
             dmc.Notification(
                 title="Erreur",
                 action="show",
@@ -120,22 +129,21 @@ def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, 
             ),
             "",
             no_update,
+            no_update,
         )
     else:
         sample = filtered.sample(n=1).to_dicts()[0]
-        # print(sample)
         verse, word = sample["VerseId"], sample["WordId"]
         return (
             build_verse(verse, word),
-            passage(verse),
             build_word(word),
             sample,
-            {"display": "block"},
             {"display": "block"},
             {"display": "none"},
             no_update,
             "",
             {"display": "flex"},
+            {"display": "none"},
         )
 
 
@@ -152,6 +160,20 @@ def barchart(root):
         .sort("count", descending=True)
     )
     return df.pivot(["Tense"], index="Binyan", values="count").fill_null(0).to_dicts()
+
+
+@callback(
+    Output("frenchverse-div", "children"),
+    Output("frenchverse-div", "style", allow_duplicate=True),
+    Input("solution-btn", "n_clicks"),
+    State("solution-storage", "data"),
+    prevent_initial_call=True,
+)
+def show_frenchverse(n_clicks, data):
+    if not n_clicks:
+        raise PreventUpdate
+    verse = data["VerseId"]
+    return french_passage(verse), {"display": "block"}
 
 
 @callback(
@@ -315,7 +337,6 @@ solution_body = dmc.TableTbody(
     id="solution-body",
 )
 
-
 layout = dmc.MantineProvider(
     dash.html.Div(
         children=[
@@ -388,19 +409,19 @@ layout = dmc.MantineProvider(
                 justify={"sm": "center"},
                 mb=10,
             ),
-            html.Div(
-                [
-                    html.P(
-                        [
-                            "Analysez cette forme verbale issue de ",
-                            html.Span(id="weblink-span"),
-                            ":",
-                        ]
-                    ),
-                ],
-                style={"display": "none"},
-                id="analyze-div",
-            ),
+            # html.Div(
+            #     [
+            #         # html.P(
+            #         #     [
+            #         #         "Analysez cette forme verbale issue de ",
+            #         #         html.Span(id="weblink-span"),
+            #         #         ":",
+            #         #     ]
+            #         # ),
+            #     ],
+            #     style={"display": "none"},
+            #     id="analyze-div",
+            # ),
             html.Div(children=[], id="word-div", style={"textAlign": "center"}),
             html.Div(
                 [
@@ -410,6 +431,13 @@ layout = dmc.MantineProvider(
                 id="fullverse-div",
             ),
             dmc.Flex(children=[], id="clause-div", className="fullverse", mb=10),
+            dmc.Flex(
+                [
+                ],
+                style={"display": "none"},
+                id="frenchverse-div",
+                className="frenchverse", mb=10
+            ),
             dmc.Flex(
                 children=[
                     dmc.Select(
