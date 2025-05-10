@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 import polars as pl
 
 import dash_mantine_components as dmc
-from dash import html, dcc, dash_table
+from dash import html, dash_table
 
 dash.register_page(__name__, path="/statistics")
 
@@ -270,14 +270,12 @@ table = dash_table.DataTable(
     tooltip_duration=None,
 )
 
-
 dropdown = dmc.MultiSelect(
     data=[{"value": k, "label": k} for k in ["Total", "Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]],
     value=["Total"],
     id="dropdown",
     mb=10,
 )
-
 
 chart = dmc.BarChart(
     h=450,
@@ -301,7 +299,6 @@ chart = dmc.BarChart(
     className="mantine-barchart",
     px=25,
 )
-
 
 layout = dmc.MantineProvider(
     children=[

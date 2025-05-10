@@ -8,7 +8,7 @@ def htmlify(a):
     lines = [re.sub(r"^\d. ", "", s.strip()) for s in a.split("\n")]
     previous_depth = 0
     html = ["<ol>"]
-    for d, l in zip(depth, lines):
+    for d, line in zip(depth, lines):
         delta = d - previous_depth
         if delta == 1:
             html.append("<ol>")
@@ -16,7 +16,7 @@ def htmlify(a):
             for _ in range(abs(delta)):
                 html.append("</ol>")
         previous_depth = d
-        html.append(f"<li>{l}</li>")
+        html.append(f"<li>{line}</li>")
     remaining = html.count("<ol>") - html.count(r"</ol>")
     for _ in range(remaining):
         html.append("</ol>")

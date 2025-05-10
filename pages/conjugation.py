@@ -9,7 +9,7 @@ from dash_iconify import DashIconify
 from hegram.mechon_mamre import verse_to_url, en_to_fr_books
 import requests
 
-from hegram.data import dropdown_data, en_to_fr, answer_data
+from hegram.data import dropdown_data, en_to_fr, answer_data, roots_data
 from hegram.definitions import definitions
 from hegram.utils import convert_html_to_dash, htmlify
 from hebrew import Hebrew
@@ -77,7 +77,7 @@ def french_passage(verse_id: int):
     Output("answer-div", "style"),
     Output("frenchverse-div", "style"),
     Input("clause-btn", "n_clicks"),
-    State("root-number", "value"),
+    State("conjugation-roots-dropdown", "value"),
     State("conjugation-book-dropdown", "value"),
     State("conjugation-binyan-dropdown", "value"),
     State("conjugation-tense-dropdown", "value"),
@@ -86,22 +86,10 @@ def french_passage(verse_id: int):
     State("conjugation-number-dropdown", "value"),
     prevent_initial_call=True,
 )
-def generate_verb(clicked, max_roots, book, binyanim, tenses, persons, genders, numbers):
+def generate_verb(clicked, roots, book, binyanim, tenses, persons, genders, numbers):
     if clicked is None:
         raise PreventUpdate
     df = pl.scan_parquet("data/conjugation.parquet")
-
-    if max_roots:
-        roots = (
-            df.select([pl.col("Root").value_counts(sort=True)])
-            .collect()
-            .unnest(pl.col("Root"))
-            .top_k(max_roots, by="count")
-            .select(pl.col("Root"))
-            .to_series()
-        ).to_list()
-    else:
-        roots = []
 
     filtered = df.filter(
         pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
@@ -260,6 +248,14 @@ def get_root_select_data():
     return data
 
 
+root_select = dmc.MultiSelect(
+    label="Racines autorisées",
+    data=roots_data,
+    value=[],
+    id="conjugation-roots-dropdown",
+    mb=10,
+)
+
 book_select = dmc.MultiSelect(
     label="Livres autorisés",
     data=dropdown_data["Book"],
@@ -379,11 +375,7 @@ layout = dmc.MantineProvider(
                             ),
                             dmc.AccordionPanel(
                                 children=[
-                                    dmc.NumberInput(
-                                        label="Niveau d'occurrence maximum autorisé (e.g. 50 n'autorise que les 50 racines les plus courantes)",
-                                        min=0,
-                                        id="root-number",
-                                    ),
+                                    root_select,
                                     book_select,
                                     binyan_select,
                                     tense_select,
@@ -409,19 +401,6 @@ layout = dmc.MantineProvider(
                 justify={"sm": "center"},
                 mb=10,
             ),
-            # html.Div(
-            #     [
-            #         # html.P(
-            #         #     [
-            #         #         "Analysez cette forme verbale issue de ",
-            #         #         html.Span(id="weblink-span"),
-            #         #         ":",
-            #         #     ]
-            #         # ),
-            #     ],
-            #     style={"display": "none"},
-            #     id="analyze-div",
-            # ),
             html.Div(children=[], id="word-div", style={"textAlign": "center"}),
             html.Div(
                 [
@@ -431,13 +410,7 @@ layout = dmc.MantineProvider(
                 id="fullverse-div",
             ),
             dmc.Flex(children=[], id="clause-div", className="fullverse", mb=10),
-            dmc.Flex(
-                [
-                ],
-                style={"display": "none"},
-                id="frenchverse-div",
-                className="frenchverse", mb=10
-            ),
+            dmc.Flex([], style={"display": "none"}, id="frenchverse-div", className="frenchverse", mb=10),
             dmc.Flex(
                 children=[
                     dmc.Select(
