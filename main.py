@@ -192,6 +192,20 @@ app.layout = dmc.MantineProvider(
                                     ),
                                 ],
                             ),
+                            dmc.NavLink(
+                                label="Hitpael",
+                                childrenOffset=28,
+                                children=[
+                                    dmc.NavLink(
+                                        label="Verbe fort",
+                                        href=page_registry["pages.hitpael_strong"]["relative_path"],
+                                        id={
+                                            "type": "navlink",
+                                            "index": page_registry["pages.hitpael_strong"]["relative_path"],
+                                        },
+                                    ),
+                                ],
+                            ),
                         ],
                     ),
                 ],
@@ -204,7 +218,7 @@ app.layout = dmc.MantineProvider(
             "height": 70,
             # "breakpoint": "sm",
             # "collapsed": {"mobile": False, "desktop": False},
-            "collapsed": False
+            "collapsed": False,
         },
         navbar={
             "width": 300,
