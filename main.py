@@ -88,9 +88,20 @@ app.layout = dmc.MantineProvider(
                     dmc.NavLink(
                         label="Exercices",
                         color="black",
-                        href=page_registry["pages.conjugation"]["relative_path"],
-                        id={"type": "navlink", "index": page_registry["pages.conjugation"]["relative_path"]},
                         leftSection=DashIconify(icon="material-symbols:exercise", height=16),
+                        childrenOffset=28,
+                        children=[
+                            dmc.NavLink(
+                                label="Conjugaison",
+                                id={"type": "navlink", "index": page_registry["pages.conjugation"]["relative_path"]},
+                                href=page_registry["pages.conjugation"]["relative_path"],
+                            ),
+                            dmc.NavLink(
+                                label="Prépositions",
+                                id={"type": "navlink", "index": page_registry["pages.prepositions"]["relative_path"]},
+                                href=page_registry["pages.prepositions"]["relative_path"],
+                            ),
+                        ],
                     ),
                     dmc.NavLink(
                         label="Conjugaison",

@@ -16,7 +16,7 @@ from hebrew import Hebrew
 
 COMMON_BINYANIM = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
 
-dash.register_page(__name__, path="/conjugation")
+dash.register_page(__name__, path="/exercises/conjugation")
 
 
 def build_verse(verse_id, word_id):

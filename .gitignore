@@ -1,6 +1,9 @@
 *.ipynb
 .vscode/*
-data/*
+data/definitions.json
+data/conjugation.parquet
+data/verses.parquet
+data/words.parquet
 .DS_store
 
 # Python-generated files

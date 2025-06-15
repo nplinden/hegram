@@ -1,0 +1,133 @@
+base_meaning,person,hebrew,french
+Dans,base,בּ,Dans
+Dans,1S,בִּי,Dans moi
+Dans,2MS,בְּךָ,Dans toi (M)
+Dans,2FS,בָּךְ,Dans toi (F)
+Dans,3MS,בּוֹ,Dans lui
+Dans,3FS,לָהּ,Dans elle
+Dans,1P,בָּנוּ,Dans nous
+Dans,2MP,בָּכֶם,Dans vous (M)
+Dans,2FP,בָּכֶן,Dans vous (F)
+Dans,3MP,בָּהֶם,Dans eux
+Dans,3FP,בָּהֶן,Dans elles
+Comme,base,כְּ,Comme
+Comme,1S,כָּמוֹנִי,Comme moi
+Comme,2MS,כָּמוֹךָ,Comme toi (M)
+Comme,2FS,כָּמוֹךְ,Comme toi (F)
+Comme,3MS,כָּמוֹהוּ,Comme lui
+Comme,3FS,כָּמוֹהָ,Comme elle
+Comme,1P,כָּמוֹנוּ,Comme nous
+Comme,2MP,כָּכֶם,Comme vous (M)
+Comme,2FP,כָּכֶן,Comme vous (F)
+Comme,3MP,כָּהֶם,Comme eux
+Comme,3FP,כָּהֶן,Comme elles
+Pour,base,לְ,Pour
+Pour,1S,לִי,Pour moi
+Pour,2MS,לְךָ,Pour toi (M)
+Pour,2FS,לָךְ,Pour toi (F)
+Pour,3MS,לוֹ,Pour lui
+Pour,3FS,לָהּ,Pour elle
+Pour,1P,לָנוּ,Pour nous
+Pour,2MP,לָכֶם,Pour vous (M)
+Pour,2FP,לָכֶן,Pour vous (F)
+Pour,3MP,לָהֶם,Pour eux
+Pour,3FP,לָהֶן,Pour elles
+De,base,מִן,De
+De,1S,מִמֶּנִּי,De moi
+De,2MS,מִמְּךָ,De toi (M)
+De,2FS,מִמְּךְ,De toi (F)
+De,3MS,מִמֶּנּוּ,De lui
+De,3FS,מִמֶּנָּה,D’elle
+De,1P,מִמֶּנּוּ,De nous
+De,2MP,מִכֶּם,De vous (M)
+De,2FP,מִכֶּן,De vous (F)
+De,3MP,מֵהֶם,D’eux
+De,3FP,מֵהֶן,D’elles
+Avec,base,עִם,Avec
+Avec,1S,עִמִּי,Avec moi
+Avec,2MS,עִמְּךָ,Avec toi (M)
+Avec,2FS,עִמָּךְ,Avec toi (F)
+Avec,3MS,עִמּוֹ,Avec lui
+Avec,3FS,עִמָּהּ,Avec elle
+Avec,1P,עִמָּנוּ,Avec nous
+Avec,2MP,עִמָּכֶם,Avec vous (M)
+Avec,2FP,עִמָּכֶן,Avec vous (F)
+Avec,3MP,עִמָּם,Avec eux
+Avec,3FP,עִמָּן,Avec elles
+Sur,base,עַל,Sur
+Sur,1S,עָלַי,Sur moi
+Sur,2MS,עָלֶיךָ,Sur toi (M)
+Sur,2FS,עָלַיִךְ,Sur toi (F)
+Sur,3MS,עָלָיו,Sur lui
+Sur,3FS,עָלֶיהָ,Sur elle
+Sur,1P,עָלֵינוּ,Sur nous
+Sur,2MP,עֲלֵיכֶם,Sur vous (M)
+Sur,2FP,עֲלֵיכֶן,Sur vous (F)
+Sur,3MP,עֲלֵיהֶם,Sur eux
+Sur,3FP,עֲלֵיהֶן,Sur elles
+Vers,base,אֶל,Vers
+Vers,1S,אֵלַי,Vers moi
+Vers,2MS,אֵלֶיךָ,Vers toi (M)
+Vers,2FS,אֵלַיִךְ,Vers toi (F)
+Vers,3MS,אֵלָיו,Vers lui
+Vers,3FS,אֵלֶיהָ,Vers elle
+Vers,1P,אֵלֵינוּ,Vers nous
+Vers,2MP,אֲלֵיכֶם,Vers vous (M)
+Vers,2FP,אֲלֵיכֶן,Vers vous (F)
+Vers,3MP,אֲלֵיהֶם,Vers eux
+Vers,3FP,אֲלֵיהֶן,Vers elles
+Avec (bis),base,אֵת,Avec
+Avec (bis),1S,אִתִּי,Avec moi
+Avec (bis),2MS,אִתְּךָ,Avec toi (M)
+Avec (bis),2FS,אִתָּךְ,Avec toi (F)
+Avec (bis),3MS,אִתּוֹ,Avec lui
+Avec (bis),3FS,אִתָּהּ,Avec elle
+Avec (bis),1P,אִתָּנוּ,Avec nous
+Avec (bis),2MP,אִתְּכֶם,Avec vous (M)
+Avec (bis),2FP,אִתְּכֶן,Avec vous (F)
+Avec (bis),3MP,אִתָּם,Avec eux
+Avec (bis),3FP,אִתָּן,Avec elles
+Accusatif,base,אֵת,Accusatif
+Accusatif,1S,אֹתִי,Moi
+Accusatif,2MS,אֹתְךָ,Toi (M)
+Accusatif,2FS,אֹתָךְ,Toi (F)
+Accusatif,3MS,אֹתוֹ,Lui
+Accusatif,3FS,אֹתָהּ,Elle
+Accusatif,1P,אֹתָנוּ,Nous
+Accusatif,2MP,אֶתְכֶם,Vous (M)
+Accusatif,2FP,אֶתְכֶן,Vous (F)
+Accusatif,3MP,אֹתָם,Eux
+Accusatif,3FP,אֹתָן,Elles
+Voici,base,הִנֵּה,Voici
+Voici,1S,הִנְנִי,Me voici
+Voici,2MS,הִנְּךָ,Te voici (M)
+Voici,2FS,הִנָּךְ,Te voici (F)
+Voici,3MS,הִנּוֹ,Le voici
+Voici,3FS,הִנָּהּ,La voici
+Voici,1P,הִנְּנוּ,Nous voici
+Voici,2MP,הִנְּכֶם,Vous voici (M)
+Voici,2FP,הִנְּכֶן,Vous voici (F)
+Voici,3MP,הִנָּם,Les voici (M)
+Voici,3FP,הִנָּן,Les voici (F)
+Entre,base,בֵּין,Entre
+Entre,1S,בֵּינִי,Entre moi
+Entre,2MS,בֵּינְךָ,Entre toi (M)
+Entre,2FS,בֵּינֵךְ,Entre toi (F)
+Entre,3MS,בֵּינוֹ,Entre eux
+Entre,3FS,בֵּינָהּ,Entre elle
+Entre,1P,בֵּינֵינוּ,Entre nous
+Entre,2MP,בֵּינֵיכֶם,Entre vous (M)
+Entre,2FP,בֵּינֵיכֶן,Entre vous (F)
+Entre,3MP,בֵינֵיהֶם,Entre eux
+Entre,3FP,בֵינֵיהֶן,Entre elles
+N'est pas,base,אַיִן,N’est pas
+N'est pas,1S,אֵינֶנִּי,Je ne suis pas
+N'est pas,2MS,אֵינְךָ,Tu n’es pas (M)
+N'est pas,2FS,אֵינֵךְ,Tu n'es pas (F)
+N'est pas,3MS,אֵינֶנּוּ,Il n’est pas
+N'est pas,3FS,אֵינֶנָּה,Elle n’est pas
+N'est pas,1P,אֵינֶנּוּ,Nous ne sommes pas
+N'est pas,2MP,אֵינְכֶם,Vous n’êtes pas (M)
+N'est pas,2FP,אֵינְכֶן,Vous n’êtes pas (F)
+N'est pas,3MP,אֵינָם,Ils ne sont pas
+N'est pas,3FP,אֵינָן,Elles ne sont pas
