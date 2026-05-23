@@ -38,7 +38,10 @@ def update_navlinks(pathname):
     return [control["id"]["index"] == pathname for control in callback_context.outputs_list]
 
 
-_commit = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], text=True).strip()
+try:
+    _commit = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], text=True).strip()
+except (FileNotFoundError, subprocess.CalledProcessError):
+    _commit = ""
 
 icons = {
     "Conjugation": DashIconify(icon="material-symbols:exercise", height=16),
