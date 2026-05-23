@@ -1,3 +1,4 @@
+import subprocess
 import sys
 from flask import Flask
 import dash_mantine_components as dmc
@@ -36,6 +37,8 @@ app = Dash(
 def update_navlinks(pathname):
     return [control["id"]["index"] == pathname for control in callback_context.outputs_list]
 
+
+_commit = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], text=True).strip()
 
 icons = {
     "Conjugation": DashIconify(icon="material-symbols:exercise", height=16),
@@ -219,8 +222,13 @@ app.layout = dmc.MantineProvider(
                             ),
                         ],
                     ),
+                html.Div(
+                    _commit,
+                    style={"position": "absolute", "bottom": "8px", "fontSize": "11px", "color": "#aaa"},
+                ),
                 ],
                 p="md",
+                style={"position": "relative"},
             ),
             dmc.AppShellMain(children=[page_container]),
         ],
