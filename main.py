@@ -224,11 +224,10 @@ app.layout = dmc.MantineProvider(
                     ),
                 html.Div(
                     _commit,
-                    style={"marginTop": "auto", "paddingTop": "16px", "fontSize": "11px", "color": "#aaa"},
+                    style={"marginTop": "16px", "fontSize": "11px", "color": "#aaa"},
                 ),
                 ],
                 p="md",
-                style={"display": "flex", "flexDirection": "column", "height": "100%", "overflowY": "auto"},
             ),
             dmc.AppShellMain(children=[page_container]),
         ],
