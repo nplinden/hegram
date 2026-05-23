@@ -2,32 +2,13 @@ import dash
 from dash import callback, Input, Output, State, dcc
 from dash import html, no_update
 import dash_mantine_components as dmc
-from random import choice
 from dash.dash_table import DataTable
 from pages.datatable_style import style
 import pandas as pd
 
 dash.register_page(__name__, path="/exercises/prepositions")
 
-prep_he_to_fr = {
-    "בּ": "Dans",
-    "כְּ": "Comme",
-    "לְ": "Pour",
-    "מִן": "De",
-    "עִם": "Avec",
-    "עַל": "Sur",
-    "אֶל": "Vers",
-    "אֵת": "Avec/Accusatif",
-    "הִנֵּה": "Voici",
-    "בֵּין": "Entre",
-    "אֵין": "N'est pas",
-}
-prep_fr_to_he = {v: k for k, v in prep_he_to_fr.items()}
-prepositions = list(prep_he_to_fr.keys())
-
 flexion = pd.read_csv("data/prepositions.csv")
-
-print(flexion)
 
 
 def build_table(hebrew, french):
