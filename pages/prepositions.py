@@ -20,7 +20,7 @@ prep_he_to_fr = {
     "אֵת": "Avec/Accusatif",
     "הִנֵּה": "Voici",
     "בֵּין": "Entre",
-    "אַיִן": "N'est pas",
+    "אֵין": "N'est pas",
 }
 prep_fr_to_he = {v: k for k, v in prep_he_to_fr.items()}
 prepositions = list(prep_he_to_fr.keys())
