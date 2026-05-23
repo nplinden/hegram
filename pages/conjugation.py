@@ -1,5 +1,6 @@
 import dash
 import dash_mantine_components as dmc
+from loguru import logger
 from dash import html, no_update
 import polars as pl
 from bs4 import BeautifulSoup
@@ -59,7 +60,7 @@ def french_passage(verse_id: int):
     url = verse_to_url(book, int(chapter))
     response = requests.get(url)
     if response.status_code != 200:
-        print(f"Failed to retrieve French passage for verse {verse_id}: HTTP {response.status_code}")
+        logger.error("Failed to retrieve French passage for verse {}: HTTP {}", verse_id, response.status_code)
         return html.P([html.Em(["Can't retrieve french passage"])])
     else:
         soup = BeautifulSoup(response.content, "html.parser")
