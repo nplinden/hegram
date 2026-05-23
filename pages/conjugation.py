@@ -59,6 +59,7 @@ def french_passage(verse_id: int):
     url = verse_to_url(book, int(chapter))
     response = requests.get(url)
     if response.status_code != 200:
+        print(f"Failed to retrieve French passage for verse {verse_id}: HTTP {response.status_code}")
         return html.P([html.Em(["Can't retrieve french passage"])])
     else:
         soup = BeautifulSoup(response.content, "html.parser")
