@@ -116,4 +116,6 @@ def generate_preposition(clicked, with_suffix):
     prevent_initial_call=True,
 )
 def show_solution(clicked, data):
+    if not data:
+        return no_update
     return build_table(data[0]["hebrew"], data[0]["french"])
