@@ -6,27 +6,27 @@ from dash.exceptions import PreventUpdate
 
 dash.register_page(__name__, path="/exercises/numbers")
 
-# Masculine absolute forms for 1–10; invariable forms for 11+
+# Feminine absolute forms (default counting forms) for 1–19; invariable for 20+
 NUMBERS = [
-    {"arabic": 1,   "name": "אֶחָד",             "numeral": "א׳"},
-    {"arabic": 2,   "name": "שְׁנַיִם",           "numeral": "ב׳"},
-    {"arabic": 3,   "name": "שְׁלֹשָׁה",          "numeral": "ג׳"},
-    {"arabic": 4,   "name": "אַרְבָּעָה",         "numeral": "ד׳"},
-    {"arabic": 5,   "name": "חֲמִשָּׁה",          "numeral": "ה׳"},
-    {"arabic": 6,   "name": "שִׁשָּׁה",           "numeral": "ו׳"},
-    {"arabic": 7,   "name": "שִׁבְעָה",           "numeral": "ז׳"},
-    {"arabic": 8,   "name": "שְׁמֹנָה",           "numeral": "ח׳"},
-    {"arabic": 9,   "name": "תִּשְׁעָה",          "numeral": "ט׳"},
-    {"arabic": 10,  "name": "עֲשָׂרָה",           "numeral": "י׳"},
-    {"arabic": 11,  "name": "אַחַד עָשָׂר",       "numeral": "י״א"},
-    {"arabic": 12,  "name": "שְׁנֵים עָשָׂר",     "numeral": "י״ב"},
-    {"arabic": 13,  "name": "שְׁלֹשָׁה עָשָׂר",   "numeral": "י״ג"},
-    {"arabic": 14,  "name": "אַרְבָּעָה עָשָׂר",  "numeral": "י״ד"},
-    {"arabic": 15,  "name": "חֲמִשָּׁה עָשָׂר",   "numeral": "ט״ו"},
-    {"arabic": 16,  "name": "שִׁשָּׁה עָשָׂר",    "numeral": "ט״ז"},
-    {"arabic": 17,  "name": "שִׁבְעָה עָשָׂר",    "numeral": "י״ז"},
-    {"arabic": 18,  "name": "שְׁמֹנָה עָשָׂר",    "numeral": "י״ח"},
-    {"arabic": 19,  "name": "תִּשְׁעָה עָשָׂר",   "numeral": "י״ט"},
+    {"arabic": 1,   "name": "אַחַת",               "numeral": "א׳"},
+    {"arabic": 2,   "name": "שְׁתַּיִם",            "numeral": "ב׳"},
+    {"arabic": 3,   "name": "שָׁלֹשׁ",              "numeral": "ג׳"},
+    {"arabic": 4,   "name": "אַרְבַּע",             "numeral": "ד׳"},
+    {"arabic": 5,   "name": "חָמֵשׁ",               "numeral": "ה׳"},
+    {"arabic": 6,   "name": "שֵׁשׁ",                "numeral": "ו׳"},
+    {"arabic": 7,   "name": "שֶׁבַע",               "numeral": "ז׳"},
+    {"arabic": 8,   "name": "שְׁמֹנֶה",             "numeral": "ח׳"},
+    {"arabic": 9,   "name": "תֵּשַׁע",              "numeral": "ט׳"},
+    {"arabic": 10,  "name": "עֶשֶׂר",               "numeral": "י׳"},
+    {"arabic": 11,  "name": "אַחַת עֶשְׂרֵה",       "numeral": "י״א"},
+    {"arabic": 12,  "name": "שְׁתֵּים עֶשְׂרֵה",    "numeral": "י״ב"},
+    {"arabic": 13,  "name": "שְׁלֹשׁ עֶשְׂרֵה",     "numeral": "י״ג"},
+    {"arabic": 14,  "name": "אַרְבַּע עֶשְׂרֵה",    "numeral": "י״ד"},
+    {"arabic": 15,  "name": "חָמֵשׁ עֶשְׂרֵה",      "numeral": "ט״ו"},
+    {"arabic": 16,  "name": "שֵׁשׁ עֶשְׂרֵה",       "numeral": "ט״ז"},
+    {"arabic": 17,  "name": "שְׁבַע עֶשְׂרֵה",      "numeral": "י״ז"},
+    {"arabic": 18,  "name": "שְׁמֹנֶה עֶשְׂרֵה",    "numeral": "י״ח"},
+    {"arabic": 19,  "name": "תְּשַׁע עֶשְׂרֵה",     "numeral": "י״ט"},
     {"arabic": 20,  "name": "עֶשְׂרִים",           "numeral": "כ׳"},
     {"arabic": 30,  "name": "שְׁלֹשִׁים",          "numeral": "ל׳"},
     {"arabic": 40,  "name": "אַרְבָּעִים",         "numeral": "מ׳"},
@@ -100,7 +100,7 @@ layout = dmc.MantineProvider(
             html.H1("Exercice sur les nombres"),
             html.P(
                 "Un nombre s'affiche sous l'une de ses trois formes. "
-                "Retrouvez les deux autres. Les formes de 1 à 10 sont au masculin absolu."
+                "Retrouvez les deux autres. Les formes de 1 à 19 sont au féminin absolu (formes de comptage)."
             ),
             dmc.CheckboxGroup(
                 id="numbers-range-check",
