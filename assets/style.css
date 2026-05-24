@@ -16,7 +16,7 @@ body {
 }
 
 .consonantal {
-    font-family: "Ezra SIL", serif;
+    font-family: "Ezra SIL", sans-serif;
 }
 
 .link,
@@ -29,7 +29,7 @@ body {
 }
 
 #title {
-    font-family: "Ezra SIL", serif;
+    font-family: "Ezra SIL", sans-serif;
     font-weight: bold;
     font-size: 1.5rem;
     text-decoration: underline;
@@ -40,7 +40,7 @@ body {
 a h1,
 a:visited h1,
 a:link h1 {
-    font-family: "Ezra SIL", serif;
+    font-family: "Ezra SIL", sans-serif;
     font-weight: bold;
     text-decoration: underline;
     text-decoration-color: black !important;
@@ -79,6 +79,6 @@ a:link h1 {
 
 .definition-title {
     font-size: 5rem;
-    font-family: "Ezra SIL", serif;
+    font-family: "Ezra SIL", sans-serif;
     margin: 5px;
 }

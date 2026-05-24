@@ -446,7 +446,7 @@ layout = dmc.MantineProvider(
             dcc.Store(id="solution-storage", storage_type="local"),
             html.Div(
                 [
-                    html.P(children=[], id="solution-p-root", style={"fontFamily": "\"Ezra SIL\", serif"}),
+                    html.P(children=[], id="solution-p-root", style={"fontFamily": "\"Ezra SIL\", sans-serif"}),
                     html.P(
                         children=[],
                         id="solution-p-rest",
@@ -459,7 +459,7 @@ layout = dmc.MantineProvider(
                 color="red",
                 id="solution-alert",
                 style={"display": "none"},
-                styles={"title": {"fontFamily": "\"Ezra SIL\", serif", "fontSize": "3rem"}, "message": {"fontSize": "1rem"}},
+                styles={"title": {"fontFamily": "\"Ezra SIL\", sans-serif", "fontSize": "3rem"}, "message": {"fontSize": "1rem"}},
             ),
         ],
         className="container",
