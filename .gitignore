@@ -14,6 +14,10 @@ dist/
 wheels/
 *.egg-info
 
+# Claude Code
+.claude/settings.json
+.claude/settings.local.json
+
 # Virtual environments
 .venv
 
