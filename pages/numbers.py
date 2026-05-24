@@ -133,6 +133,8 @@ def _card(bg, name_val, name_color, arabic_val, arabic_color, numeral_val, numer
             "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
             "overflow": "hidden",
             "marginBottom": "24px",
+            "maxWidth": "400px",
+            "marginInline": "auto",
         },
     )
 
