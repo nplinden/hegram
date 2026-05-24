@@ -1,6 +1,6 @@
 import dash
 import dash_mantine_components as dmc
-from loguru import logger
+import json as _json
 from dash import html, no_update
 import polars as pl
 from bs4 import BeautifulSoup
@@ -8,12 +8,21 @@ from dash import callback, Input, Output, State, dcc
 from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
 from hegram.mechon_mamre import verse_to_url, en_to_fr_books
-import requests
 
 from hegram.data import dropdown_data, en_to_fr, answer_data, roots_data
 from hegram.definitions import definitions
 from hegram.utils import convert_html_to_dash, htmlify
 from hebrew import Hebrew
+
+_book_index = _json.load(open("json/index.json", encoding="utf-8"))
+_book_cache: dict = {}
+
+
+def _get_chapters(json_file: str) -> list:
+    if json_file not in _book_cache:
+        with open(f"json/{json_file}", encoding="utf-8") as f:
+            _book_cache[json_file] = _json.load(f)["chapters"]
+    return _book_cache[json_file]
 
 COMMON_BINYANIM = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
 
@@ -55,17 +64,11 @@ def passage(verse_id: int):
 
 def french_passage(verse_id: int):
     df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
-    book = en_to_fr_books[df["book"]]
-    chapter, verse = df["chapter"], df["verse"]
-    url = verse_to_url(book, int(chapter))
-    response = requests.get(url)
-    if response.status_code != 200:
-        logger.error("Failed to retrieve French passage for verse {}: HTTP {}", verse_id, response.status_code)
-        return html.P([html.Em(["Can't retrieve french passage"])])
-    else:
-        soup = BeautifulSoup(response.content, "html.parser")
-        text = soup.find_all("table")[1].find("b", string=str(verse)).next_element.next_element.strip()
-        return html.P([passage(verse_id), f" : {text}"])
+    book, chapter, verse = df["book"], df["chapter"], df["verse"]
+    entry = _book_index[book]
+    chapters = _get_chapters(entry["json_file"])
+    text = chapters[chapter - 1 + entry["chapter_offset"]][verse - 1]
+    return html.P([passage(verse_id), f" : {text}"])
 
 
 @callback(
