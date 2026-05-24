@@ -3,7 +3,6 @@
   "name": "Le Cantique des Cantiques",
   "chapters": [
     {
-      "chapter_file": "ft3001.htm",
       "chapter_num": 3001,
       "title": "Le Cantique des Cantiques - Chapitre 1 - שִׁיר הַשִּׁירִים",
       "verses": [
@@ -78,7 +77,6 @@
       ]
     },
     {
-      "chapter_file": "ft3002.htm",
       "chapter_num": 3002,
       "title": "Le Cantique des Cantiques - Chapitre 2 - שִׁיר הַשִּׁירִים",
       "verses": [
@@ -153,7 +151,6 @@
       ]
     },
     {
-      "chapter_file": "ft3003.htm",
       "chapter_num": 3003,
       "title": "Le Cantique des Cantiques - Chapitre 3 - שִׁיר הַשִּׁירִים",
       "verses": [
@@ -204,7 +201,6 @@
       ]
     },
     {
-      "chapter_file": "ft3004.htm",
       "chapter_num": 3004,
       "title": "Le Cantique des Cantiques - Chapitre 4 - שִׁיר הַשִּׁירִים",
       "verses": [
@@ -275,7 +271,6 @@
       ]
     },
     {
-      "chapter_file": "ft3005.htm",
       "chapter_num": 3005,
       "title": "Le Cantique des Cantiques - Chapitre 5 - שִׁיר הַשִּׁירִים",
       "verses": [
@@ -346,7 +341,6 @@
       ]
     },
     {
-      "chapter_file": "ft3006.htm",
       "chapter_num": 3006,
       "title": "Le Cantique des Cantiques - Chapitre 6 - שִׁיר הַשִּׁירִים",
       "verses": [
@@ -401,7 +395,6 @@
       ]
     },
     {
-      "chapter_file": "ft3007.htm",
       "chapter_num": 3007,
       "title": "Le Cantique des Cantiques - Chapitre 7 - שִׁיר הַשִּׁירִים",
       "verses": [
@@ -464,7 +457,6 @@
       ]
     },
     {
-      "chapter_file": "ft3008.htm",
       "chapter_num": 3008,
       "title": "Le Cantique des Cantiques - Chapitre 8 - שִׁיר הַשִּׁירִים",
       "verses": [
