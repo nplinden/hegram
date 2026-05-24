@@ -218,7 +218,7 @@ layout = dmc.MantineProvider(
             html.Div(id="numbers-card"),
             html.Div(
                 id="numbers-answer-section",
-                style={"display": "none"},
+                style={"display": "none", "maxWidth": "400px", "marginInline": "auto"},
                 children=[
                     dmc.Flex(
                         [
