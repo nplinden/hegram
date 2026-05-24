@@ -1,0 +1,212 @@
+[
+  {
+    "index": 1,
+    "name": "La Genèse",
+    "chapters": 50,
+    "json_file": "01_La_Genèse.json"
+  },
+  {
+    "index": 2,
+    "name": "L’Exode",
+    "chapters": 40,
+    "json_file": "02_L_Exode.json"
+  },
+  {
+    "index": 3,
+    "name": "Le Lévitique",
+    "chapters": 27,
+    "json_file": "03_Le_Lévitique.json"
+  },
+  {
+    "index": 4,
+    "name": "Les Nombres",
+    "chapters": 36,
+    "json_file": "04_Les_Nombres.json"
+  },
+  {
+    "index": 5,
+    "name": "Le Deutéronome",
+    "chapters": 34,
+    "json_file": "05_Le_Deutéronome.json"
+  },
+  {
+    "index": 6,
+    "name": "Josué",
+    "chapters": 24,
+    "json_file": "06_Josué.json"
+  },
+  {
+    "index": 7,
+    "name": "Les Juges",
+    "chapters": 21,
+    "json_file": "07_Les_Juges.json"
+  },
+  {
+    "index": 8,
+    "name": "Samuel",
+    "chapters": 55,
+    "json_file": "08_Samuel.json"
+  },
+  {
+    "index": 9,
+    "name": "Rois",
+    "chapters": 47,
+    "json_file": "09_Rois.json"
+  },
+  {
+    "index": 10,
+    "name": "Isaïe",
+    "chapters": 66,
+    "json_file": "10_Isaïe.json"
+  },
+  {
+    "index": 11,
+    "name": "Jérémie",
+    "chapters": 52,
+    "json_file": "11_Jérémie.json"
+  },
+  {
+    "index": 12,
+    "name": "Ézéchiel",
+    "chapters": 48,
+    "json_file": "12_Ézéchiel.json"
+  },
+  {
+    "index": 13,
+    "name": "Osée",
+    "chapters": 14,
+    "json_file": "13_Osée.json"
+  },
+  {
+    "index": 14,
+    "name": "Joël",
+    "chapters": 4,
+    "json_file": "14_Joël.json"
+  },
+  {
+    "index": 15,
+    "name": "Amos",
+    "chapters": 9,
+    "json_file": "15_Amos.json"
+  },
+  {
+    "index": 16,
+    "name": "Obadia",
+    "chapters": 1,
+    "json_file": "16_Obadia.json"
+  },
+  {
+    "index": 17,
+    "name": "Jonas",
+    "chapters": 4,
+    "json_file": "17_Jonas.json"
+  },
+  {
+    "index": 18,
+    "name": "Michée",
+    "chapters": 7,
+    "json_file": "18_Michée.json"
+  },
+  {
+    "index": 19,
+    "name": "Nahoum",
+    "chapters": 3,
+    "json_file": "19_Nahoum.json"
+  },
+  {
+    "index": 20,
+    "name": "Habacuc",
+    "chapters": 3,
+    "json_file": "20_Habacuc.json"
+  },
+  {
+    "index": 21,
+    "name": "Cephania",
+    "chapters": 3,
+    "json_file": "21_Cephania.json"
+  },
+  {
+    "index": 22,
+    "name": "Haggaï",
+    "chapters": 2,
+    "json_file": "22_Haggaï.json"
+  },
+  {
+    "index": 23,
+    "name": "Zacharie",
+    "chapters": 14,
+    "json_file": "23_Zacharie.json"
+  },
+  {
+    "index": 24,
+    "name": "Malachie",
+    "chapters": 3,
+    "json_file": "24_Malachie.json"
+  },
+  {
+    "index": 25,
+    "name": "Chroniques",
+    "chapters": 65,
+    "json_file": "25_Chroniques.json"
+  },
+  {
+    "index": 26,
+    "name": "Les Psaumes",
+    "chapters": 150,
+    "json_file": "26_Les_Psaumes.json"
+  },
+  {
+    "index": 27,
+    "name": "Job",
+    "chapters": 42,
+    "json_file": "27_Job.json"
+  },
+  {
+    "index": 28,
+    "name": "Les Proverbes",
+    "chapters": 31,
+    "json_file": "28_Les_Proverbes.json"
+  },
+  {
+    "index": 29,
+    "name": "Ruth",
+    "chapters": 4,
+    "json_file": "29_Ruth.json"
+  },
+  {
+    "index": 30,
+    "name": "Le Cantique des Cantiques",
+    "chapters": 8,
+    "json_file": "30_Le_Cantique_des_Cantiques.json"
+  },
+  {
+    "index": 31,
+    "name": "L’Ecclésiaste",
+    "chapters": 12,
+    "json_file": "31_L_Ecclésiaste.json"
+  },
+  {
+    "index": 32,
+    "name": "Les Lamentations",
+    "chapters": 5,
+    "json_file": "32_Les_Lamentations.json"
+  },
+  {
+    "index": 33,
+    "name": "Esther",
+    "chapters": 10,
+    "json_file": "33_Esther.json"
+  },
+  {
+    "index": 34,
+    "name": "Daniel",
+    "chapters": 12,
+    "json_file": "34_Daniel.json"
+  },
+  {
+    "index": 35,
+    "name": "Ezra / Néhémie",
+    "chapters": 23,
+    "json_file": "35_Ezra_Néhémie.json"
+  }
+]
