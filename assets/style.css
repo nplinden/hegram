@@ -11,8 +11,14 @@
     unicode-range: U+0590-U+05FF, U+FB1D-U+FB4F;
 }
 
+@font-face {
+    font-family: "Ezra SIL";
+    src: local('Segoe UI'), local('Helvetica Neue'), local('Arial'),
+         local('Roboto'), local('Noto Sans');
+}
+
 body {
-    font-family: sans-serif;
+    font-family: "Ezra SIL", sans-serif;
 }
 
 .consonantal {
