@@ -56,7 +56,7 @@ LABELS = {
     "numeral": "Numéral hébreu",
 }
 
-_HEBREW_STYLE = {"fontFamily": "serif", "fontSize": "1.1rem", "direction": "rtl"}
+_HEBREW_STYLE = {"fontFamily": "\"Ezra SIL\", serif", "fontSize": "1.1rem", "direction": "rtl"}
 
 
 def _pool(ranges):
@@ -75,7 +75,7 @@ def _options(pool, key):
 def _question_card(given_key, given_value):
     is_hebrew = given_key in ("name", "numeral")
     text_style = {
-        "fontFamily": "serif",
+        "fontFamily": "\"Ezra SIL\", serif",
         "fontSize": "3.5rem",
         "textAlign": "center",
         "lineHeight": "1.2",
@@ -194,7 +194,7 @@ layout = dmc.MantineProvider(
                 id="numbers-result",
                 style={"display": "none"},
                 styles={
-                    "title": {"fontFamily": "serif", "fontSize": "1.4rem", "direction": "rtl"},
+                    "title": {"fontFamily": "\"Ezra SIL\", serif", "fontSize": "1.4rem", "direction": "rtl"},
                     "message": {"fontSize": "1rem"},
                 },
             ),

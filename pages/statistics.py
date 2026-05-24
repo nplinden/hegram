@@ -255,12 +255,12 @@ table = dash_table.DataTable(
     style_cell_conditional=[
         {
             "if": {"column_id": "Root"},
-            "font-family": "serif",
+            "font-family": "\"Ezra SIL\", serif",
             "fontSize": 20,
         },
         {
             "if": {"column_id": "Class"},
-            "font-family": "serif",
+            "font-family": "\"Ezra SIL\", serif",
             "fontSize": 20,
         },
     ],
@@ -370,7 +370,7 @@ layout = dmc.MantineProvider(
                     color="gray",
                     id="definition-alert",
                     style={"display": "none"},
-                    styles={"title": {"fontFamily": "serif", "fontSize": "3rem"}, "message": {"fontSize": "1rem"}},
+                    styles={"title": {"fontFamily": "\"Ezra SIL\", serif", "fontSize": "3rem"}, "message": {"fontSize": "1rem"}},
                     className="container",
                 ),
             ],
