@@ -322,7 +322,7 @@ def generate_number(_, ranges):
         _select_data(pool, "arabic"),
         _select_data(pool, "numeral"),
         None, None, None,
-        {"display": "block"},
+        {"display": "block", "maxWidth": "400px", "marginInline": "auto"},
         {"number": number, "given_key": given_key},
     )
 
