@@ -1,9 +1,7 @@
 {
-  "book_index": 25,
   "name": "Chroniques",
   "chapters": [
     {
-      "chapter_num": 1,
       "title": "I Chroniques - Chapitre 1 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -225,7 +223,6 @@
       ]
     },
     {
-      "chapter_num": 2,
       "title": "I Chroniques - Chapitre 2 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -451,7 +448,6 @@
       ]
     },
     {
-      "chapter_num": 3,
       "title": "I Chroniques - Chapitre 3 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -553,7 +549,6 @@
       ]
     },
     {
-      "chapter_num": 4,
       "title": "I Chroniques - Chapitre 4 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -731,7 +726,6 @@
       ]
     },
     {
-      "chapter_num": 5,
       "title": "I Chroniques - Chapitre 5 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -901,7 +895,6 @@
       ]
     },
     {
-      "chapter_num": 6,
       "title": "I Chroniques - Chapitre 6 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -1171,7 +1164,6 @@
       ]
     },
     {
-      "chapter_num": 7,
       "title": "I Chroniques - Chapitre 7 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -1337,7 +1329,6 @@
       ]
     },
     {
-      "chapter_num": 8,
       "title": "I Chroniques - Chapitre 8 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -1503,7 +1494,6 @@
       ]
     },
     {
-      "chapter_num": 9,
       "title": "I Chroniques - Chapitre 9 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -1685,7 +1675,6 @@
       ]
     },
     {
-      "chapter_num": 10,
       "title": "I Chroniques - Chapitre 10 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -1747,7 +1736,6 @@
       ]
     },
     {
-      "chapter_num": 11,
       "title": "I Chroniques - Chapitre 11 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -1941,7 +1929,6 @@
       ]
     },
     {
-      "chapter_num": 12,
       "title": "I Chroniques - Chapitre 12 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -2111,7 +2098,6 @@
       ]
     },
     {
-      "chapter_num": 13,
       "title": "I Chroniques - Chapitre 13 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -2173,7 +2159,6 @@
       ]
     },
     {
-      "chapter_num": 14,
       "title": "I Chroniques - Chapitre 14 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -2247,7 +2232,6 @@
       ]
     },
     {
-      "chapter_num": 15,
       "title": "I Chroniques - Chapitre 15 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -2369,7 +2353,6 @@
       ]
     },
     {
-      "chapter_num": 16,
       "title": "I Chroniques - Chapitre 16 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -2547,7 +2530,6 @@
       ]
     },
     {
-      "chapter_num": 17,
       "title": "I Chroniques - Chapitre 17 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -2661,7 +2643,6 @@
       ]
     },
     {
-      "chapter_num": 18,
       "title": "I Chroniques - Chapitre 18 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -2735,7 +2716,6 @@
       ]
     },
     {
-      "chapter_num": 19,
       "title": "I Chroniques - Chapitre 19 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -2817,7 +2797,6 @@
       ]
     },
     {
-      "chapter_num": 20,
       "title": "I Chroniques - Chapitre 20 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -2855,7 +2834,6 @@
       ]
     },
     {
-      "chapter_num": 21,
       "title": "I Chroniques - Chapitre 21 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -2981,7 +2959,6 @@
       ]
     },
     {
-      "chapter_num": 22,
       "title": "I Chroniques - Chapitre 22 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -3063,7 +3040,6 @@
       ]
     },
     {
-      "chapter_num": 23,
       "title": "I Chroniques - Chapitre 23 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -3197,7 +3173,6 @@
       ]
     },
     {
-      "chapter_num": 24,
       "title": "I Chroniques - Chapitre 24 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -3327,7 +3302,6 @@
       ]
     },
     {
-      "chapter_num": 25,
       "title": "I Chroniques - Chapitre 25 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -3457,7 +3431,6 @@
       ]
     },
     {
-      "chapter_num": 26,
       "title": "I Chroniques - Chapitre 26 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -3591,7 +3564,6 @@
       ]
     },
     {
-      "chapter_num": 27,
       "title": "I Chroniques - Chapitre 27 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -3733,7 +3705,6 @@
       ]
     },
     {
-      "chapter_num": 28,
       "title": "I Chroniques - Chapitre 28 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -3823,7 +3794,6 @@
       ]
     },
     {
-      "chapter_num": 29,
       "title": "I Chroniques - Chapitre 29 - דִּבְרֵי הַיָּמִים א",
       "verses": [
         {
@@ -3949,7 +3919,6 @@
       ]
     },
     {
-      "chapter_num": 1,
       "title": "II Chroniques - Chapitre 1 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -4027,7 +3996,6 @@
       ]
     },
     {
-      "chapter_num": 2,
       "title": "II Chroniques - Chapitre 2 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -4101,7 +4069,6 @@
       ]
     },
     {
-      "chapter_num": 3,
       "title": "II Chroniques - Chapitre 3 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -4175,7 +4142,6 @@
       ]
     },
     {
-      "chapter_num": 4,
       "title": "II Chroniques - Chapitre 4 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -4269,7 +4235,6 @@
       ]
     },
     {
-      "chapter_num": 5,
       "title": "II Chroniques - Chapitre 5 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -4331,7 +4296,6 @@
       ]
     },
     {
-      "chapter_num": 6,
       "title": "II Chroniques - Chapitre 6 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -4505,7 +4469,6 @@
       ]
     },
     {
-      "chapter_num": 7,
       "title": "II Chroniques - Chapitre 7 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -4599,7 +4562,6 @@
       ]
     },
     {
-      "chapter_num": 8,
       "title": "II Chroniques - Chapitre 8 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -4677,7 +4639,6 @@
       ]
     },
     {
-      "chapter_num": 9,
       "title": "II Chroniques - Chapitre 9 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -4807,7 +4768,6 @@
       ]
     },
     {
-      "chapter_num": 10,
       "title": "II Chroniques - Chapitre 10 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -4889,7 +4849,6 @@
       ]
     },
     {
-      "chapter_num": 11,
       "title": "II Chroniques - Chapitre 11 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -4987,7 +4946,6 @@
       ]
     },
     {
-      "chapter_num": 12,
       "title": "II Chroniques - Chapitre 12 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -5057,7 +5015,6 @@
       ]
     },
     {
-      "chapter_num": 13,
       "title": "II Chroniques - Chapitre 13 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -5155,7 +5112,6 @@
       ]
     },
     {
-      "chapter_num": 14,
       "title": "II Chroniques - Chapitre 14 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -5217,7 +5173,6 @@
       ]
     },
     {
-      "chapter_num": 15,
       "title": "II Chroniques - Chapitre 15 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -5299,7 +5254,6 @@
       ]
     },
     {
-      "chapter_num": 16,
       "title": "II Chroniques - Chapitre 16 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -5361,7 +5315,6 @@
       ]
     },
     {
-      "chapter_num": 17,
       "title": "II Chroniques - Chapitre 17 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -5443,7 +5396,6 @@
       ]
     },
     {
-      "chapter_num": 18,
       "title": "II Chroniques - Chapitre 18 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -5585,7 +5537,6 @@
       ]
     },
     {
-      "chapter_num": 19,
       "title": "II Chroniques - Chapitre 19 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -5635,7 +5586,6 @@
       ]
     },
     {
-      "chapter_num": 20,
       "title": "II Chroniques - Chapitre 20 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -5789,7 +5739,6 @@
       ]
     },
     {
-      "chapter_num": 21,
       "title": "II Chroniques - Chapitre 21 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -5875,7 +5824,6 @@
       ]
     },
     {
-      "chapter_num": 22,
       "title": "II Chroniques - Chapitre 22 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -5929,7 +5877,6 @@
       ]
     },
     {
-      "chapter_num": 23,
       "title": "II Chroniques - Chapitre 23 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -6019,7 +5966,6 @@
       ]
     },
     {
-      "chapter_num": 24,
       "title": "II Chroniques - Chapitre 24 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -6133,7 +6079,6 @@
       ]
     },
     {
-      "chapter_num": 25,
       "title": "II Chroniques - Chapitre 25 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -6251,7 +6196,6 @@
       ]
     },
     {
-      "chapter_num": 26,
       "title": "II Chroniques - Chapitre 26 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -6349,7 +6293,6 @@
       ]
     },
     {
-      "chapter_num": 27,
       "title": "II Chroniques - Chapitre 27 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -6391,7 +6334,6 @@
       ]
     },
     {
-      "chapter_num": 28,
       "title": "II Chroniques - Chapitre 28 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -6505,7 +6447,6 @@
       ]
     },
     {
-      "chapter_num": 29,
       "title": "II Chroniques - Chapitre 29 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -6655,7 +6596,6 @@
       ]
     },
     {
-      "chapter_num": 30,
       "title": "II Chroniques - Chapitre 30 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -6769,7 +6709,6 @@
       ]
     },
     {
-      "chapter_num": 31,
       "title": "II Chroniques - Chapitre 31 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -6859,7 +6798,6 @@
       ]
     },
     {
-      "chapter_num": 32,
       "title": "II Chroniques - Chapitre 32 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -6997,7 +6935,6 @@
       ]
     },
     {
-      "chapter_num": 33,
       "title": "II Chroniques - Chapitre 33 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -7103,7 +7040,6 @@
       ]
     },
     {
-      "chapter_num": 34,
       "title": "II Chroniques - Chapitre 34 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -7241,7 +7177,6 @@
       ]
     },
     {
-      "chapter_num": 35,
       "title": "II Chroniques - Chapitre 35 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {
@@ -7355,7 +7290,6 @@
       ]
     },
     {
-      "chapter_num": 36,
       "title": "II Chroniques - Chapitre 36 - דִּבְרֵי הַיָּמִים ב",
       "verses": [
         {

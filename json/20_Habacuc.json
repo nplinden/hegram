@@ -1,9 +1,7 @@
 {
-  "book_index": 20,
   "name": "Habacuc",
   "chapters": [
     {
-      "chapter_num": 2001,
       "title": "Habacuc - Chapitre 1 - חֲבַקּוּק",
       "verses": [
         {
@@ -77,7 +75,6 @@
       ]
     },
     {
-      "chapter_num": 2002,
       "title": "Habacuc - Chapitre 2 - חֲבַקּוּק",
       "verses": [
         {
@@ -163,7 +160,6 @@
       ]
     },
     {
-      "chapter_num": 2003,
       "title": "Habacuc - Chapitre 3 - חֲבַקּוּק",
       "verses": [
         {

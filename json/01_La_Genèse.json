@@ -1,9 +1,7 @@
 {
-  "book_index": 1,
   "name": "La Genèse",
   "chapters": [
     {
-      "chapter_num": 101,
       "title": "La Genèse - Chapitre 1 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -133,7 +131,6 @@
       ]
     },
     {
-      "chapter_num": 102,
       "title": "La Genèse - Chapitre 2 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -239,7 +236,6 @@
       ]
     },
     {
-      "chapter_num": 103,
       "title": "La Genèse - Chapitre 3 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -341,7 +337,6 @@
       ]
     },
     {
-      "chapter_num": 104,
       "title": "La Genèse - Chapitre 4 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -451,7 +446,6 @@
       ]
     },
     {
-      "chapter_num": 105,
       "title": "La Genèse - Chapitre 5 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -585,7 +579,6 @@
       ]
     },
     {
-      "chapter_num": 106,
       "title": "La Genèse - Chapitre 6 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -679,7 +672,6 @@
       ]
     },
     {
-      "chapter_num": 107,
       "title": "La Genèse - Chapitre 7 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -781,7 +773,6 @@
       ]
     },
     {
-      "chapter_num": 108,
       "title": "La Genèse - Chapitre 8 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -875,7 +866,6 @@
       ]
     },
     {
-      "chapter_num": 109,
       "title": "La Genèse - Chapitre 9 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -997,7 +987,6 @@
       ]
     },
     {
-      "chapter_num": 110,
       "title": "La Genèse - Chapitre 10 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -1131,7 +1120,6 @@
       ]
     },
     {
-      "chapter_num": 111,
       "title": "La Genèse - Chapitre 11 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -1265,7 +1253,6 @@
       ]
     },
     {
-      "chapter_num": 112,
       "title": "La Genèse - Chapitre 12 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -1351,7 +1338,6 @@
       ]
     },
     {
-      "chapter_num": 113,
       "title": "La Genèse - Chapitre 13 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -1429,7 +1415,6 @@
       ]
     },
     {
-      "chapter_num": 114,
       "title": "La Genèse - Chapitre 14 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -1531,7 +1516,6 @@
       ]
     },
     {
-      "chapter_num": 115,
       "title": "La Genèse - Chapitre 15 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -1621,7 +1605,6 @@
       ]
     },
     {
-      "chapter_num": 116,
       "title": "La Genèse - Chapitre 16 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -1691,7 +1674,6 @@
       ]
     },
     {
-      "chapter_num": 117,
       "title": "La Genèse - Chapitre 17 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -1805,7 +1787,6 @@
       ]
     },
     {
-      "chapter_num": 118,
       "title": "La Genèse - Chapitre 18 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -1943,7 +1924,6 @@
       ]
     },
     {
-      "chapter_num": 119,
       "title": "La Genèse - Chapitre 19 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -2101,7 +2081,6 @@
       ]
     },
     {
-      "chapter_num": 120,
       "title": "La Genèse - Chapitre 20 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -2179,7 +2158,6 @@
       ]
     },
     {
-      "chapter_num": 121,
       "title": "La Genèse - Chapitre 21 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -2321,7 +2299,6 @@
       ]
     },
     {
-      "chapter_num": 122,
       "title": "La Genèse - Chapitre 22 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -2423,7 +2400,6 @@
       ]
     },
     {
-      "chapter_num": 123,
       "title": "La Genèse - Chapitre 23 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -2509,7 +2485,6 @@
       ]
     },
     {
-      "chapter_num": 124,
       "title": "La Genèse - Chapitre 24 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -2783,7 +2758,6 @@
       ]
     },
     {
-      "chapter_num": 125,
       "title": "La Genèse - Chapitre 25 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -2925,7 +2899,6 @@
       ]
     },
     {
-      "chapter_num": 126,
       "title": "La Genèse - Chapitre 26 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -3071,7 +3044,6 @@
       ]
     },
     {
-      "chapter_num": 127,
       "title": "La Genèse - Chapitre 27 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -3261,7 +3233,6 @@
       ]
     },
     {
-      "chapter_num": 128,
       "title": "La Genèse - Chapitre 28 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -3355,7 +3326,6 @@
       ]
     },
     {
-      "chapter_num": 129,
       "title": "La Genèse - Chapitre 29 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -3501,7 +3471,6 @@
       ]
     },
     {
-      "chapter_num": 130,
       "title": "La Genèse - Chapitre 30 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -3679,7 +3648,6 @@
       ]
     },
     {
-      "chapter_num": 131,
       "title": "La Genèse - Chapitre 31 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -3901,7 +3869,6 @@
       ]
     },
     {
-      "chapter_num": 132,
       "title": "La Genèse - Chapitre 32 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -4039,7 +4006,6 @@
       ]
     },
     {
-      "chapter_num": 133,
       "title": "La Genèse - Chapitre 33 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -4125,7 +4091,6 @@
       ]
     },
     {
-      "chapter_num": 134,
       "title": "La Genèse - Chapitre 34 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -4255,7 +4220,6 @@
       ]
     },
     {
-      "chapter_num": 135,
       "title": "La Genèse - Chapitre 35 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -4377,7 +4341,6 @@
       ]
     },
     {
-      "chapter_num": 136,
       "title": "La Genèse - Chapitre 36 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -4555,7 +4518,6 @@
       ]
     },
     {
-      "chapter_num": 137,
       "title": "La Genèse - Chapitre 37 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -4705,7 +4667,6 @@
       ]
     },
     {
-      "chapter_num": 138,
       "title": "La Genèse - Chapitre 38 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -4831,7 +4792,6 @@
       ]
     },
     {
-      "chapter_num": 139,
       "title": "La Genèse - Chapitre 39 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -4929,7 +4889,6 @@
       ]
     },
     {
-      "chapter_num": 140,
       "title": "La Genèse - Chapitre 40 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -5027,7 +4986,6 @@
       ]
     },
     {
-      "chapter_num": 141,
       "title": "La Genèse - Chapitre 41 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -5261,7 +5219,6 @@
       ]
     },
     {
-      "chapter_num": 142,
       "title": "La Genèse - Chapitre 42 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -5419,7 +5376,6 @@
       ]
     },
     {
-      "chapter_num": 143,
       "title": "La Genèse - Chapitre 43 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -5561,7 +5517,6 @@
       ]
     },
     {
-      "chapter_num": 144,
       "title": "La Genèse - Chapitre 44 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -5703,7 +5658,6 @@
       ]
     },
     {
-      "chapter_num": 145,
       "title": "La Genèse - Chapitre 45 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -5821,7 +5775,6 @@
       ]
     },
     {
-      "chapter_num": 146,
       "title": "La Genèse - Chapitre 46 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -5963,7 +5916,6 @@
       ]
     },
     {
-      "chapter_num": 147,
       "title": "La Genèse - Chapitre 47 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -6093,7 +6045,6 @@
       ]
     },
     {
-      "chapter_num": 148,
       "title": "La Genèse - Chapitre 48 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -6187,7 +6138,6 @@
       ]
     },
     {
-      "chapter_num": 149,
       "title": "La Genèse - Chapitre 49 - בְּרֵאשִׁית",
       "verses": [
         {
@@ -6325,7 +6275,6 @@
       ]
     },
     {
-      "chapter_num": 150,
       "title": "La Genèse - Chapitre 50 - בְּרֵאשִׁית",
       "verses": [
         {

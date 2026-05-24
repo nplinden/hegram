@@ -1,9 +1,7 @@
 {
-  "book_index": 21,
   "name": "Cephania",
   "chapters": [
     {
-      "chapter_num": 2101,
       "title": "Cephania - Chapitre 1 - צְפַנְיָה",
       "verses": [
         {
@@ -81,7 +79,6 @@
       ]
     },
     {
-      "chapter_num": 2102,
       "title": "Cephania - Chapitre 2 - צְפַנְיָה",
       "verses": [
         {
@@ -147,7 +144,6 @@
       ]
     },
     {
-      "chapter_num": 2103,
       "title": "Cephania - Chapitre 3 - צְפַנְיָה",
       "verses": [
         {

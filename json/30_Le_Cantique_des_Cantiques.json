@@ -1,9 +1,7 @@
 {
-  "book_index": 30,
   "name": "Le Cantique des Cantiques",
   "chapters": [
     {
-      "chapter_num": 3001,
       "title": "Le Cantique des Cantiques - Chapitre 1 - שִׁיר הַשִּׁירִים",
       "verses": [
         {
@@ -77,7 +75,6 @@
       ]
     },
     {
-      "chapter_num": 3002,
       "title": "Le Cantique des Cantiques - Chapitre 2 - שִׁיר הַשִּׁירִים",
       "verses": [
         {
@@ -151,7 +148,6 @@
       ]
     },
     {
-      "chapter_num": 3003,
       "title": "Le Cantique des Cantiques - Chapitre 3 - שִׁיר הַשִּׁירִים",
       "verses": [
         {
@@ -201,7 +197,6 @@
       ]
     },
     {
-      "chapter_num": 3004,
       "title": "Le Cantique des Cantiques - Chapitre 4 - שִׁיר הַשִּׁירִים",
       "verses": [
         {
@@ -271,7 +266,6 @@
       ]
     },
     {
-      "chapter_num": 3005,
       "title": "Le Cantique des Cantiques - Chapitre 5 - שִׁיר הַשִּׁירִים",
       "verses": [
         {
@@ -341,7 +335,6 @@
       ]
     },
     {
-      "chapter_num": 3006,
       "title": "Le Cantique des Cantiques - Chapitre 6 - שִׁיר הַשִּׁירִים",
       "verses": [
         {
@@ -395,7 +388,6 @@
       ]
     },
     {
-      "chapter_num": 3007,
       "title": "Le Cantique des Cantiques - Chapitre 7 - שִׁיר הַשִּׁירִים",
       "verses": [
         {
@@ -457,7 +449,6 @@
       ]
     },
     {
-      "chapter_num": 3008,
       "title": "Le Cantique des Cantiques - Chapitre 8 - שִׁיר הַשִּׁירִים",
       "verses": [
         {
