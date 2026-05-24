@@ -107,6 +107,11 @@ app.layout = dmc.MantineProvider(
                                 id={"type": "navlink", "index": page_registry["pages.prepositions"]["relative_path"]},
                                 href=page_registry["pages.prepositions"]["relative_path"],
                             ),
+                            dmc.NavLink(
+                                label="Nombres",
+                                id={"type": "navlink", "index": page_registry["pages.numbers"]["relative_path"]},
+                                href=page_registry["pages.numbers"]["relative_path"],
+                            ),
                         ],
                     ),
                     dmc.NavLink(
