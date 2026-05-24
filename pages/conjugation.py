@@ -67,7 +67,13 @@ def french_passage(verse_id: int):
     book, chapter, verse = df["book"], df["chapter"], df["verse"]
     entry = _book_index[book]
     chapters = _get_chapters(entry["json_file"])
-    text = chapters[chapter - 1 + entry["chapter_offset"]][verse - 1]
+    fr_ch = chapters[chapter - 1 + entry["chapter_offset"]]
+    ch_map = entry.get("verse_maps", {}).get(str(chapter))
+    if ch_map and verse - 1 < len(ch_map):
+        fr_v_idx = ch_map[verse - 1]
+    else:
+        fr_v_idx = min(verse - 1, len(fr_ch) - 1)
+    text = fr_ch[fr_v_idx]
     return html.P([passage(verse_id), f" : {text}"])
 
 
