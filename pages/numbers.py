@@ -102,109 +102,101 @@ layout = dmc.MantineProvider(
                 "Un nombre s'affiche sous l'une de ses trois formes. "
                 "Retrouvez les deux autres. Les formes de 1 à 19 sont au féminin absolu (formes de comptage)."
             ),
-            dmc.Card(
-                withBorder=True,
-                shadow="sm",
-                radius="md",
-                p="xl",
+            dmc.CheckboxGroup(
+                id="numbers-range-check",
+                label="Plages autorisées",
+                value=["1-10"],
+                children=dmc.Group(
+                    [
+                        dmc.Checkbox(value="1-10",    label="1–10"),
+                        dmc.Checkbox(value="11-19",   label="11–19"),
+                        dmc.Checkbox(value="20-90",   label="20–90"),
+                        dmc.Checkbox(value="100-400", label="100–400"),
+                    ]
+                ),
+                mb=16,
+            ),
+            dmc.Flex(
+                dmc.Button(
+                    "Trouver un nombre",
+                    id="numbers-generate-btn",
+                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                ),
+                justify="center",
+                mb=20,
+            ),
+            dcc.Store(id="numbers-store", storage_type="session"),
+            html.Div(id="numbers-question-div"),
+            html.Div(
+                id="numbers-answer-div",
+                style={"display": "none"},
                 children=[
-                    dmc.CheckboxGroup(
-                        id="numbers-range-check",
-                        label="Plages autorisées",
-                        value=["1-10"],
-                        children=dmc.Group(
-                            [
-                                dmc.Checkbox(value="1-10",    label="1–10"),
-                                dmc.Checkbox(value="11-19",   label="11–19"),
-                                dmc.Checkbox(value="20-90",   label="20–90"),
-                                dmc.Checkbox(value="100-400", label="100–400"),
-                            ]
-                        ),
+                    dmc.Flex(
+                        [
+                            html.Div(
+                                [
+                                    dmc.Text(
+                                        id="numbers-answer-label-0",
+                                        size="sm",
+                                        c="dimmed",
+                                        ta="center",
+                                        mb=4,
+                                    ),
+                                    dmc.Select(
+                                        id="numbers-answer-select-0",
+                                        data=[],
+                                        value=None,
+                                        searchable=True,
+                                        styles={"input": _HEBREW_STYLE, "option": _HEBREW_STYLE},
+                                        comboboxProps={"withinPortal": True},
+                                    ),
+                                ],
+                                style={"flex": 1},
+                            ),
+                            html.Div(
+                                [
+                                    dmc.Text(
+                                        id="numbers-answer-label-1",
+                                        size="sm",
+                                        c="dimmed",
+                                        ta="center",
+                                        mb=4,
+                                    ),
+                                    dmc.Select(
+                                        id="numbers-answer-select-1",
+                                        data=[],
+                                        value=None,
+                                        searchable=True,
+                                        styles={"input": _HEBREW_STYLE, "option": _HEBREW_STYLE},
+                                        comboboxProps={"withinPortal": True},
+                                    ),
+                                ],
+                                style={"flex": 1},
+                            ),
+                        ],
+                        direction={"base": "column", "sm": "row"},
+                        gap="lg",
                         mb=16,
                     ),
                     dmc.Flex(
                         dmc.Button(
-                            "Trouver un nombre",
-                            id="numbers-generate-btn",
+                            "Vérifier",
+                            id="numbers-check-btn",
                             color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                         ),
                         justify="center",
-                        mb=20,
-                    ),
-                    dcc.Store(id="numbers-store", storage_type="session"),
-                    html.Div(id="numbers-question-div"),
-                    html.Div(
-                        id="numbers-answer-div",
-                        style={"display": "none"},
-                        children=[
-                            dmc.Flex(
-                                [
-                                    html.Div(
-                                        [
-                                            dmc.Text(
-                                                id="numbers-answer-label-0",
-                                                size="sm",
-                                                c="dimmed",
-                                                ta="center",
-                                                mb=4,
-                                            ),
-                                            dmc.Select(
-                                                id="numbers-answer-select-0",
-                                                data=[],
-                                                value=None,
-                                                searchable=True,
-                                                styles={"input": _HEBREW_STYLE, "option": _HEBREW_STYLE},
-                                                comboboxProps={"withinPortal": True},
-                                            ),
-                                        ],
-                                        style={"flex": 1},
-                                    ),
-                                    html.Div(
-                                        [
-                                            dmc.Text(
-                                                id="numbers-answer-label-1",
-                                                size="sm",
-                                                c="dimmed",
-                                                ta="center",
-                                                mb=4,
-                                            ),
-                                            dmc.Select(
-                                                id="numbers-answer-select-1",
-                                                data=[],
-                                                value=None,
-                                                searchable=True,
-                                                styles={"input": _HEBREW_STYLE, "option": _HEBREW_STYLE},
-                                                comboboxProps={"withinPortal": True},
-                                            ),
-                                        ],
-                                        style={"flex": 1},
-                                    ),
-                                ],
-                                direction={"base": "column", "sm": "row"},
-                                gap="lg",
-                                mb=16,
-                            ),
-                            dmc.Flex(
-                                dmc.Button(
-                                    "Vérifier",
-                                    id="numbers-check-btn",
-                                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                                ),
-                                justify="center",
-                                mb=16,
-                            ),
-                        ],
-                    ),
-                    dmc.Alert(
-                        "",
-                        id="numbers-result",
-                        style={"display": "none"},
-                        styles={
-                            "title": {"fontFamily": "\"Ezra SIL\", sans-serif", "fontSize": "1.4rem", "direction": "rtl"},
-                            "message": {"fontSize": "1rem"},
-                        },
+                        mb=16,
                     ),
                 ],
+            ),
+            dmc.Alert(
+                "",
+                id="numbers-result",
+                style={"display": "none"},
+                styles={
+                    "title": {"fontFamily": "\"Ezra SIL\", sans-serif", "fontSize": "1.4rem", "direction": "rtl"},
+                    "message": {"fontSize": "1rem"},
+                },
             ),
         ],
         className="container",
