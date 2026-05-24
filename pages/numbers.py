@@ -50,13 +50,17 @@ _RANGE_FILTERS = {
 
 REPRESENTATIONS = ["arabic", "name", "numeral"]
 
-LABELS = {
-    "arabic":  "Numéral arabe",
-    "name":    "Nom hébreu",
-    "numeral": "Numéral hébreu",
-}
+_HEBREW_INPUT_STYLE = {"fontFamily": '"Ezra SIL", sans-serif', "fontSize": "1.1rem", "direction": "rtl"}
 
-_HEBREW_STYLE = {"fontFamily": "\"Ezra SIL\", sans-serif", "fontSize": "1.1rem", "direction": "rtl"}
+_BG_NEUTRAL   = "#FFFFFF"
+_BG_CORRECT   = "#D4EFDF"
+_BG_INCORRECT = "#F2D7D5"
+_BG_PARTIAL   = "#FCF3CF"
+
+_COLOR_GIVEN   = "#000000"
+_COLOR_CORRECT = "#27AE60"
+_COLOR_WRONG   = "#A93226"
+_COLOR_UNKNOWN = "#AAAAAA"
 
 
 def _pool(ranges):
@@ -66,31 +70,114 @@ def _pool(ranges):
     return result or [n for n in NUMBERS if n["arabic"] <= 10]
 
 
-def _options(pool, key):
+def _select_data(pool, key):
     if key == "arabic":
         return [{"value": str(n["arabic"]), "label": str(n["arabic"])} for n in pool]
     return [{"value": n[key], "label": n[key]} for n in pool]
 
 
-def _question_card(given_key, given_value):
-    is_hebrew = given_key in ("name", "numeral")
+def _zone(label_text, value, color, is_rtl=False, font_size="3rem", border_right=False, border_bottom=False):
+    borders = {}
+    if border_right:
+        borders["borderRight"] = "1px solid rgba(0,0,0,0.1)"
+    if border_bottom:
+        borders["borderBottom"] = "1px solid rgba(0,0,0,0.1)"
+
     text_style = {
-        "fontFamily": "\"Ezra SIL\", sans-serif",
-        "fontSize": "3.5rem",
+        "fontFamily": '"Ezra SIL", sans-serif',
+        "fontSize": font_size,
         "textAlign": "center",
-        "lineHeight": "1.2",
-        **({"direction": "rtl"} if is_hebrew else {}),
+        "color": color,
+        "margin": "0",
+        "lineHeight": "1.3",
     }
-    return dmc.Card(
+    if is_rtl:
+        text_style["direction"] = "rtl"
+
+    return html.Div(
         [
-            dmc.Text(LABELS[given_key], size="sm", c="dimmed", ta="center", mb=4),
-            html.P(str(given_value), style=text_style),
+            dmc.Text(label_text, size="sm", c="dimmed", ta="center", mb=8),
+            html.P(value, style=text_style),
         ],
-        withBorder=True,
-        shadow="sm",
-        radius="md",
-        style={"maxWidth": "280px", "margin": "0 auto", "padding": "16px"},
-        mb=20,
+        style={
+            "padding": "24px 16px",
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "center",
+            "alignItems": "center",
+            "flex": 1,
+            **borders,
+        },
+    )
+
+
+def _card(bg, name_val, name_color, arabic_val, arabic_color, numeral_val, numeral_color):
+    top = _zone(
+        "Nom hébreu", name_val, name_color,
+        is_rtl=True, font_size="2.5rem", border_bottom=True,
+    )
+    arabic = _zone(
+        "Numéral arabe", str(arabic_val), arabic_color,
+        font_size="3rem", border_right=True,
+    )
+    numeral = _zone(
+        "Numéral hébreu", numeral_val, numeral_color,
+        is_rtl=True, font_size="3rem",
+    )
+    return html.Div(
+        [top, html.Div([arabic, numeral], style={"display": "flex"})],
+        style={
+            "backgroundColor": bg,
+            "borderRadius": "16px",
+            "border": "1px solid #e0e0e0",
+            "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
+            "overflow": "hidden",
+            "marginBottom": "24px",
+        },
+    )
+
+
+def _neutral_card(number, given_key):
+    def slot(key):
+        if key == given_key:
+            v = str(number[key]) if key == "arabic" else number[key]
+            return v, _COLOR_GIVEN
+        return "?", _COLOR_UNKNOWN
+
+    name_v, name_c     = slot("name")
+    arabic_v, arabic_c = slot("arabic")
+    num_v, num_c       = slot("numeral")
+    return _card(_BG_NEUTRAL, name_v, name_c, arabic_v, arabic_c, num_v, num_c)
+
+
+def _result_card(number, given_key, user_answers):
+    correct = wrong = 0
+    colors = {}
+    for k in REPRESENTATIONS:
+        if k == given_key:
+            colors[k] = _COLOR_GIVEN
+            continue
+        expected = str(number[k])
+        got = str(user_answers.get(k) or "")
+        if got == expected:
+            colors[k] = _COLOR_CORRECT
+            correct += 1
+        else:
+            colors[k] = _COLOR_WRONG
+            wrong += 1
+
+    if wrong == 0:
+        bg = _BG_CORRECT
+    elif correct == 0:
+        bg = _BG_INCORRECT
+    else:
+        bg = _BG_PARTIAL
+
+    return _card(
+        bg,
+        number["name"],        colors["name"],
+        str(number["arabic"]), colors["arabic"],
+        number["numeral"],     colors["numeral"],
     )
 
 
@@ -123,51 +210,55 @@ layout = dmc.MantineProvider(
                     color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                 ),
                 justify="center",
-                mb=20,
+                mb=24,
             ),
             dcc.Store(id="numbers-store", storage_type="session"),
-            html.Div(id="numbers-question-div"),
+            html.Div(id="numbers-card"),
             html.Div(
-                id="numbers-answer-div",
+                id="numbers-answer-section",
                 style={"display": "none"},
                 children=[
                     dmc.Flex(
                         [
                             html.Div(
-                                [
-                                    dmc.Text(
-                                        id="numbers-answer-label-0",
-                                        size="sm",
-                                        c="dimmed",
-                                        ta="center",
-                                        mb=4,
-                                    ),
+                                id="numbers-select-name-wrapper",
+                                children=[
+                                    dmc.Text("Nom hébreu", size="sm", c="dimmed", ta="center", mb=4),
                                     dmc.Select(
-                                        id="numbers-answer-select-0",
+                                        id="numbers-select-name",
                                         data=[],
                                         value=None,
                                         searchable=True,
-                                        styles={"input": _HEBREW_STYLE, "option": _HEBREW_STYLE},
+                                        styles={"input": _HEBREW_INPUT_STYLE, "option": _HEBREW_INPUT_STYLE},
                                         comboboxProps={"withinPortal": True},
                                     ),
                                 ],
                                 style={"flex": 1},
                             ),
                             html.Div(
-                                [
-                                    dmc.Text(
-                                        id="numbers-answer-label-1",
-                                        size="sm",
-                                        c="dimmed",
-                                        ta="center",
-                                        mb=4,
-                                    ),
+                                id="numbers-select-arabic-wrapper",
+                                children=[
+                                    dmc.Text("Numéral arabe", size="sm", c="dimmed", ta="center", mb=4),
                                     dmc.Select(
-                                        id="numbers-answer-select-1",
+                                        id="numbers-select-arabic",
                                         data=[],
                                         value=None,
                                         searchable=True,
-                                        styles={"input": _HEBREW_STYLE, "option": _HEBREW_STYLE},
+                                        comboboxProps={"withinPortal": True},
+                                    ),
+                                ],
+                                style={"flex": 1},
+                            ),
+                            html.Div(
+                                id="numbers-select-numeral-wrapper",
+                                children=[
+                                    dmc.Text("Numéral hébreu", size="sm", c="dimmed", ta="center", mb=4),
+                                    dmc.Select(
+                                        id="numbers-select-numeral",
+                                        data=[],
+                                        value=None,
+                                        searchable=True,
+                                        styles={"input": _HEBREW_INPUT_STYLE, "option": _HEBREW_INPUT_STYLE},
                                         comboboxProps={"withinPortal": True},
                                     ),
                                 ],
@@ -189,15 +280,6 @@ layout = dmc.MantineProvider(
                     ),
                 ],
             ),
-            dmc.Alert(
-                "",
-                id="numbers-result",
-                style={"display": "none"},
-                styles={
-                    "title": {"fontFamily": "\"Ezra SIL\", sans-serif", "fontSize": "1.4rem", "direction": "rtl"},
-                    "message": {"fontSize": "1rem"},
-                },
-            ),
         ],
         className="container",
     )
@@ -205,16 +287,18 @@ layout = dmc.MantineProvider(
 
 
 @callback(
-    Output("numbers-question-div", "children"),
-    Output("numbers-answer-div", "style"),
-    Output("numbers-answer-label-0", "children"),
-    Output("numbers-answer-select-0", "data"),
-    Output("numbers-answer-select-0", "value"),
-    Output("numbers-answer-label-1", "children"),
-    Output("numbers-answer-select-1", "data"),
-    Output("numbers-answer-select-1", "value"),
+    Output("numbers-card", "children"),
+    Output("numbers-select-name-wrapper", "style"),
+    Output("numbers-select-arabic-wrapper", "style"),
+    Output("numbers-select-numeral-wrapper", "style"),
+    Output("numbers-select-name", "data"),
+    Output("numbers-select-arabic", "data"),
+    Output("numbers-select-numeral", "data"),
+    Output("numbers-select-name", "value"),
+    Output("numbers-select-arabic", "value"),
+    Output("numbers-select-numeral", "value"),
+    Output("numbers-answer-section", "style"),
     Output("numbers-store", "data"),
-    Output("numbers-result", "style", allow_duplicate=True),
     Input("numbers-generate-btn", "n_clicks"),
     State("numbers-range-check", "value"),
     prevent_initial_call=True,
@@ -223,53 +307,38 @@ def generate_number(_, ranges):
     pool = _pool(ranges)
     number = random.choice(pool)
     given_key = random.choice(REPRESENTATIONS)
-    answer_keys = [k for k in REPRESENTATIONS if k != given_key]
+
+    shown  = {"flex": 1}
+    hidden = {"display": "none"}
 
     return (
-        _question_card(given_key, number[given_key]),
+        _neutral_card(number, given_key),
+        hidden if given_key == "name"    else shown,
+        hidden if given_key == "arabic"  else shown,
+        hidden if given_key == "numeral" else shown,
+        _select_data(pool, "name"),
+        _select_data(pool, "arabic"),
+        _select_data(pool, "numeral"),
+        None, None, None,
         {"display": "block"},
-        LABELS[answer_keys[0]],
-        _options(pool, answer_keys[0]),
-        None,
-        LABELS[answer_keys[1]],
-        _options(pool, answer_keys[1]),
-        None,
-        {"number": number, "answer_keys": answer_keys},
-        {"display": "none"},
+        {"number": number, "given_key": given_key},
     )
 
 
 @callback(
-    Output("numbers-result", "children"),
-    Output("numbers-result", "title"),
-    Output("numbers-result", "color"),
-    Output("numbers-result", "style", allow_duplicate=True),
+    Output("numbers-card", "children", allow_duplicate=True),
     Input("numbers-check-btn", "n_clicks"),
     State("numbers-store", "data"),
-    State("numbers-answer-select-0", "value"),
-    State("numbers-answer-select-1", "value"),
+    State("numbers-select-name", "value"),
+    State("numbers-select-arabic", "value"),
+    State("numbers-select-numeral", "value"),
     prevent_initial_call=True,
 )
-def check_answer(_, store, val0, val1):
+def check_answer(_, store, name_val, arabic_val, numeral_val):
     if not store:
         raise PreventUpdate
-
-    number = store["number"]
-    k0, k1 = store["answer_keys"]
-
-    correct0 = str(number[k0])
-    correct1 = str(number[k1])
-    ok0 = (val0 or "") == correct0
-    ok1 = (val1 or "") == correct1
-
-    title = f"{number['arabic']}  ·  {number['name']}  ·  {number['numeral']}"
-    lines = []
-    for label, val, correct, ok in [
-        (LABELS[k0], val0, correct0, ok0),
-        (LABELS[k1], val1, correct1, ok1),
-    ]:
-        mark = "✓" if ok else f"✗  →  {correct}"
-        lines.append(html.P(f"{label} : {val or '—'}  {mark}"))
-
-    color = "green" if (ok0 and ok1) else "red"
-    return lines, title, color, {"display": "block"}
+    return _result_card(
+        store["number"],
+        store["given_key"],
+        {"name": name_val, "arabic": arabic_val, "numeral": numeral_val},
+    )
