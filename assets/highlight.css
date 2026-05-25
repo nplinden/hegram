@@ -29,7 +29,7 @@ span.hlbx {
 }
 
 :root {
-  --hl-strong: hsla(60, 100%, 70%, 0.9);
-  --hl-rim: hsla(55, 80%, 50%, 1);
+  --hl-strong: hsla(210, 100%, 80%, 0.7);
+  --hl-rim: hsla(210, 80%, 55%, 1);
   --ehl-strong: hsla(240, 100%, 70%, 0.9);
 }
