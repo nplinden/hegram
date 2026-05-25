@@ -1,6 +1,7 @@
 import dash
 from dash import callback, Output, Input
 from dash.exceptions import PreventUpdate
+from dash_iconify import DashIconify
 from hegram.definitions import definitions
 from hegram.utils import htmlify, convert_html_to_dash
 from loguru import logger
@@ -300,13 +301,24 @@ chart = dmc.BarChart(
     px=25,
 )
 
+@callback(
+    Output("stat-intro-modal", "opened"),
+    Input("stat-intro-btn", "n_clicks"),
+    prevent_initial_call=True,
+)
+def open_stat_intro_modal(_):
+    return True
+
+
 layout = dmc.MantineProvider(
     children=[
         html.Div(
             [
-                html.Div(
-                    [
-                        html.H1("Statistiques sur les racines verbales"),
+                dmc.Modal(
+                    id="stat-intro-modal",
+                    opened=False,
+                    title="Statistiques sur les racines verbales",
+                    children=[
                         html.P(
                             "Vous trouverez ici un aperçu du nombre d'occurrences de chaque racine verbale dans la Bible hébraïque, avec une ventilation selon les binyanim et les temps. Cette page comporte trois volets :"
                         ),
@@ -331,6 +343,19 @@ layout = dmc.MantineProvider(
                             ]
                         ),
                     ],
+                ),
+                dmc.Flex(
+                    [
+                        dmc.ActionIcon(
+                            DashIconify(icon="material-symbols:info", width=20),
+                            id="stat-intro-btn",
+                            variant="subtle",
+                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                            size="lg",
+                        ),
+                    ],
+                    justify="flex-end",
+                    align="center",
                     className="container",
                 ),
                 html.Div(
