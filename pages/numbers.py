@@ -160,11 +160,39 @@ def _neutral_card(number, given_key, pool):
         label = LABELS[key]
         is_rtl = key in ("name", "numeral")
         font_size = "2.5rem" if key == "name" else "3rem"
+        # Always render the select so its ID is always in the DOM.
+        # For the given slot, hide it and show the value as text instead.
+        select = _make_select(key, pool)
         if key == given_key:
             v = str(number[key]) if key == "arabic" else number[key]
-            return _text_zone(label, v, _COLOR_GIVEN, is_rtl=is_rtl, font_size=font_size,
-                              border_right=border_right, border_bottom=border_bottom)
-        return _select_zone(label, _make_select(key, pool),
+            borders = {}
+            if border_right:
+                borders["borderRight"] = "1px solid rgba(0,0,0,0.1)"
+            if border_bottom:
+                borders["borderBottom"] = "1px solid rgba(0,0,0,0.1)"
+            text_style = {
+                "fontFamily": '"Ezra SIL", sans-serif',
+                "fontSize": font_size,
+                "textAlign": "center",
+                "color": _COLOR_GIVEN,
+                "margin": "0",
+                "lineHeight": "1.3",
+            }
+            if is_rtl:
+                text_style["direction"] = "rtl"
+            return html.Div(
+                [
+                    dmc.Text(label, size="sm", c="dimmed", ta="center", mb=8),
+                    html.P(v, style=text_style),
+                    html.Div(select, style={"display": "none"}),
+                ],
+                style={
+                    "padding": "24px 16px", "display": "flex", "flexDirection": "column",
+                    "justifyContent": "center", "alignItems": "center", "flex": 1,
+                    **borders,
+                },
+            )
+        return _select_zone(label, select,
                             border_right=border_right, border_bottom=border_bottom)
 
     top    = make_zone("name", border_bottom=True)
@@ -276,6 +304,7 @@ def generate_number(_, ranges):
 
 @callback(
     Output("numbers-card", "children", allow_duplicate=True),
+    Output("numbers-verify-section", "style", allow_duplicate=True),
     Input("numbers-check-btn", "n_clicks"),
     State("numbers-store", "data"),
     State("numbers-select-name", "value"),
@@ -286,8 +315,11 @@ def generate_number(_, ranges):
 def check_answer(_, store, name_val, arabic_val, numeral_val):
     if not store:
         raise PreventUpdate
-    return _result_card(
-        store["number"],
-        store["given_key"],
-        {"name": name_val, "arabic": arabic_val, "numeral": numeral_val},
+    return (
+        _result_card(
+            store["number"],
+            store["given_key"],
+            {"name": name_val, "arabic": arabic_val, "numeral": numeral_val},
+        ),
+        {"display": "none"},
     )
