@@ -95,21 +95,6 @@ layout = dmc.MantineProvider(
             dcc.Download(id="download-paal-strong"),
             dmc.Flex(
                 [
-                    html.Div(
-                        [
-                            html.P(
-                                "שׁמר",
-                                style={
-                                    "fontFamily": '"Ezra SIL", sans-serif',
-                                    "fontSize": "2.5rem",
-                                    "direction": "rtl",
-                                    "margin": "0 0 2px 0",
-                                    "lineHeight": 1.2,
-                                },
-                            ),
-                            dmc.Text("Verbe fort au Paal", size="sm", c="dimmed"),
-                        ]
-                    ),
                     dmc.ActionIcon(
                         DashIconify(icon="material-symbols:download", width=20),
                         id="button-paal-strong",
@@ -118,10 +103,10 @@ layout = dmc.MantineProvider(
                         size="lg",
                     ),
                 ],
-                justify="space-between",
-                align="center",
-                mb=24,
+                justify="flex-end",
+                mb=16,
             ),
+            _single_card("Racine", "שׁמר"),
             dmc.SimpleGrid(
                 cols={"base": 1, "sm": 2},
                 spacing="lg",
