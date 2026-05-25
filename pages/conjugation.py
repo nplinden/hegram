@@ -120,17 +120,14 @@ def french_passage(verse_id: int):
     return html.P([passage(verse_id), f" : {text}"])
 
 
-def _verse_ref(verse_id: int) -> str:
-    df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
-    book = en_to_fr_books[df["book"]]
-    return f"{book} {df['chapter']}:{df['verse']}"
+def _verse_ref(verse_row: dict) -> str:
+    book = en_to_fr_books[verse_row["book"]]
+    return f"{book} {verse_row['chapter']}:{verse_row['verse']}"
 
 
-def _build_verse_html(verse_id: int, word_id: int) -> str:
-    df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
-    word_df = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect()
-    word = BeautifulSoup(word_df.to_dicts()[0]["html"], features="html.parser").find("span").string
-    soup = BeautifulSoup(df["html"], features="html.parser")
+def _build_verse_html(verse_row: dict, word_html_str: str) -> str:
+    word = BeautifulSoup(word_html_str, features="html.parser").find("span").string
+    soup = BeautifulSoup(verse_row["html"], features="html.parser")
     span = soup.find("span", string=word)
     _hl(span)
     prev = span.find_previous_sibling("span")
@@ -142,19 +139,28 @@ def _build_verse_html(verse_id: int, word_id: int) -> str:
     return str(soup)
 
 
-def _build_word_html(word_id: int) -> str:
-    row = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect().to_dicts()[0]
-    soup = BeautifulSoup(row["html"], features="html.parser")
-    soup.find("div")["class"] = ["singleword"]
-    return str(soup)
-
-
 def _build_pdf_html(samples: list[dict]) -> str:
+    word_ids = list({s["WordId"] for s in samples})
+    verse_ids = list({s["VerseId"] for s in samples})
+    words = {
+        r["id"]: r["html"]
+        for r in pl.scan_parquet("data/words.parquet")
+        .filter(pl.col("id").is_in(word_ids))
+        .collect()
+        .to_dicts()
+    }
+    verses = {
+        r["id"]: r
+        for r in pl.scan_parquet("data/verses.parquet")
+        .filter(pl.col("id").is_in(verse_ids))
+        .collect()
+        .to_dicts()
+    }
     answer_labels = ["Racine", "Binyan", "Temps", "Personne"]
     questions_html = ""
     for i, s in enumerate(samples, 1):
-        verse_html = _build_verse_html(s["VerseId"], s["WordId"])
-        ref = _verse_ref(s["VerseId"])
+        verse_html = _build_verse_html(verses[s["VerseId"]], words[s["WordId"]])
+        ref = _verse_ref(verses[s["VerseId"]])
         answer_fields = "".join(
             f'<div class="answer-field"><span class="answer-label">{label} :</span><span class="answer-line"></span></div>'
             for label in answer_labels
