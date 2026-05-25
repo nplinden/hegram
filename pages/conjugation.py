@@ -298,13 +298,16 @@ _ROOT_DATA = get_root_select_data()
 
 
 def _answer_row(index, correct, guess, is_correct):
-    icon = dmc.ActionIcon(
-        DashIconify(icon="material-symbols:help-outline", width=14),
-        id={"type": "answer-help-btn", "index": index},
-        variant="subtle",
-        size="xs",
-        color="gray",
-    )
+    if index == 0:
+        icon = dmc.ActionIcon(
+            DashIconify(icon="material-symbols:help-outline", width=14),
+            id={"type": "answer-help-btn", "index": index},
+            variant="subtle",
+            size="xs",
+            color="gray",
+        )
+    else:
+        icon = None
     if is_correct:
         text_el = dmc.Text(correct or "—", c="green.7", fw=600, size="lg")
     else:
@@ -316,8 +319,9 @@ def _answer_row(index, correct, guess, is_correct):
             ],
             style={"display": "flex", "gap": "8px", "alignItems": "center"},
         )
+    children = [c for c in [icon, text_el] if c is not None]
     return html.Div(
-        [icon, text_el],
+        children,
         style={
             "display": "flex",
             "alignItems": "center",
