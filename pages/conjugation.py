@@ -1,4 +1,6 @@
 import base64 as _b64
+import os as _os
+import weasyprint as _weasyprint
 import dash
 import dash_mantine_components as dmc
 import json as _json
@@ -8,6 +10,7 @@ from bs4 import BeautifulSoup, NavigableString
 from dash import callback, Input, Output, State, dcc, ALL
 from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
+from loguru import logger
 from hegram.mechon_mamre import verse_to_url, en_to_fr_books
 
 from hegram.data import dropdown_data, en_to_fr, answer_data, roots_data
@@ -146,13 +149,7 @@ def _build_word_html(word_id: int) -> str:
     return str(soup)
 
 
-def _pdf_font_b64() -> str:
-    with open("assets/SILEOT.woff", "rb") as f:
-        return _b64.b64encode(f.read()).decode()
-
-
 def _build_pdf_html(samples: list[dict]) -> str:
-    font_b64 = _pdf_font_b64()
     answer_labels = [
         ("Racine", "Binyan"),
         ("Temps", "Personne / Genre / Nombre"),
@@ -184,36 +181,36 @@ def _build_pdf_html(samples: list[dict]) -> str:
     )}
   </div>
 </div>"""
-    css = f"""
-@font-face {{
+    css = """
+@font-face {
   font-family: "Ezra SIL";
-  src: url("data:font/woff;base64,{font_b64}");
+  src: url("SILEOT.woff");
   unicode-range: U+0590-U+05FF, U+FB1D-U+FB4F;
-}}
-* {{ box-sizing: border-box; margin: 0; padding: 0; }}
-body {{ font-family: "Ezra SIL", sans-serif; background: white; color: #111; }}
-.question {{
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; }
+.question {
   padding: 15mm 20mm;
   page-break-after: always;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   gap: 20px;
-}}
-.question:last-child {{ page-break-after: avoid; }}
-.question-number {{
+}
+.question:last-child { page-break-after: avoid; }
+.question-number {
   font-size: 0.85rem;
   font-weight: 600;
   color: #888;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-}}
-.cards-row {{
+}
+.cards-row {
   display: flex;
   gap: 20px;
   align-items: flex-start;
-}}
-.verb-card {{
+}
+.verb-card {
   flex: 0 0 auto;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -222,69 +219,69 @@ body {{ font-family: "Ezra SIL", sans-serif; background: white; color: #111; }}
   align-items: center;
   justify-content: center;
   min-width: 140px;
-}}
-.verse-card {{
+}
+.verse-card {
   flex: 1;
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 16px 20px;
-}}
-.singleword {{
+}
+.singleword {
   font-family: "Ezra SIL", sans-serif;
   font-size: 3rem;
   direction: rtl;
-}}
-.fullverse {{
+}
+.fullverse {
   font-family: "Ezra SIL", sans-serif;
   font-size: 1.8rem;
   direction: rtl;
   line-height: 1.6;
-}}
-.hl {{
+}
+.hl {
   background-color: rgba(147, 197, 253, 0.6);
   border-radius: 2px;
-}}
-.verse-ref {{
+}
+.verse-ref {
   font-style: italic;
   font-size: 0.8rem;
   color: #666;
   margin-top: 10px;
   direction: ltr;
-}}
-.answer-section {{
+}
+.answer-section {
   border-top: 1px solid #e0e0e0;
   padding-top: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-}}
-.answer-row {{
+}
+.answer-row {
   display: flex;
   gap: 16px;
-}}
-.answer-field {{
+}
+.answer-field {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
-}}
-.answer-label {{
+}
+.answer-label {
   font-size: 0.75rem;
   font-weight: 600;
   color: #555;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-}}
-.answer-box {{
+}
+.answer-box {
   border: 1px solid #aaa;
   border-radius: 4px;
   height: 38px;
   background: white;
-}}
-@media print {{
-  body {{ margin: 0; }}
-  .question {{ padding: 10mm 15mm; min-height: unset; }}
-}}
+}
+@media print {
+  body { margin: 0; }
+  .question { padding: 10mm 15mm; min-height: unset; }
+}
 """
     return f"""<!DOCTYPE html>
 <html lang="fr">
@@ -895,23 +892,29 @@ def open_detail_modal(n_clicks_list):
     prevent_initial_call=True,
 )
 def generate_pdf(_, n_questions, roots, book, binyanim, tenses, persons, genders, numbers):
-    if not n_questions:
+    try:
+        if not n_questions:
+            raise PreventUpdate
+        df = pl.scan_parquet("data/conjugation.parquet")
+        filtered = df.filter(
+            pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
+            & pl.when(bool(binyanim)).then(pl.col("Binyan").is_in(binyanim)).otherwise(pl.lit(True))
+            & pl.when(bool(tenses)).then(pl.col("Tense").is_in(tenses)).otherwise(pl.lit(True))
+            & pl.when(bool(persons)).then(pl.col("Person").is_in(persons)).otherwise(pl.lit(True))
+            & pl.when(bool(genders)).then(pl.col("Gender").is_in(genders)).otherwise(pl.lit(True))
+            & pl.when(bool(numbers)).then(pl.col("Number").is_in(numbers)).otherwise(pl.lit(True))
+            & pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
+        ).collect()
+        if filtered.is_empty():
+            raise PreventUpdate
+        k = min(int(n_questions), len(filtered))
+        samples = filtered.sample(n=k).to_dicts()
+        html_content = _build_pdf_html(samples)
+        assets_dir = _os.path.abspath("assets")
+        pdf_bytes = _weasyprint.HTML(string=html_content, base_url=assets_dir).write_pdf()
+        return dcc.send_bytes(pdf_bytes, filename="questionnaire_conjugaison.pdf")
+    except PreventUpdate:
+        raise
+    except Exception:
+        logger.exception("PDF generation failed")
         raise PreventUpdate
-    df = pl.scan_parquet("data/conjugation.parquet")
-    filtered = df.filter(
-        pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
-        & pl.when(bool(binyanim)).then(pl.col("Binyan").is_in(binyanim)).otherwise(pl.lit(True))
-        & pl.when(bool(tenses)).then(pl.col("Tense").is_in(tenses)).otherwise(pl.lit(True))
-        & pl.when(bool(persons)).then(pl.col("Person").is_in(persons)).otherwise(pl.lit(True))
-        & pl.when(bool(genders)).then(pl.col("Gender").is_in(genders)).otherwise(pl.lit(True))
-        & pl.when(bool(numbers)).then(pl.col("Number").is_in(numbers)).otherwise(pl.lit(True))
-        & pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
-    ).collect()
-    if filtered.is_empty():
-        raise PreventUpdate
-    k = min(int(n_questions), len(filtered))
-    samples = filtered.sample(n=k).to_dicts()
-    html_content = _build_pdf_html(samples)
-    import weasyprint
-    pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
-    return dcc.send_bytes(pdf_bytes, filename="questionnaire_conjugaison.pdf")
