@@ -189,7 +189,7 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
 
     root_nodiacr = Hebrew(root).text_only()
     definition = definitions.get(str(root_nodiacr), [["No definition found"]])[0]
-    html_parts = ["<div>", "<p>Définition :</p>"]
+    html_parts = ["<div>"]
     for d in definition:
         html_parts.append(htmlify(d))
     html_parts.append("</div>")
@@ -423,7 +423,6 @@ def layout():
             dmc.Modal(
                 id="conj-detail-modal",
                 opened=False,
-                title="Détails",
                 size="xl",
                 children=[],
             ),
