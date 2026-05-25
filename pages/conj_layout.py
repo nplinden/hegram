@@ -99,9 +99,10 @@ def make_page(page_id, title, root, asset, accompli, inaccompli,
         html.Div(
             [
                 dcc.Download(id=f"download-{page_id}"),
-                html.H1(title, style={"marginBottom": "16px"}),
                 dmc.Flex(
                     [
+                        html.Div(style={"width": "36px"}),
+                        html.H1(title, style={"margin": 0, "flex": 1, "textAlign": "center"}),
                         dmc.ActionIcon(
                             DashIconify(icon="material-symbols:download", width=20),
                             id=f"btn-{page_id}",
@@ -110,7 +111,7 @@ def make_page(page_id, title, root, asset, accompli, inaccompli,
                             size="lg",
                         ),
                     ],
-                    justify="flex-end",
+                    align="center",
                     mb=16,
                 ),
                 html.Div(_single_card("Racine", root), style={"marginBottom": "16px"}),
