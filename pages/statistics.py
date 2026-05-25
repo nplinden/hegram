@@ -317,6 +317,7 @@ layout = dmc.MantineProvider(
                 dmc.Modal(
                     id="stat-intro-modal",
                     opened=False,
+                    size="xl",
                     title="Statistiques sur les racines verbales",
                     children=[
                         html.P(
