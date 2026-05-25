@@ -394,11 +394,15 @@ def layout():
                 html.Div(
                     [
                         html.Div(
-                            html.Div(children=[], id="word-div"),
+                            [
+                                dmc.Text("Mot", size="sm", c="dimmed", ta="center", mb=8),
+                                html.Div(children=[], id="word-div"),
+                            ],
                             style={
                                 "flex": 1,
                                 "borderRight": "1px solid rgba(0,0,0,0.1)",
                                 "display": "flex",
+                                "flexDirection": "column",
                                 "alignItems": "center",
                                 "justifyContent": "center",
                                 "padding": "24px 16px",
@@ -407,6 +411,7 @@ def layout():
                         ),
                         html.Div(
                             [
+                                dmc.Text("Analyse", size="sm", c="dimmed", ta="center", mb=8),
                                 dmc.Select(
                                     placeholder="Racine", value=None, data=get_root_select_data(), searchable=True, id="root-answer"
                                 ),
@@ -432,6 +437,7 @@ def layout():
                     "border": "1px solid #e0e0e0",
                     "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
                     "overflow": "hidden",
+                    "backgroundColor": "#FFFFFF",
                     "marginBottom": "24px",
                     "display": "none",
                 },
