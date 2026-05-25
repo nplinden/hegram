@@ -43,7 +43,7 @@ def binyanim_barchart(roots=None):
         Input("table", "selected_cells"),
     ],
 )
-def update_binyanim_bar_graph(data: DataList, selected_cells: DataList) -> go.Figure:
+def update_binyanim_bar_graph(data: DataList, selected_cells: DataList):
     logger.info("Triggering table_select callback")
     if selected_cells is None:
         return binyanim_barchart()
