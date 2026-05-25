@@ -325,11 +325,12 @@ solution_body = dmc.TableTbody(
     id="solution-body",
 )
 
-layout = dmc.MantineProvider(
-    dash.html.Div(
-        children=[
-            dcc.Store(id="solution-storage", storage_type="local"),
-            dcc.Interval(id="conj-init", interval=1, max_intervals=1),
+def layout():
+    return dmc.MantineProvider(
+        dash.html.Div(
+            children=[
+                dcc.Store(id="solution-storage", storage_type="local"),
+                dcc.Interval(id="conj-init", interval=1, max_intervals=1),
             dmc.Modal(
                 id="conj-intro-modal",
                 opened=False,
@@ -427,7 +428,7 @@ layout = dmc.MantineProvider(
         ],
         className="container",
     )
-)
+    )
 
 
 @callback(
