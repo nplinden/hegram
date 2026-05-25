@@ -9,10 +9,10 @@ dash.register_page(__name__, path="/exercises/prepositions")
 flexion = pd.read_csv("data/prepositions.csv")
 
 _BG_NEUTRAL  = "#FFFFFF"
-_BG_REVEALED = "#EBF5FB"
+_BG_REVEALED = "#D4EFDF"
 
 _COLOR_HEBREW = "#000000"
-_COLOR_FRENCH = "#2471A3"
+_COLOR_FRENCH = "#27AE60"
 _COLOR_HIDDEN = "#AAAAAA"
 
 _CARD_STYLE = {
@@ -26,7 +26,7 @@ _CARD_STYLE = {
 }
 
 
-def _zone(label, value, color, is_rtl=False, font_size="3rem", border_top=False):
+def _zone(label, value, color, is_rtl=False, font_size="3rem", border_bottom=False):
     text_style = {
         "fontFamily": '"Ezra SIL", sans-serif',
         "fontSize": font_size,
@@ -37,7 +37,7 @@ def _zone(label, value, color, is_rtl=False, font_size="3rem", border_top=False)
     }
     if is_rtl:
         text_style["direction"] = "rtl"
-    border = {"borderTop": "1px solid rgba(0,0,0,0.1)"} if border_top else {}
+    border = {"borderBottom": "1px solid rgba(0,0,0,0.1)"} if border_bottom else {}
     min_h = "140px" if font_size == "3rem" else "120px"
     return html.Div(
         [dmc.Text(label, size="sm", c="dimmed", ta="center", mb=8), html.P(value, style=text_style)],
@@ -49,8 +49,8 @@ def _zone(label, value, color, is_rtl=False, font_size="3rem", border_top=False)
 def _neutral_card(row):
     return html.Div(
         [
-            _zone("Hébreu", row["hebrew"], _COLOR_HEBREW, is_rtl=True),
-            _zone("Français", "?", _COLOR_HIDDEN, font_size="2rem", border_top=True),
+            _zone("Hébreu", row["hebrew"], _COLOR_HEBREW, is_rtl=True, border_bottom=True),
+            _zone("Français", "?", _COLOR_HIDDEN, font_size="2rem"),
         ],
         style={**_CARD_STYLE, "backgroundColor": _BG_NEUTRAL},
     )
@@ -59,8 +59,8 @@ def _neutral_card(row):
 def _revealed_card(row):
     return html.Div(
         [
-            _zone("Hébreu", row["hebrew"], _COLOR_HEBREW, is_rtl=True),
-            _zone("Français", row["french"], _COLOR_FRENCH, font_size="2rem", border_top=True),
+            _zone("Hébreu", row["hebrew"], _COLOR_HEBREW, is_rtl=True, border_bottom=True),
+            _zone("Français", row["french"], _COLOR_FRENCH, font_size="2rem"),
         ],
         style={**_CARD_STYLE, "backgroundColor": _BG_REVEALED},
     )
