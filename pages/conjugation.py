@@ -369,30 +369,34 @@ def _answer_row(index, correct, guess, is_correct):
     )
 
 
-def _slider_marks():
-    positions = [1, 50, 100, 250, 500, 1000, _N_ROOTS]
-    seen = set()
-    marks = []
-    for p in positions:
-        v = min(p, _N_ROOTS)
-        if v not in seen:
-            seen.add(v)
-            marks.append({"value": v, "label": str(v)})
-    return marks
-
-
 root_freq_slider = dmc.Box(
     [
         dmc.Text("Fréquence des racines", size="sm", fw=500, mb=4),
-        dmc.RangeSlider(
-            id="conjugation-roots-slider",
-            min=1,
-            max=_N_ROOTS,
-            step=1,
-            value=[1, _N_ROOTS],
-            marks=_slider_marks(),
-            mb=24,
-            minRange=1,
+        dmc.Group(
+            [
+                dmc.NumberInput(
+                    id="conjugation-roots-rank-from",
+                    label="Du rang",
+                    description="1 = le plus fréquent",
+                    min=1,
+                    max=_N_ROOTS,
+                    step=1,
+                    value=1,
+                    style={"flex": 1},
+                ),
+                dmc.NumberInput(
+                    id="conjugation-roots-rank-to",
+                    label="Au rang",
+                    description=f"max = {_N_ROOTS}",
+                    min=1,
+                    max=_N_ROOTS,
+                    step=1,
+                    value=_N_ROOTS,
+                    style={"flex": 1},
+                ),
+            ],
+            grow=True,
+            align="flex-start",
         ),
     ],
     mb=10,
@@ -635,11 +639,15 @@ def open_intro_modal(_):
 
 @callback(
     Output("conjugation-roots-dropdown", "value"),
-    Input("conjugation-roots-slider", "value"),
+    Input("conjugation-roots-rank-from", "value"),
+    Input("conjugation-roots-rank-to", "value"),
     prevent_initial_call=True,
 )
-def slider_to_root_select(slider_value):
-    lo, hi = slider_value
+def inputs_to_root_select(lo, hi):
+    if lo is None or hi is None:
+        return no_update
+    lo = max(1, int(lo))
+    hi = min(_N_ROOTS, int(hi))
     if lo == 1 and hi == _N_ROOTS:
         return []
     return _ROOTS_BY_FREQ[lo - 1 : hi]
