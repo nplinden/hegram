@@ -250,7 +250,7 @@ body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; padd
   flex: 1;
   display: flex;
   flex-direction: row;
-  align-items: baseline;
+  align-items: flex-end;
   gap: 4px;
 }
 .answer-label {
@@ -258,11 +258,11 @@ body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; padd
   font-weight: 600;
   color: #555;
   white-space: nowrap;
+  line-height: 1;
 }
 .answer-line {
   flex: 1;
   border-bottom: 1px solid #888;
-  height: 0.9em;
 }
 @media print {
   body { margin: 0; padding: 10mm 12mm; }
