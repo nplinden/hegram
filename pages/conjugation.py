@@ -4,7 +4,7 @@ import json as _json
 from dash import html, no_update
 import polars as pl
 from bs4 import BeautifulSoup
-from dash import callback, Input, Output, State, dcc
+from dash import callback, Input, Output, State, dcc, ALL
 from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
 from hegram.mechon_mamre import verse_to_url, en_to_fr_books
@@ -102,10 +102,7 @@ def french_passage(verse_id: int):
     Output("word-div", "children"),
     Output("solution-storage", "data"),
     Output("verse-card", "style"),
-    Output("solution-alert", "children"),
-    Output("solution-alert", "title"),
-    Output("solution-alert", "style"),
-    Output("solution-alert", "color"),
+    Output("conj-detail-modal", "children"),
     Output("notification", "children"),
     Output("answer-card", "style"),
     Output("frenchverse-div", "children"),
@@ -149,7 +146,7 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
         if filtered.is_empty():
             return (
                 no_update, no_update, no_update, no_update,
-                no_update, no_update, no_update, no_update,
+                no_update,
                 dmc.Notification(
                     title="Erreur",
                     action="show",
@@ -159,8 +156,9 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
                         color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                     ),
                 ),
-                no_update, no_update, no_update, no_update, no_update,
-                no_update, no_update, no_update, no_update, no_update, no_update,
+                no_update, no_update, no_update, no_update,
+                no_update, no_update, no_update,
+                no_update, no_update, no_update, no_update,
             )
         sample = filtered.sample(n=1).to_dicts()[0]
         verse, word = sample["VerseId"], sample["WordId"]
@@ -169,8 +167,6 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
             build_word(word),
             sample,
             {**_VERSE_CARD_STYLE, "display": "block"},
-            no_update, no_update,
-            {"display": "none"},
             no_update,
             no_update,
             {**_ANSWER_CARD_STYLE, "display": "block"},
@@ -239,10 +235,21 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
     tense_guess_fr = en_to_fr["Tense"].get(tense_answer, tense_answer) if tense_answer else "—"
 
     answer_panel = [
-        _answer_row("Racine", root, root_answer or "—", root_ok),
-        _answer_row("Binyan", binyan, binyan_answer or "—", binyan_ok),
-        _answer_row("Temps", tense_fr, tense_guess_fr, tense_ok),
-        _answer_row("Personne", rest or "—", person_answer or "—", person_ok),
+        _answer_row(0, root, root_answer or "—", root_ok),
+        _answer_row(1, binyan, binyan_answer or "—", binyan_ok),
+        _answer_row(2, tense_fr, tense_guess_fr, tense_ok),
+        _answer_row(3, rest or "—", person_answer or "—", person_ok),
+    ]
+
+    detail_modal_content = [
+        html.P(
+            root,
+            style={"fontFamily": '"Ezra SIL", sans-serif', "fontSize": "3rem",
+                   "direction": "rtl", "textAlign": "right", "margin": "0 0 8px"},
+        ),
+        html.P(solution, style={"color": "#555", "marginBottom": "16px"}),
+        convert_html_to_dash("\n".join(html_parts)),
+        chart,
     ]
 
     return (
@@ -250,10 +257,7 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
         no_update,
         {**store, "answered": True},
         no_update,
-        [solution, convert_html_to_dash("\n".join(html_parts)), chart],
-        root,
-        {"display": "block"},
-        alert_color,
+        detail_modal_content,
         no_update,
         {**_ANSWER_CARD_STYLE, "display": "block", "backgroundColor": bg},
         french_passage(store["VerseId"]),
@@ -294,11 +298,18 @@ def get_root_select_data():
 _ROOT_DATA = get_root_select_data()
 
 
-def _answer_row(label, correct, guess, is_correct):
+def _answer_row(index, correct, guess, is_correct):
+    icon = dmc.ActionIcon(
+        DashIconify(icon="material-symbols:help-outline", width=14),
+        id={"type": "answer-help-btn", "index": index},
+        variant="subtle",
+        size="xs",
+        color="gray",
+    )
     if is_correct:
-        content = dmc.Text(correct or "—", c="green.7", fw=600, size="lg")
+        text_el = dmc.Text(correct or "—", c="green.7", fw=600, size="lg")
     else:
-        content = html.Div(
+        text_el = html.Div(
             [
                 dmc.Text(correct or "—", c="green.7", fw=600, size="lg"),
                 dmc.Text(guess or "—", c="red.6", size="lg",
@@ -307,8 +318,11 @@ def _answer_row(label, correct, guess, is_correct):
             style={"display": "flex", "gap": "8px", "alignItems": "center"},
         )
     return html.Div(
-        content,
+        [icon, text_el],
         style={
+            "display": "flex",
+            "alignItems": "center",
+            "gap": "8px",
             "border": "1px solid rgba(0,0,0,0.12)",
             "borderRadius": "4px",
             "padding": "8px 12px",
@@ -407,6 +421,13 @@ def layout():
         dash.html.Div(
             children=[
                 dcc.Store(id="solution-storage", storage_type="memory"),
+            dmc.Modal(
+                id="conj-detail-modal",
+                opened=False,
+                title="Détails",
+                size="xl",
+                children=[],
+            ),
             dmc.Modal(
                 id="conj-intro-modal",
                 opened=False,
@@ -532,14 +553,6 @@ def layout():
                 id="verse-card",
                 style={**_VERSE_CARD_STYLE, "display": "none"},
             ),
-            dmc.Alert(
-                "",
-                title="",
-                color="red",
-                id="solution-alert",
-                style={"display": "none"},
-                styles={"title": {"fontFamily": "\"Ezra SIL\", sans-serif", "fontSize": "3rem"}, "message": {"fontSize": "1rem"}},
-            ),
         ],
         className="container",
     )
@@ -562,3 +575,14 @@ def open_intro_modal(_):
 )
 def open_settings_modal(_):
     return True
+
+
+@callback(
+    Output("conj-detail-modal", "opened"),
+    Input({"type": "answer-help-btn", "index": ALL}, "n_clicks"),
+    prevent_initial_call=True,
+)
+def open_detail_modal(n_clicks_list):
+    if any(n for n in n_clicks_list if n):
+        return True
+    raise PreventUpdate
