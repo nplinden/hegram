@@ -3,6 +3,7 @@ import random
 import dash_mantine_components as dmc
 from dash import html, callback, Input, Output, State, dcc
 from dash.exceptions import PreventUpdate
+from dash_iconify import DashIconify
 
 dash.register_page(__name__, path="/exercises/numbers")
 
@@ -232,24 +233,79 @@ def _result_card(number, given_key, user_answers):
 layout = dmc.MantineProvider(
     html.Div(
         [
-            html.H1("Exercice sur les nombres"),
-            html.P(
-                "Un nombre s'affiche sous l'une de ses trois formes. "
-                "Retrouvez les deux autres. Les formes de 1 à 19 sont au féminin absolu (formes de comptage)."
-            ),
-            dmc.CheckboxGroup(
-                id="numbers-range-check",
-                label="Plages autorisées",
-                value=["1-10"],
-                children=dmc.Group(
-                    [
-                        dmc.Checkbox(value="1-10",    label="1–10"),
-                        dmc.Checkbox(value="11-19",   label="11–19"),
-                        dmc.Checkbox(value="20-90",   label="20–90"),
-                        dmc.Checkbox(value="100-400", label="100–400"),
-                    ]
-                ),
-                mb=16,
+            dmc.Accordion(
+                disableChevronRotation=False,
+                children=[
+                    dmc.AccordionItem(
+                        [
+                            dmc.AccordionControl(
+                                "Introduction",
+                                icon=DashIconify(
+                                    icon="material-symbols:text-snippet",
+                                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                                    width=20,
+                                ),
+                            ),
+                            dmc.AccordionPanel(
+                                [
+                                    html.H1("Exercice sur les nombres"),
+                                    html.P(
+                                        "Un nombre s'affiche sous l'une de ses trois formes. "
+                                        "Retrouvez les deux autres. Les formes de 1 à 19 sont au féminin absolu (formes de comptage)."
+                                    ),
+                                ]
+                            ),
+                        ],
+                        value="introduction",
+                    ),
+                    dmc.AccordionItem(
+                        [
+                            dmc.AccordionControl(
+                                "Paramètres",
+                                icon=DashIconify(
+                                    icon="material-symbols:settings",
+                                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                                    width=20,
+                                ),
+                            ),
+                            dmc.AccordionPanel(
+                                [
+                                    dmc.CheckboxGroup(
+                                        id="numbers-range-check",
+                                        label="Plages autorisées",
+                                        value=["1-10"],
+                                        children=dmc.Group(
+                                            [
+                                                dmc.Checkbox(value="1-10",    label="1–10"),
+                                                dmc.Checkbox(value="11-19",   label="11–19"),
+                                                dmc.Checkbox(value="20-90",   label="20–90"),
+                                                dmc.Checkbox(value="100-400", label="100–400"),
+                                            ]
+                                        ),
+                                        mb=16,
+                                    ),
+                                    dmc.CheckboxGroup(
+                                        id="numbers-hint-type-check",
+                                        label="Formes pouvant être données comme indice",
+                                        value=["arabic", "name", "numeral"],
+                                        children=dmc.Group(
+                                            [
+                                                dmc.Checkbox(value="arabic",  label="Numéral arabe"),
+                                                dmc.Checkbox(value="name",    label="Nom hébreu"),
+                                                dmc.Checkbox(value="numeral", label="Numéral hébreu"),
+                                            ]
+                                        ),
+                                        mb=8,
+                                    ),
+                                ]
+                            ),
+                        ],
+                        value="settings",
+                    ),
+                ],
+                mb=10,
+                value="introduction",
+                id="numbers-accordion",
             ),
             dmc.Flex(
                 dmc.Button(
@@ -289,12 +345,14 @@ layout = dmc.MantineProvider(
     Output("numbers-store", "data"),
     Input("numbers-generate-btn", "n_clicks"),
     State("numbers-range-check", "value"),
+    State("numbers-hint-type-check", "value"),
     prevent_initial_call=True,
 )
-def generate_number(_, ranges):
+def generate_number(_, ranges, hint_types):
     pool = _pool(ranges)
     number = random.choice(pool)
-    given_key = random.choice(REPRESENTATIONS)
+    allowed_given = [k for k in REPRESENTATIONS if k in (hint_types or REPRESENTATIONS)]
+    given_key = random.choice(allowed_given or REPRESENTATIONS)
     return (
         _neutral_card(number, given_key, pool),
         {"display": "block", "maxWidth": "400px", "marginInline": "auto"},
