@@ -38,10 +38,11 @@ def _zone(label, value, color, is_rtl=False, font_size="3rem", border_top=False)
     if is_rtl:
         text_style["direction"] = "rtl"
     border = {"borderTop": "1px solid rgba(0,0,0,0.1)"} if border_top else {}
+    min_h = "140px" if font_size == "3rem" else "120px"
     return html.Div(
         [dmc.Text(label, size="sm", c="dimmed", ta="center", mb=8), html.P(value, style=text_style)],
         style={"padding": "24px 16px", "display": "flex", "flexDirection": "column",
-               "justifyContent": "center", "alignItems": "center", **border},
+               "justifyContent": "center", "alignItems": "center", "minHeight": min_h, **border},
     )
 
 
@@ -101,33 +102,39 @@ layout = dmc.MantineProvider(
                     ),
                 ],
             ),
+            html.Div(
+                dmc.Flex(
+                    [
+                        dmc.ActionIcon(
+                            DashIconify(icon="material-symbols:info", width=20),
+                            id="prep-intro-btn",
+                            variant="subtle",
+                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                            size="lg",
+                        ),
+                        dmc.ActionIcon(
+                            DashIconify(icon="material-symbols:settings", width=20),
+                            id="prep-settings-btn",
+                            variant="subtle",
+                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                            size="lg",
+                        ),
+                    ],
+                    justify="flex-end",
+                    align="center",
+                    gap="xs",
+                ),
+                style={"maxWidth": "400px", "marginInline": "auto", "marginBottom": "4px"},
+            ),
             html.Div(id="prep-card"),
-            dmc.Flex(
-                [
-                    dmc.ActionIcon(
-                        DashIconify(icon="material-symbols:info", width=20),
-                        id="prep-intro-btn",
-                        variant="subtle",
-                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                        size="lg",
-                    ),
-                    dmc.ActionIcon(
-                        DashIconify(icon="material-symbols:settings", width=20),
-                        id="prep-settings-btn",
-                        variant="subtle",
-                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                        size="lg",
-                    ),
-                    dmc.Button(
-                        "Voir la solution",
-                        id="prep-action-btn",
-                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                    ),
-                ],
-                justify="center",
-                align="center",
-                gap="md",
-                mb=24,
+            dmc.Button(
+                "Voir la solution",
+                id="prep-action-btn",
+                color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                fullWidth=True,
+                radius="xl",
+                size="md",
+                style={"maxWidth": "400px", "marginInline": "auto", "display": "block", "marginBottom": "24px"},
             ),
         ],
         className="container",
