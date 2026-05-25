@@ -3,7 +3,7 @@ import dash_mantine_components as dmc
 import json as _json
 from dash import html, no_update
 import polars as pl
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 from dash import callback, Input, Output, State, dcc, ALL
 from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
@@ -54,6 +54,13 @@ dash.register_page(__name__, path="/exercises/conjugation")
 _HEBREW_CONSONANTS = set(chr(c) for c in range(0x05D0, 0x05EB))
 
 
+def _hl(span):
+    span["class"].append("hl")
+    if span.string and span.string.endswith(" "):
+        span.string.replace_with(span.string[:-1])
+        span.insert_after(NavigableString(" "))
+
+
 def build_verse(verse_id, word_id):
     df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
     word_df = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect()
@@ -61,13 +68,13 @@ def build_verse(verse_id, word_id):
 
     soup = BeautifulSoup(df["html"], features="html.parser")
     span = soup.find("span", string=word)
-    span["class"].append("hl")
+    _hl(span)
 
     prev = span.find_previous_sibling("span")
     if prev:
         consonants = [c for c in prev.get_text() if c in _HEBREW_CONSONANTS]
         if consonants == ['\u05D5']:  # single vav — prefix of wayyiqtol/waw-consecutive
-            prev["class"] = list(prev.get("class", [])) + ["hl"]
+            _hl(prev)
 
     soup.find("div")["class"] = ["fullverse"]
     return convert_html_to_dash(str(soup))
