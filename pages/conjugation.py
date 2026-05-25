@@ -188,55 +188,56 @@ def _build_pdf_html(samples: list[dict]) -> str:
   unicode-range: U+0590-U+05FF, U+FB1D-U+FB4F;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; }
+body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; padding: 12mm 15mm; }
 .question {
-  padding: 15mm 20mm;
-  page-break-after: always;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 8px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  break-inside: avoid;
 }
-.question:last-child { page-break-after: avoid; }
+.question:last-child { border-bottom: none; margin-bottom: 0; }
 .question-number {
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  color: #888;
+  color: #999;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 .cards-row {
   display: flex;
-  gap: 16px;
-  align-items: flex-start;
+  gap: 12px;
+  align-items: stretch;
   width: 100%;
 }
 .verb-card {
   flex: 0 0 25%;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 24px 16px;
+  border-radius: 6px;
+  padding: 8px 10px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .verse-card {
-  flex: 0 0 calc(75% - 16px);
+  flex: 0 0 calc(75% - 12px);
   min-width: 0;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 16px 20px;
+  border-radius: 6px;
+  padding: 8px 12px;
 }
 .singleword {
   font-family: "Ezra SIL", sans-serif;
-  font-size: 2rem;
+  font-size: 1.6rem;
   direction: rtl;
 }
 .fullverse {
   font-family: "Ezra SIL", sans-serif;
-  font-size: 1.2rem;
+  font-size: 1rem;
   direction: rtl;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 .hl {
   background-color: rgba(147, 197, 253, 0.6);
@@ -244,30 +245,28 @@ body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; }
 }
 .verse-ref {
   font-style: italic;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: #666;
-  margin-top: 10px;
+  margin-top: 4px;
   direction: ltr;
 }
 .answer-section {
-  border-top: 1px solid #e0e0e0;
-  padding-top: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
 }
 .answer-row {
   display: flex;
-  gap: 16px;
+  gap: 10px;
 }
 .answer-field {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 .answer-label {
-  font-size: 0.75rem;
+  font-size: 0.6rem;
   font-weight: 600;
   color: #555;
   text-transform: uppercase;
@@ -275,13 +274,12 @@ body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; }
 }
 .answer-box {
   border: 1px solid #aaa;
-  border-radius: 4px;
-  height: 38px;
+  border-radius: 3px;
+  height: 26px;
   background: white;
 }
 @media print {
-  body { margin: 0; }
-  .question { padding: 10mm 15mm; min-height: unset; }
+  body { margin: 0; padding: 10mm 12mm; }
 }
 """
     return f"""<!DOCTYPE html>
