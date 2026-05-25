@@ -381,7 +381,7 @@ def _slider_marks():
     return marks
 
 
-root_freq_slider = html.Div(
+root_freq_slider = dmc.Box(
     [
         dmc.Text("Fréquence des racines", size="sm", fw=500, mb=4),
         dmc.RangeSlider(
