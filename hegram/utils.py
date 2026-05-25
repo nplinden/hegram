@@ -33,15 +33,18 @@ def convert_html_to_dash(html_code):
 
     def _convert(elem):
         comp = getattr(html, elem.tag.capitalize())
-        children = [_convert(child) for child in elem]
-        if not children:
-            children = elem.text
+        children = []
+        if elem.text:
+            children.append(elem.text)
+        for child in elem:
+            children.append(_convert(child))
+            if child.tail:
+                children.append(child.tail)
         attribs = elem.attrib.copy()
         if "class" in attribs:
             attribs["className"] = attribs.pop("class")
         attribs = {k: (parse_css(v) if k == "style" else v) for k, v in attribs.items()}
-
-        return comp(children=children, **attribs)
+        return comp(children=children if children else None, **attribs)
 
     et = ElementTree.fromstring(html_code)
 
