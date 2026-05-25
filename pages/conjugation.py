@@ -157,6 +157,9 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
             no_update,
             no_update,
             {**_ANSWER_CARD_STYLE, "display": "block"},
+            no_update,
+            {"display": "none"},
+            "Vérifier",
         )
 
     root = store["Root"]
