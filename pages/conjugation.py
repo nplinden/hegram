@@ -329,6 +329,7 @@ layout = dmc.MantineProvider(
     dash.html.Div(
         children=[
             dcc.Store(id="solution-storage", storage_type="local"),
+            dcc.Interval(id="conj-init", interval=1, max_intervals=1),
             dmc.Modal(
                 id="conj-intro-modal",
                 opened=False,
@@ -445,3 +446,12 @@ def open_intro_modal(_):
 )
 def open_settings_modal(_):
     return True
+
+
+@callback(
+    Output("solution-storage", "data", allow_duplicate=True),
+    Input("conj-init", "n_intervals"),
+    prevent_initial_call=True,
+)
+def reset_store(_):
+    return {"answered": True}
