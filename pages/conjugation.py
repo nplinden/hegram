@@ -26,6 +26,17 @@ def _get_chapters(json_file: str) -> list:
 
 COMMON_BINYANIM = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
 
+_ANSWER_CARD_STYLE = {
+    "borderRadius": "16px",
+    "border": "1px solid #e0e0e0",
+    "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
+    "overflow": "hidden",
+    "backgroundColor": "#FFFFFF",
+    "maxWidth": "640px",
+    "marginInline": "auto",
+    "marginBottom": "24px",
+}
+
 dash.register_page(__name__, path="/exercises/conjugation")
 
 
@@ -145,10 +156,7 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
             {"display": "none"},
             no_update,
             no_update,
-            {"display": "block"},
-            no_update,
-            {"display": "none"},
-            "Vérifier",
+            {**_ANSWER_CARD_STYLE, "display": "block"},
         )
 
     root = store["Root"]
@@ -208,7 +216,7 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
         {"display": "block"},
         color,
         no_update,
-        {"display": "none"},
+        {**_ANSWER_CARD_STYLE, "display": "none"},
         french_passage(store["VerseId"]),
         {"display": "block"},
         "Trouver un verbe",
@@ -432,17 +440,7 @@ def layout():
                     style={"display": "flex"},
                 ),
                 id="answer-card",
-                style={
-                    "borderRadius": "16px",
-                    "border": "1px solid #e0e0e0",
-                    "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
-                    "overflow": "hidden",
-                    "backgroundColor": "#FFFFFF",
-                    "maxWidth": "640px",
-                    "marginInline": "auto",
-                    "marginBottom": "24px",
-                    "display": "none",
-                },
+                style={**_ANSWER_CARD_STYLE, "display": "none"},
             ),
             html.Div(
                 [html.P("Verset complet:")],
