@@ -106,7 +106,7 @@ layout = dmc.MantineProvider(
                 justify="flex-end",
                 mb=16,
             ),
-            _single_card("Racine", "שׁמר"),
+            html.Div(_single_card("Racine", "שׁמר"), style={"marginBottom": "16px"}),
             dmc.SimpleGrid(
                 cols={"base": 1, "sm": 2},
                 spacing="lg",
