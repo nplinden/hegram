@@ -288,27 +288,29 @@ layout = dmc.MantineProvider(
                     ),
                 ],
             ),
-            dmc.Flex(
-                [
-                    dmc.ActionIcon(
-                        DashIconify(icon="material-symbols:info", width=20),
-                        id="numbers-intro-btn",
-                        variant="subtle",
-                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                        size="lg",
-                    ),
-                    dmc.ActionIcon(
-                        DashIconify(icon="material-symbols:settings", width=20),
-                        id="numbers-settings-btn",
-                        variant="subtle",
-                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                        size="lg",
-                    ),
-                ],
-                justify="flex-end",
-                align="center",
-                gap="xs",
-                mb=4,
+            html.Div(
+                dmc.Flex(
+                    [
+                        dmc.ActionIcon(
+                            DashIconify(icon="material-symbols:info", width=20),
+                            id="numbers-intro-btn",
+                            variant="subtle",
+                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                            size="lg",
+                        ),
+                        dmc.ActionIcon(
+                            DashIconify(icon="material-symbols:settings", width=20),
+                            id="numbers-settings-btn",
+                            variant="subtle",
+                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                            size="lg",
+                        ),
+                    ],
+                    justify="flex-end",
+                    align="center",
+                    gap="xs",
+                ),
+                style={"maxWidth": "400px", "marginInline": "auto", "marginBottom": "4px"},
             ),
             html.Div(id="numbers-card"),
             dmc.Flex(
