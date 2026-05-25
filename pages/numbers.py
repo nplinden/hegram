@@ -245,12 +245,53 @@ layout = dmc.MantineProvider(
                     ),
                 ],
             ),
+            dmc.Modal(
+                id="numbers-settings-modal",
+                opened=False,
+                title="Paramètres",
+                children=[
+                    dmc.CheckboxGroup(
+                        id="numbers-range-check",
+                        label="Plages autorisées",
+                        value=["1-10"],
+                        children=dmc.Group(
+                            [
+                                dmc.Checkbox(value="1-10",    label="1–10"),
+                                dmc.Checkbox(value="11-19",   label="11–19"),
+                                dmc.Checkbox(value="20-90",   label="20–90"),
+                                dmc.Checkbox(value="100-400", label="100–400"),
+                            ]
+                        ),
+                        mb=16,
+                    ),
+                    dmc.CheckboxGroup(
+                        id="numbers-hint-type-check",
+                        label="Formes pouvant être données comme indice",
+                        value=["arabic", "name", "numeral"],
+                        children=dmc.Group(
+                            [
+                                dmc.Checkbox(value="arabic",  label="Numéral arabe"),
+                                dmc.Checkbox(value="name",    label="Nom hébreu"),
+                                dmc.Checkbox(value="numeral", label="Numéral hébreu"),
+                            ]
+                        ),
+                        mb=8,
+                    ),
+                ],
+            ),
             html.Div(id="numbers-card"),
             dmc.Flex(
                 [
                     dmc.ActionIcon(
                         DashIconify(icon="material-symbols:info", width=20),
                         id="numbers-intro-btn",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:settings", width=20),
+                        id="numbers-settings-btn",
                         variant="subtle",
                         color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                         size="lg",
@@ -275,57 +316,6 @@ layout = dmc.MantineProvider(
                 gap="md",
                 mb=24,
             ),
-            dmc.Accordion(
-                disableChevronRotation=False,
-                children=[
-                    dmc.AccordionItem(
-                        [
-                            dmc.AccordionControl(
-                                "Paramètres",
-                                icon=DashIconify(
-                                    icon="material-symbols:settings",
-                                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                                    width=20,
-                                ),
-                            ),
-                            dmc.AccordionPanel(
-                                [
-                                    dmc.CheckboxGroup(
-                                        id="numbers-range-check",
-                                        label="Plages autorisées",
-                                        value=["1-10"],
-                                        children=dmc.Group(
-                                            [
-                                                dmc.Checkbox(value="1-10",    label="1–10"),
-                                                dmc.Checkbox(value="11-19",   label="11–19"),
-                                                dmc.Checkbox(value="20-90",   label="20–90"),
-                                                dmc.Checkbox(value="100-400", label="100–400"),
-                                            ]
-                                        ),
-                                        mb=16,
-                                    ),
-                                    dmc.CheckboxGroup(
-                                        id="numbers-hint-type-check",
-                                        label="Formes pouvant être données comme indice",
-                                        value=["arabic", "name", "numeral"],
-                                        children=dmc.Group(
-                                            [
-                                                dmc.Checkbox(value="arabic",  label="Numéral arabe"),
-                                                dmc.Checkbox(value="name",    label="Nom hébreu"),
-                                                dmc.Checkbox(value="numeral", label="Numéral hébreu"),
-                                            ]
-                                        ),
-                                        mb=8,
-                                    ),
-                                ]
-                            ),
-                        ],
-                        value="settings",
-                    ),
-                ],
-                mb=10,
-                id="numbers-accordion",
-            ),
         ],
         className="container",
     )
@@ -338,6 +328,15 @@ layout = dmc.MantineProvider(
     prevent_initial_call=True,
 )
 def open_intro_modal(_):
+    return True
+
+
+@callback(
+    Output("numbers-settings-modal", "opened"),
+    Input("numbers-settings-btn", "n_clicks"),
+    prevent_initial_call=True,
+)
+def open_settings_modal(_):
     return True
 
 
