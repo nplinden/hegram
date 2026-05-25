@@ -102,7 +102,13 @@ def french_passage(verse_id: int):
     Output("frenchverse-div", "children"),
     Output("frenchverse-div", "style"),
     Output("conj-action-btn", "children"),
-    Output("answer-panel", "children"),
+    Output("answer-dropdowns", "style"),
+    Output("answer-results", "children"),
+    Output("answer-results", "style"),
+    Output("root-answer", "value"),
+    Output("binyan-answer", "value"),
+    Output("tense-answer", "value"),
+    Output("person-answer", "value"),
     Input("conj-action-btn", "n_clicks"),
     State("conjugation-roots-dropdown", "value"),
     State("conjugation-book-dropdown", "value"),
@@ -145,6 +151,7 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
                     ),
                 ),
                 no_update, no_update, no_update, no_update, no_update,
+                no_update, no_update, no_update, no_update, no_update, no_update,
             )
         sample = filtered.sample(n=1).to_dicts()[0]
         verse, word = sample["VerseId"], sample["WordId"]
@@ -161,7 +168,10 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
             no_update,
             {"display": "none"},
             "Vérifier",
-            _make_dropdowns(),
+            {"display": "flex", "flexDirection": "column", "gap": "12px"},
+            [],
+            {"display": "none"},
+            None, None, None, None,
         )
 
     root = store["Root"]
@@ -241,7 +251,10 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
         french_passage(store["VerseId"]),
         {"display": "block"},
         "Trouver un verbe",
+        {"display": "none"},
         answer_panel,
+        {"display": "flex", "flexDirection": "column", "gap": "12px"},
+        no_update, no_update, no_update, no_update,
     )
 
 
@@ -294,16 +307,6 @@ def _answer_row(label, correct, guess, is_correct):
             "backgroundColor": "rgba(255,255,255,0.5)",
         },
     )
-
-
-def _make_dropdowns():
-    return [
-        dmc.Text("Analyse", size="sm", c="dimmed", ta="center", mb=8),
-        dmc.Select(placeholder="Racine", value=None, data=_ROOT_DATA, searchable=True, id="root-answer"),
-        dmc.Select(placeholder="Binyan", value=None, data=dropdown_data["Binyan"], id="binyan-answer"),
-        dmc.Select(placeholder="Temps", value=None, data=dropdown_data["Tense"], id="tense-answer"),
-        dmc.Select(placeholder="Personne", value=None, data=answer_data, id="person-answer"),
-    ]
 
 
 root_select = dmc.MultiSelect(
@@ -478,12 +481,21 @@ def layout():
                         html.Div(
                             [
                                 dmc.Text("Analyse", size="sm", c="dimmed", ta="center", mb=8),
-                                dmc.Select(
-                                    placeholder="Racine", value=None, data=_ROOT_DATA, searchable=True, id="root-answer"
+                                html.Div(
+                                    [
+                                        dmc.Select(placeholder="Racine", value=None, data=_ROOT_DATA, searchable=True, id="root-answer"),
+                                        dmc.Select(placeholder="Binyan", value=None, data=dropdown_data["Binyan"], id="binyan-answer"),
+                                        dmc.Select(placeholder="Temps", value=None, data=dropdown_data["Tense"], id="tense-answer"),
+                                        dmc.Select(placeholder="Personne", value=None, data=answer_data, id="person-answer"),
+                                    ],
+                                    id="answer-dropdowns",
+                                    style={"display": "flex", "flexDirection": "column", "gap": "12px"},
                                 ),
-                                dmc.Select(placeholder="Binyan", value=None, data=dropdown_data["Binyan"], id="binyan-answer"),
-                                dmc.Select(placeholder="Temps", value=None, data=dropdown_data["Tense"], id="tense-answer"),
-                                dmc.Select(placeholder="Personne", value=None, data=answer_data, id="person-answer"),
+                                html.Div(
+                                    [],
+                                    id="answer-results",
+                                    style={"display": "none"},
+                                ),
                             ],
                             id="answer-panel",
                             style={
