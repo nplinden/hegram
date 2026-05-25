@@ -347,7 +347,6 @@ def open_settings_modal(_):
     Input("numbers-generate-btn", "n_clicks"),
     State("numbers-range-check", "value"),
     State("numbers-hint-type-check", "value"),
-    prevent_initial_call=True,
 )
 def generate_number(_, ranges, hint_types):
     pool = _pool(ranges)
