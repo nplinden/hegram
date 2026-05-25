@@ -102,6 +102,7 @@ def french_passage(verse_id: int):
     Output("frenchverse-div", "children"),
     Output("frenchverse-div", "style"),
     Output("conj-action-btn", "children"),
+    Output("answer-panel", "children"),
     Input("conj-action-btn", "n_clicks"),
     State("conjugation-roots-dropdown", "value"),
     State("conjugation-book-dropdown", "value"),
@@ -143,7 +144,7 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
                         color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                     ),
                 ),
-                no_update, no_update, no_update, no_update,
+                no_update, no_update, no_update, no_update, no_update,
             )
         sample = filtered.sample(n=1).to_dicts()[0]
         verse, word = sample["VerseId"], sample["WordId"]
@@ -160,6 +161,7 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
             no_update,
             {"display": "none"},
             "Vérifier",
+            _make_dropdowns(),
         )
 
     root = store["Root"]
@@ -201,13 +203,29 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
         px=25,
     )
 
-    correct = (
-        binyan_answer == binyan
-        and root_answer == root
-        and tense_answer == store["Tense"]
-        and (person_answer or "") == rest
-    )
-    color = "green" if correct else "red"
+    root_ok = root_answer == root
+    binyan_ok = binyan_answer == binyan
+    tense_ok = tense_answer == store["Tense"]
+    person_ok = (person_answer or "") == rest
+    n_correct = sum([root_ok, binyan_ok, tense_ok, person_ok])
+
+    if n_correct == 4:
+        bg, alert_color = "#D4EFDF", "green"
+    elif n_correct == 0:
+        bg, alert_color = "#FADBD8", "red"
+    else:
+        bg, alert_color = "#FFF9C4", "yellow"
+
+    tense_fr = en_to_fr["Tense"][store["Tense"]]
+    tense_guess_fr = en_to_fr["Tense"].get(tense_answer, tense_answer) if tense_answer else "—"
+
+    answer_panel = [
+        dmc.Text("Analyse", size="sm", c="dimmed", ta="center", mb=8),
+        _answer_row("Racine", root, root_answer or "—", root_ok),
+        _answer_row("Binyan", binyan, binyan_answer or "—", binyan_ok),
+        _answer_row("Temps", tense_fr, tense_guess_fr, tense_ok),
+        _answer_row("Personne", rest or "—", person_answer or "—", person_ok),
+    ]
 
     return (
         no_update,
@@ -217,12 +235,13 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
         [solution, convert_html_to_dash("\n".join(html_parts)), chart],
         root,
         {"display": "block"},
-        color,
+        alert_color,
         no_update,
-        {**_ANSWER_CARD_STYLE, "display": "none"},
+        {**_ANSWER_CARD_STYLE, "display": "block", "backgroundColor": bg},
         french_passage(store["VerseId"]),
         {"display": "block"},
         "Trouver un verbe",
+        answer_panel,
     )
 
 
@@ -249,6 +268,42 @@ def get_root_select_data():
     roots = pl.scan_parquet("data/conjugation.parquet").select(["Root"]).unique().sort(["Root"]).collect().to_series()
     data = [{"label": v, "value": v} for v in roots]
     return data
+
+
+_ROOT_DATA = get_root_select_data()
+
+
+def _answer_row(label, correct, guess, is_correct):
+    if is_correct:
+        content = dmc.Text(correct or "—", c="green.7", fw=600, size="sm")
+    else:
+        content = html.Div(
+            [
+                dmc.Text(correct or "—", c="green.7", fw=600, size="sm"),
+                dmc.Text(guess or "—", c="red.6", size="sm",
+                         style={"textDecoration": "line-through"}),
+            ],
+            style={"display": "flex", "gap": "8px", "alignItems": "center"},
+        )
+    return html.Div(
+        [dmc.Text(label, size="xs", c="dimmed", mb=2), content],
+        style={
+            "border": "1px solid rgba(0,0,0,0.12)",
+            "borderRadius": "4px",
+            "padding": "8px 12px",
+            "backgroundColor": "rgba(255,255,255,0.5)",
+        },
+    )
+
+
+def _make_dropdowns():
+    return [
+        dmc.Text("Analyse", size="sm", c="dimmed", ta="center", mb=8),
+        dmc.Select(placeholder="Racine", value=None, data=_ROOT_DATA, searchable=True, id="root-answer"),
+        dmc.Select(placeholder="Binyan", value=None, data=dropdown_data["Binyan"], id="binyan-answer"),
+        dmc.Select(placeholder="Temps", value=None, data=dropdown_data["Tense"], id="tense-answer"),
+        dmc.Select(placeholder="Personne", value=None, data=answer_data, id="person-answer"),
+    ]
 
 
 root_select = dmc.MultiSelect(
@@ -424,12 +479,13 @@ def layout():
                             [
                                 dmc.Text("Analyse", size="sm", c="dimmed", ta="center", mb=8),
                                 dmc.Select(
-                                    placeholder="Racine", value=None, data=get_root_select_data(), searchable=True, id="root-answer"
+                                    placeholder="Racine", value=None, data=_ROOT_DATA, searchable=True, id="root-answer"
                                 ),
                                 dmc.Select(placeholder="Binyan", value=None, data=dropdown_data["Binyan"], id="binyan-answer"),
                                 dmc.Select(placeholder="Temps", value=None, data=dropdown_data["Tense"], id="tense-answer"),
                                 dmc.Select(placeholder="Personne", value=None, data=answer_data, id="person-answer"),
                             ],
+                            id="answer-panel",
                             style={
                                 "flex": 1,
                                 "display": "flex",
