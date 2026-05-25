@@ -438,6 +438,8 @@ def layout():
                     "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
                     "overflow": "hidden",
                     "backgroundColor": "#FFFFFF",
+                    "maxWidth": "640px",
+                    "marginInline": "auto",
                     "marginBottom": "24px",
                     "display": "none",
                 },
