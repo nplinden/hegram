@@ -308,31 +308,28 @@ layout = dmc.MantineProvider(
                 id="numbers-accordion",
             ),
             dmc.Flex(
-                dmc.Button(
-                    "Trouver un nombre",
-                    id="numbers-generate-btn",
-                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                ),
-                justify="center",
-                mb=24,
-            ),
-            dcc.Store(id="numbers-store", storage_type="session"),
-            html.Div(id="numbers-card"),
-            html.Div(
-                id="numbers-verify-section",
-                style={"display": "none", "maxWidth": "400px", "marginInline": "auto"},
-                children=[
-                    dmc.Flex(
+                [
+                    dmc.Button(
+                        "Trouver un nombre",
+                        id="numbers-generate-btn",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                    ),
+                    html.Div(
                         dmc.Button(
                             "Vérifier",
                             id="numbers-check-btn",
                             color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                         ),
-                        justify="center",
-                        mb=16,
+                        id="numbers-verify-section",
+                        style={"display": "none"},
                     ),
                 ],
+                justify="center",
+                gap="md",
+                mb=24,
             ),
+            dcc.Store(id="numbers-store", storage_type="session"),
+            html.Div(id="numbers-card"),
         ],
         className="container",
     )
@@ -355,7 +352,7 @@ def generate_number(_, ranges, hint_types):
     given_key = random.choice(allowed_given or REPRESENTATIONS)
     return (
         _neutral_card(number, given_key, pool),
-        {"display": "block", "maxWidth": "400px", "marginInline": "auto"},
+        {"display": "block"},
         {"number": number, "given_key": given_key},
     )
 
