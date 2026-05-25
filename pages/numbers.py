@@ -288,7 +288,6 @@ layout = dmc.MantineProvider(
                     ),
                 ],
             ),
-            html.Div(id="numbers-card"),
             dmc.Flex(
                 [
                     dmc.ActionIcon(
@@ -305,6 +304,15 @@ layout = dmc.MantineProvider(
                         color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                         size="lg",
                     ),
+                ],
+                justify="flex-end",
+                align="center",
+                gap="xs",
+                mb=4,
+            ),
+            html.Div(id="numbers-card"),
+            dmc.Flex(
+                [
                     dmc.Button(
                         "Trouver un nombre",
                         id="numbers-action-btn",
