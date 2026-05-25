@@ -127,9 +127,20 @@ def update_table(
     return rows, [{"name": c, "id": c} for c in df.columns]
 
 
+_DEFINITION_CARD_STYLE = {
+    "maxWidth": "640px",
+    "marginInline": "auto",
+    "border": "1px solid rgba(0,0,0,0.12)",
+    "borderRadius": "8px",
+    "boxShadow": "0 2px 8px rgba(0,0,0,0.08)",
+    "padding": "24px",
+    "display": "none",
+}
+
+
 @callback(
-    Output("definition-alert", "children"),
-    Output("definition-alert", "style"),
+    Output("definition-card", "children"),
+    Output("definition-card", "style"),
     Input("table", "active_cell"),
     Input("table", "data"),
 )
@@ -143,12 +154,25 @@ def update_definition(active_cell: Data, data: DataList):
     root = Hebrew(list(get_roots_from_cell(data, active_cell))[0]).text_only()
     logger.info("root={}", root)
     definition = definitions.get(str(root), [["No definition found"]])[0]
-    html = ["<div>", f"<h2 class='consonantal definition-title'>{root}</h2>"]
+    html_parts = ["<div>"]
     for d in definition:
-        html.append(htmlify(d))
-    html.append("</div>")
-    html = "\n".join(html)
-    return convert_html_to_dash(html), {"display": "block"}
+        html_parts.append(htmlify(d))
+    html_parts.append("</div>")
+
+    children = [
+        html.P(
+            str(root),
+            style={
+                "fontFamily": '"Ezra SIL", sans-serif',
+                "fontSize": "3rem",
+                "direction": "rtl",
+                "textAlign": "center",
+                "margin": "0 0 12px",
+            },
+        ),
+        convert_html_to_dash("\n".join(html_parts)),
+    ]
+    return children, {**_DEFINITION_CARD_STYLE, "display": "block"}
 
 
 @callback(Output("table", "page_count"), Input("table", "page_size"))
@@ -306,14 +330,10 @@ layout = dmc.MantineProvider(
                     ],
                     className="occurrence-grid container",
                 ),
-                html.Div([], className="container", id="definition-div"),
-                dmc.Alert(
-                    "",
-                    title="",
-                    color="gray",
-                    id="definition-alert",
-                    style={"display": "none"},
-                    styles={"title": {"fontFamily": "\"Ezra SIL\", sans-serif", "fontSize": "3rem"}, "message": {"fontSize": "1rem"}},
+                html.Div(
+                    [],
+                    id="definition-card",
+                    style=_DEFINITION_CARD_STYLE,
                     className="container",
                 ),
             ],
