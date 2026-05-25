@@ -150,15 +150,16 @@ def _build_word_html(word_id: int) -> str:
 
 
 def _build_pdf_html(samples: list[dict]) -> str:
-    answer_labels = [
-        ("Racine", "Binyan"),
-        ("Temps", "Personne / Genre / Nombre"),
-    ]
+    answer_labels = ["Racine", "Binyan", "Temps", "Personne / Genre / Nombre"]
     questions_html = ""
     for i, s in enumerate(samples, 1):
         word_html = _build_word_html(s["WordId"])
         verse_html = _build_verse_html(s["VerseId"], s["WordId"])
         ref = _verse_ref(s["VerseId"])
+        answer_fields = "".join(
+            f'<div class="answer-field"><div class="answer-label">{label}</div><div class="answer-box"></div></div>'
+            for label in answer_labels
+        )
         questions_html += f"""
 <div class="question">
   <div class="question-number">Question {i}</div>
@@ -170,15 +171,7 @@ def _build_pdf_html(samples: list[dict]) -> str:
     </div>
   </div>
   <div class="answer-section">
-    {"".join(
-        f'<div class="answer-row">'
-        + "".join(
-            f'<div class="answer-field"><div class="answer-label">{label}</div><div class="answer-box"></div></div>'
-            for label in row
-        )
-        + '</div>'
-        for row in answer_labels
-    )}
+    <div class="answer-row">{answer_fields}</div>
   </div>
 </div>"""
     css = """
@@ -275,7 +268,7 @@ body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; padd
 .answer-box {
   border: 1px solid #aaa;
   border-radius: 3px;
-  height: 26px;
+  height: 20px;
   background: white;
 }
 @media print {
