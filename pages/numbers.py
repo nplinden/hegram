@@ -343,8 +343,8 @@ def open_settings_modal(_):
     State("numbers-select-arabic", "value"),
     State("numbers-select-numeral", "value"),
 )
-def handle_action(_, store, ranges, hint_types, name_val, arabic_val, numeral_val):
-    if store is None or store.get("answered"):
+def handle_action(n_clicks, store, ranges, hint_types, name_val, arabic_val, numeral_val):
+    if n_clicks is None or store is None or store.get("answered"):
         pool = _pool(ranges)
         number = random.choice(pool)
         allowed_given = [k for k in REPRESENTATIONS if k in (hint_types or REPRESENTATIONS)]
