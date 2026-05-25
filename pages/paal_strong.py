@@ -135,6 +135,7 @@ layout = dmc.MantineProvider(
             ),
         ],
         className="container",
+        style={"maxWidth": "860px", "marginInline": "auto"},
     )
 )
 
