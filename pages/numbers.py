@@ -313,18 +313,14 @@ layout = dmc.MantineProvider(
                 style={"maxWidth": "400px", "marginInline": "auto", "marginBottom": "4px"},
             ),
             html.Div(id="numbers-card"),
-            dmc.Flex(
-                [
-                    dmc.Button(
-                        "Trouver un nombre",
-                        id="numbers-action-btn",
-                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                    ),
-                ],
-                justify="center",
-                align="center",
-                gap="md",
-                mb=24,
+            dmc.Button(
+                "Trouver un nombre",
+                id="numbers-action-btn",
+                color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                fullWidth=True,
+                radius="xl",
+                size="md",
+                style={"maxWidth": "400px", "marginInline": "auto", "display": "block", "marginBottom": "24px"},
             ),
         ],
         className="container",
