@@ -82,11 +82,16 @@ def french_passage(verse_id: int):
     Output("word-div", "children"),
     Output("solution-storage", "data"),
     Output("fullverse-div", "style"),
-    Output("solution-alert", "style", allow_duplicate=True),
+    Output("solution-alert", "children"),
+    Output("solution-alert", "title"),
+    Output("solution-alert", "style"),
+    Output("solution-alert", "color"),
     Output("notification", "children"),
     Output("answer-div", "style"),
+    Output("frenchverse-div", "children"),
     Output("frenchverse-div", "style"),
-    Input("clause-btn", "n_clicks"),
+    Output("conj-action-btn", "children"),
+    Input("conj-action-btn", "n_clicks"),
     State("conjugation-roots-dropdown", "value"),
     State("conjugation-book-dropdown", "value"),
     State("conjugation-binyan-dropdown", "value"),
@@ -94,90 +99,6 @@ def french_passage(verse_id: int):
     State("conjugation-person-dropdown", "value"),
     State("conjugation-gender-dropdown", "value"),
     State("conjugation-number-dropdown", "value"),
-    prevent_initial_call=True,
-)
-def generate_verb(clicked, roots, book, binyanim, tenses, persons, genders, numbers):
-    if clicked is None:
-        raise PreventUpdate
-    df = pl.scan_parquet("data/conjugation.parquet")
-
-    filtered = df.filter(
-        pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
-        & pl.when(bool(binyanim)).then(pl.col("Binyan").is_in(binyanim)).otherwise(pl.lit(True))
-        & pl.when(bool(tenses)).then(pl.col("Tense").is_in(tenses)).otherwise(pl.lit(True))
-        & pl.when(bool(persons)).then(pl.col("Person").is_in(persons)).otherwise(pl.lit(True))
-        & pl.when(bool(genders)).then(pl.col("Gender").is_in(genders)).otherwise(pl.lit(True))
-        & pl.when(bool(numbers)).then(pl.col("Number").is_in(numbers)).otherwise(pl.lit(True))
-        & pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
-    ).collect()
-    if filtered.is_empty():
-        return (
-            no_update,
-            no_update,
-            no_update,
-            no_update,
-            no_update,
-            dmc.Notification(
-                title="Erreur",
-                action="show",
-                message="Aucun verbe ne satisfait ces filtres !",
-                icon=DashIconify(
-                    icon="material-symbols:error-outline-rounded", color=dmc.DEFAULT_THEME["colors"]["dark"][6]
-                ),
-            ),
-            no_update,
-            no_update,
-        )
-    else:
-        sample = filtered.sample(n=1).to_dicts()[0]
-        verse, word = sample["VerseId"], sample["WordId"]
-        return (
-            build_verse(verse, word),
-            build_word(word),
-            sample,
-            {"display": "block"},
-            {"display": "none"},
-            no_update,
-            {"display": "flex"},
-            {"display": "none"},
-        )
-
-
-def barchart(root):
-    df = pl.scan_parquet("data/conjugation.parquet").filter(
-        (pl.col("Root") == root) & (pl.col("Binyan").is_in(COMMON_BINYANIM))
-    )
-    df = (
-        df.select(["Binyan", "Tense"])
-        .collect()
-        .to_struct(name="Struct")
-        .value_counts()
-        .unnest("Struct")
-        .sort("count", descending=True)
-    )
-    return df.pivot(["Tense"], index="Binyan", values="count").fill_null(0).to_dicts()
-
-
-@callback(
-    Output("frenchverse-div", "children"),
-    Output("frenchverse-div", "style", allow_duplicate=True),
-    Input("solution-btn", "n_clicks"),
-    State("solution-storage", "data"),
-    prevent_initial_call=True,
-)
-def show_frenchverse(n_clicks, data):
-    if not n_clicks:
-        raise PreventUpdate
-    verse = data["VerseId"]
-    return french_passage(verse), {"display": "block"}
-
-
-@callback(
-    Output("solution-alert", "children"),
-    Output("solution-alert", "title"),
-    Output("solution-alert", "style", allow_duplicate=True),
-    Output("solution-alert", "color"),
-    Input("solution-btn", "n_clicks"),
     State("solution-storage", "data"),
     State("root-answer", "value"),
     State("binyan-answer", "value"),
@@ -185,28 +106,67 @@ def show_frenchverse(n_clicks, data):
     State("person-answer", "value"),
     prevent_initial_call=True,
 )
-def show_solution(n_clicks, data, root_answer, binyan_answer, tense_answer, person_answer):
-    if not n_clicks:
-        raise PreventUpdate
+def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
+                  store, root_answer, binyan_answer, tense_answer, person_answer):
+    if store is None or store.get("answered"):
+        df = pl.scan_parquet("data/conjugation.parquet")
+        filtered = df.filter(
+            pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
+            & pl.when(bool(binyanim)).then(pl.col("Binyan").is_in(binyanim)).otherwise(pl.lit(True))
+            & pl.when(bool(tenses)).then(pl.col("Tense").is_in(tenses)).otherwise(pl.lit(True))
+            & pl.when(bool(persons)).then(pl.col("Person").is_in(persons)).otherwise(pl.lit(True))
+            & pl.when(bool(genders)).then(pl.col("Gender").is_in(genders)).otherwise(pl.lit(True))
+            & pl.when(bool(numbers)).then(pl.col("Number").is_in(numbers)).otherwise(pl.lit(True))
+            & pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
+        ).collect()
+        if filtered.is_empty():
+            return (
+                no_update, no_update, no_update, no_update,
+                no_update, no_update, no_update, no_update,
+                dmc.Notification(
+                    title="Erreur",
+                    action="show",
+                    message="Aucun verbe ne satisfait ces filtres !",
+                    icon=DashIconify(
+                        icon="material-symbols:error-outline-rounded",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                    ),
+                ),
+                no_update, no_update, no_update, no_update,
+            )
+        sample = filtered.sample(n=1).to_dicts()[0]
+        verse, word = sample["VerseId"], sample["WordId"]
+        return (
+            build_verse(verse, word),
+            build_word(word),
+            sample,
+            {"display": "block"},
+            no_update, no_update,
+            {"display": "none"},
+            no_update,
+            no_update,
+            {"display": "flex"},
+            no_update,
+            {"display": "none"},
+            "Vérifier",
+        )
 
-    root = data["Root"]
-    tense = en_to_fr["Tense"][data["Tense"]]
-    binyan = data["Binyan"]
-    number = {"Singular": "S", "Plural": "P"}.get(data["Number"], "")
-    person = {"1": "1", "2": "2", "3": "3"}.get(data.get("Person", ""), "")
-    gender = {"M": "M", "F": "F"}.get(data.get("Gender", ""), "")
+    root = store["Root"]
+    tense = en_to_fr["Tense"][store["Tense"]]
+    binyan = store["Binyan"]
+    number = {"Singular": "S", "Plural": "P"}.get(store["Number"], "")
+    person = {"1": "1", "2": "2", "3": "3"}.get(store.get("Person", ""), "")
+    gender = {"M": "M", "F": "F"}.get(store.get("Gender", ""), "")
     rest = f"{person}{gender}{number}"
 
     root_nodiacr = Hebrew(root).text_only()
     definition = definitions.get(str(root_nodiacr), [["No definition found"]])[0]
-    html = ["<div>", "<p>Définition :</p>"]
+    html_parts = ["<div>", "<p>Définition :</p>"]
     for d in definition:
-        html.append(htmlify(d))
-    html.append("</div>")
-    html = "\n".join(html)
+        html_parts.append(htmlify(d))
+    html_parts.append("</div>")
 
     solution = f"{binyan} {tense} {rest}"
-
     chart = dmc.BarChart(
         h=450,
         dataKey="Binyan",
@@ -230,20 +190,44 @@ def show_solution(n_clicks, data, root_answer, binyan_answer, tense_answer, pers
         px=25,
     )
 
-    results = True
-    if binyan_answer is None or binyan_answer != binyan:
-        results = False
-    if root_answer is None or root_answer != root:
-        results = False
-    if tense_answer is None or tense_answer != data["Tense"]:
-        results = False
-    if person_answer is None:
-        person_answer = ""
-    if person_answer != rest:
-        results = False
+    correct = (
+        binyan_answer == binyan
+        and root_answer == root
+        and tense_answer == store["Tense"]
+        and (person_answer or "") == rest
+    )
+    color = "green" if correct else "red"
 
-    color = "green" if results else "red"
-    return [solution, convert_html_to_dash(html), chart], root, {"display": "block"}, color
+    return (
+        no_update,
+        no_update,
+        {**store, "answered": True},
+        no_update,
+        [solution, convert_html_to_dash("\n".join(html_parts)), chart],
+        root,
+        {"display": "block"},
+        color,
+        no_update,
+        {"display": "none"},
+        french_passage(store["VerseId"]),
+        {"display": "block"},
+        "Trouver un verbe",
+    )
+
+
+def barchart(root):
+    df = pl.scan_parquet("data/conjugation.parquet").filter(
+        (pl.col("Root") == root) & (pl.col("Binyan").is_in(COMMON_BINYANIM))
+    )
+    df = (
+        df.select(["Binyan", "Tense"])
+        .collect()
+        .to_struct(name="Struct")
+        .value_counts()
+        .unnest("Struct")
+        .sort("count", descending=True)
+    )
+    return df.pivot(["Tense"], index="Binyan", values="count").fill_null(0).to_dicts()
 
 
 def data_from_list(items):
@@ -397,7 +381,7 @@ layout = dmc.MantineProvider(
             dmc.Flex(
                 dmc.Button(
                     "Trouver un verbe",
-                    id="clause-btn",
+                    id="conj-action-btn",
                     color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                     radius="xl",
                     size="md",
@@ -423,12 +407,6 @@ layout = dmc.MantineProvider(
                     dmc.Select(placeholder="Binyan", value=None, data=dropdown_data["Binyan"], id="binyan-answer"),
                     dmc.Select(placeholder="Temps", value=None, data=dropdown_data["Tense"], id="tense-answer"),
                     dmc.Select(placeholder="Personne", value=None, data=answer_data, id="person-answer"),
-                    dmc.Button(
-                        "Ok",
-                        id="solution-btn",
-                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                        radius="xl",
-                    ),
                 ],
                 style={"display": "none"},
                 direction={"base": "column", "sm": "row"},
@@ -436,15 +414,6 @@ layout = dmc.MantineProvider(
                 justify={"sm": "center"},
                 mb=10,
                 id="answer-div",
-            ),
-            html.Div(
-                [
-                    html.P(children=[], id="solution-p-root", style={"fontFamily": "\"Ezra SIL\", sans-serif"}),
-                    html.P(
-                        children=[],
-                        id="solution-p-rest",
-                    ),
-                ]
             ),
             dmc.Alert(
                 "",
