@@ -298,17 +298,8 @@ layout = dmc.MantineProvider(
                     ),
                     dmc.Button(
                         "Trouver un nombre",
-                        id="numbers-generate-btn",
+                        id="numbers-action-btn",
                         color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                    ),
-                    html.Div(
-                        dmc.Button(
-                            "Vérifier",
-                            id="numbers-check-btn",
-                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                        ),
-                        id="numbers-verify-section",
-                        style={"display": "none"},
                     ),
                 ],
                 justify="center",
@@ -342,42 +333,33 @@ def open_settings_modal(_):
 
 @callback(
     Output("numbers-card", "children"),
-    Output("numbers-verify-section", "style"),
+    Output("numbers-action-btn", "children"),
     Output("numbers-store", "data"),
-    Input("numbers-generate-btn", "n_clicks"),
+    Input("numbers-action-btn", "n_clicks"),
+    State("numbers-store", "data"),
     State("numbers-range-check", "value"),
     State("numbers-hint-type-check", "value"),
-)
-def generate_number(_, ranges, hint_types):
-    pool = _pool(ranges)
-    number = random.choice(pool)
-    allowed_given = [k for k in REPRESENTATIONS if k in (hint_types or REPRESENTATIONS)]
-    given_key = random.choice(allowed_given or REPRESENTATIONS)
-    return (
-        _neutral_card(number, given_key, pool),
-        {"display": "block"},
-        {"number": number, "given_key": given_key},
-    )
-
-
-@callback(
-    Output("numbers-card", "children", allow_duplicate=True),
-    Output("numbers-verify-section", "style", allow_duplicate=True),
-    Input("numbers-check-btn", "n_clicks"),
-    State("numbers-store", "data"),
     State("numbers-select-name", "value"),
     State("numbers-select-arabic", "value"),
     State("numbers-select-numeral", "value"),
-    prevent_initial_call=True,
 )
-def check_answer(_, store, name_val, arabic_val, numeral_val):
-    if not store:
-        raise PreventUpdate
+def handle_action(_, store, ranges, hint_types, name_val, arabic_val, numeral_val):
+    if store is None or store.get("answered"):
+        pool = _pool(ranges)
+        number = random.choice(pool)
+        allowed_given = [k for k in REPRESENTATIONS if k in (hint_types or REPRESENTATIONS)]
+        given_key = random.choice(allowed_given or REPRESENTATIONS)
+        return (
+            _neutral_card(number, given_key, pool),
+            "Vérifier",
+            {"number": number, "given_key": given_key, "answered": False},
+        )
     return (
         _result_card(
             store["number"],
             store["given_key"],
             {"name": name_val, "arabic": arabic_val, "numeral": numeral_val},
         ),
-        {"display": "none"},
+        "Trouver un nombre",
+        {**store, "answered": True},
     )
