@@ -247,7 +247,6 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
             style={"fontFamily": '"Ezra SIL", sans-serif', "fontSize": "3rem",
                    "direction": "rtl", "textAlign": "right", "margin": "0 0 8px"},
         ),
-        html.P(solution, style={"color": "#555", "marginBottom": "16px"}),
         convert_html_to_dash("\n".join(html_parts)),
         chart,
     ]
