@@ -214,7 +214,7 @@ dropdown = dmc.MultiSelect(
 )
 
 chart = dmc.BarChart(
-    h=450,
+    h="100%",
     dataKey="Binyan",
     data=[],
     series=[
@@ -301,6 +301,7 @@ layout = dmc.MantineProvider(
                             [
                                 chart,
                             ],
+                            style={"height": "100%"},
                         ),
                     ],
                     className="occurrence-grid container",

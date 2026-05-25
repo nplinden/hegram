@@ -62,6 +62,7 @@ a:link h1 {
     .occurrence-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
+        align-items: stretch;
     }
 }
 
