@@ -93,6 +93,7 @@ layout = dmc.MantineProvider(
     html.Div(
         [
             dcc.Download(id="download-paal-strong"),
+            html.H1("Paal — Verbe fort", style={"marginBottom": "16px"}),
             dmc.Flex(
                 [
                     dmc.ActionIcon(
