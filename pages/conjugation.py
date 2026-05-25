@@ -84,7 +84,6 @@ def french_passage(verse_id: int):
     Output("fullverse-div", "style"),
     Output("solution-alert", "style", allow_duplicate=True),
     Output("notification", "children"),
-    Output("accordion", "value"),
     Output("answer-div", "style"),
     Output("frenchverse-div", "style"),
     Input("clause-btn", "n_clicks"),
@@ -126,7 +125,6 @@ def generate_verb(clicked, roots, book, binyanim, tenses, persons, genders, numb
                     icon="material-symbols:error-outline-rounded", color=dmc.DEFAULT_THEME["colors"]["dark"][6]
                 ),
             ),
-            "",
             no_update,
             no_update,
         )
@@ -140,7 +138,6 @@ def generate_verb(clicked, roots, book, binyanim, tenses, persons, genders, numb
             {"display": "block"},
             {"display": "none"},
             no_update,
-            "",
             {"display": "flex"},
             {"display": "none"},
         )
@@ -347,70 +344,66 @@ solution_body = dmc.TableTbody(
 layout = dmc.MantineProvider(
     dash.html.Div(
         children=[
-            dmc.Accordion(
-                disableChevronRotation=False,
+            dcc.Store(id="solution-storage", storage_type="local"),
+            dmc.Modal(
+                id="conj-intro-modal",
+                opened=False,
+                title="Exercice de conjugaison",
                 children=[
-                    dmc.AccordionItem(
-                        [
-                            dmc.AccordionControl(
-                                "Introduction",
-                                icon=DashIconify(
-                                    icon="material-symbols:text-snippet",
-                                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                                    width=20,
-                                ),
-                            ),
-                            dmc.AccordionPanel(
-                                children=[
-                                    html.H1("Exercice de conjugaison"),
-                                    html.P(
-                                        "Une application d'exercice à la conjugaison en hébreu biblique. Cliquez sur \"Trouver un verbe\" pour choisir aléatoirement une forme verbale dans le corpus biblique. Essayez d'analyser la conjugaison de ce verbe ! Le verset correspondant est également fourni pour plus de contexte."
-                                    ),
-                                    html.P(
-                                        'Le menu "Paramètres" ci-dessous permet de restreindre le choix des formes verbales.'
-                                    ),
-                                ]
-                            ),
-                        ],
-                        value="introduction",
+                    html.P(
+                        "Une application d'exercice à la conjugaison en hébreu biblique. Cliquez sur \"Trouver un verbe\" pour choisir aléatoirement une forme verbale dans le corpus biblique. Essayez d'analyser la conjugaison de ce verbe ! Le verset correspondant est également fourni pour plus de contexte."
                     ),
-                    dmc.AccordionItem(
-                        [
-                            dmc.AccordionControl(
-                                "Paramètres",
-                                icon=DashIconify(
-                                    icon="material-symbols:settings",
-                                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                                    width=20,
-                                ),
-                            ),
-                            dmc.AccordionPanel(
-                                children=[
-                                    root_select,
-                                    book_select,
-                                    binyan_select,
-                                    tense_select,
-                                    person_select,
-                                    gender_select,
-                                    number_select,
-                                ]
-                            ),
-                        ],
-                        value="settings",
+                    html.P(
+                        'L\'icône "Paramètres" permet de restreindre le choix des formes verbales.'
                     ),
                 ],
-                mb=10,
-                value="introduction",
-                id="accordion",
+            ),
+            dmc.Modal(
+                id="conj-settings-modal",
+                opened=False,
+                title="Paramètres",
+                children=[
+                    root_select,
+                    book_select,
+                    binyan_select,
+                    tense_select,
+                    person_select,
+                    gender_select,
+                    number_select,
+                ],
             ),
             dmc.Flex(
                 [
-                    dmc.Button("Trouver un verbe", id="clause-btn", color=dmc.DEFAULT_THEME["colors"]["dark"][6]),
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:info", width=20),
+                        id="conj-intro-btn",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:settings", width=20),
+                        id="conj-settings-btn",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
                 ],
-                direction={"base": "column", "sm": "row"},
-                gap={"base": "sm", "sm": "lg"},
-                justify={"sm": "center"},
-                mb=10,
+                justify="flex-end",
+                align="center",
+                gap="xs",
+                mb=4,
+            ),
+            dmc.Flex(
+                dmc.Button(
+                    "Trouver un verbe",
+                    id="clause-btn",
+                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                    radius="xl",
+                    size="md",
+                ),
+                justify="center",
+                mb=16,
             ),
             html.Div(children=[], id="word-div", style={"textAlign": "center"}),
             html.Div(
@@ -434,6 +427,7 @@ layout = dmc.MantineProvider(
                         "Ok",
                         id="solution-btn",
                         color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        radius="xl",
                     ),
                 ],
                 style={"display": "none"},
@@ -443,7 +437,6 @@ layout = dmc.MantineProvider(
                 mb=10,
                 id="answer-div",
             ),
-            dcc.Store(id="solution-storage", storage_type="local"),
             html.Div(
                 [
                     html.P(children=[], id="solution-p-root", style={"fontFamily": "\"Ezra SIL\", sans-serif"}),
@@ -465,3 +458,21 @@ layout = dmc.MantineProvider(
         className="container",
     )
 )
+
+
+@callback(
+    Output("conj-intro-modal", "opened"),
+    Input("conj-intro-btn", "n_clicks"),
+    prevent_initial_call=True,
+)
+def open_intro_modal(_):
+    return True
+
+
+@callback(
+    Output("conj-settings-modal", "opened"),
+    Input("conj-settings-btn", "n_clicks"),
+    prevent_initial_call=True,
+)
+def open_settings_modal(_):
+    return True
