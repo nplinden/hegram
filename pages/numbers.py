@@ -234,9 +234,27 @@ layout = dmc.MantineProvider(
     html.Div(
         [
             dcc.Store(id="numbers-store", storage_type="session"),
+            dmc.Modal(
+                id="numbers-intro-modal",
+                opened=False,
+                title="Exercice sur les nombres",
+                children=[
+                    html.P(
+                        "Un nombre s'affiche sous l'une de ses trois formes. "
+                        "Retrouvez les deux autres. Les formes de 1 à 19 sont au féminin absolu (formes de comptage)."
+                    ),
+                ],
+            ),
             html.Div(id="numbers-card"),
             dmc.Flex(
                 [
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:info", width=20),
+                        id="numbers-intro-btn",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
                     dmc.Button(
                         "Trouver un nombre",
                         id="numbers-generate-btn",
@@ -253,34 +271,13 @@ layout = dmc.MantineProvider(
                     ),
                 ],
                 justify="center",
+                align="center",
                 gap="md",
                 mb=24,
             ),
             dmc.Accordion(
                 disableChevronRotation=False,
                 children=[
-                    dmc.AccordionItem(
-                        [
-                            dmc.AccordionControl(
-                                "Introduction",
-                                icon=DashIconify(
-                                    icon="material-symbols:text-snippet",
-                                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                                    width=20,
-                                ),
-                            ),
-                            dmc.AccordionPanel(
-                                [
-                                    html.H1("Exercice sur les nombres"),
-                                    html.P(
-                                        "Un nombre s'affiche sous l'une de ses trois formes. "
-                                        "Retrouvez les deux autres. Les formes de 1 à 19 sont au féminin absolu (formes de comptage)."
-                                    ),
-                                ]
-                            ),
-                        ],
-                        value="introduction",
-                    ),
                     dmc.AccordionItem(
                         [
                             dmc.AccordionControl(
@@ -327,13 +324,21 @@ layout = dmc.MantineProvider(
                     ),
                 ],
                 mb=10,
-                value="introduction",
                 id="numbers-accordion",
             ),
         ],
         className="container",
     )
 )
+
+
+@callback(
+    Output("numbers-intro-modal", "opened"),
+    Input("numbers-intro-btn", "n_clicks"),
+    prevent_initial_call=True,
+)
+def open_intro_modal(_):
+    return True
 
 
 @callback(
