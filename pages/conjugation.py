@@ -228,12 +228,12 @@ body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; }
 }
 .singleword {
   font-family: "Ezra SIL", sans-serif;
-  font-size: 3rem;
+  font-size: 2rem;
   direction: rtl;
 }
 .fullverse {
   font-family: "Ezra SIL", sans-serif;
-  font-size: 1.8rem;
+  font-size: 1.2rem;
   direction: rtl;
   line-height: 1.6;
 }
