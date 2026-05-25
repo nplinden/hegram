@@ -499,16 +499,14 @@ def layout():
                 gap="xs",
                 mb=4,
             ),
-            dmc.Flex(
-                dmc.Button(
-                    "Trouver un verbe",
-                    id="conj-action-btn",
-                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                    radius="xl",
-                    size="md",
-                ),
-                justify="center",
-                mb=16,
+            dmc.Button(
+                "Trouver un verbe",
+                id="conj-action-btn",
+                color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                radius="xl",
+                size="md",
+                fullWidth=True,
+                style={"maxWidth": "640px", "marginInline": "auto", "display": "block", "marginBottom": "16px"},
             ),
             html.Div(
                 html.Div(
