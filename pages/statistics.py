@@ -7,7 +7,6 @@ from hegram.utils import htmlify, convert_html_to_dash
 from loguru import logger
 from hebrew import Hebrew
 from typing import Dict, List, Set, Any, Tuple
-import plotly.graph_objects as go
 import polars as pl
 
 import dash_mantine_components as dmc
@@ -21,71 +20,20 @@ Data = Dict[str, str | int]
 COMMON_BINYANIM = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
 
 
-def binyanim_barchart(radio, roots=None):
+def binyanim_barchart(roots=None):
     df = pl.scan_parquet("data/conjugation.parquet").filter(
         pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
         & pl.col("Binyan").is_in(COMMON_BINYANIM)
     )
-    if radio in ["Binyan-Tense", "Tense-Binyan"]:
-        df = (
-            df.select(["Binyan", "Tense"])
-            .collect()
-            .to_struct(name="Struct")
-            .value_counts()
-            .unnest("Struct")
-            .sort("count", descending=True)
-        )
-        if radio == "Binyan-Tense":
-            return df.pivot(["Tense"], index="Binyan", values="count").fill_null(0).to_dicts()
-        else:
-            return df.pivot(["Binyan"], index="Tense", values="count").fill_null(0).to_dicts()
-    elif radio == "Binyan":
-        df = df.select(["Binyan"])
-    elif radio == "Tense":
-        df = df.select(["Tense"])
-    return df.collect().to_series().value_counts(name="Occurences").sort("Occurences", descending=True).to_dicts()
-
-
-@callback(
-    Output("mantine-bargraph", "series"),
-    Output("mantine-bargraph", "dataKey"),
-    Output("mantine-bargraph", "xAxisLabel"),
-    Input("radiogroup", "value"),
-)
-def update_barchart_series(radio):
-    if radio == "Binyan-Tense":
-        return (
-            [
-                {"name": "Qatal", "color": "red.6"},
-                {"name": "Yiqtol", "color": "green.6"},
-                {"name": "Wayyiqtol", "color": "indigo.6"},
-                {"name": "Imperative", "color": "grape.6"},
-                {"name": "Infinitive (abslute)", "color": "teal.6"},
-                {"name": "Infinitive (construct)", "color": "yellow.6"},
-                {"name": "Participle", "color": "pink.6"},
-                {"name": "Participle (passive)", "color": "lime.6"},
-            ],
-            "Binyan",
-            "Binyan",
-        )
-    elif radio == "Tense-Binyan":
-        return (
-            [
-                {"name": "Paal", "color": "red.6"},
-                {"name": "Piel", "color": "green.6"},
-                {"name": "Pual", "color": "indigo.6"},
-                {"name": "Nifal", "color": "grape.6"},
-                {"name": "Hofal", "color": "teal.6"},
-                {"name": "Hitpael", "color": "yellow.6"},
-                {"name": "Hifil", "color": "yellow.6"},
-            ],
-            "Tense",
-            "Tense",
-        )
-    elif radio == "Binyan":
-        return [{"name": "Occurences", "color": "green.6"}], "Binyan", "Binyan"
-    elif radio == "Tense":
-        return [{"name": "Occurences", "color": "green.6"}], "Tense", "Tense"
+    df = (
+        df.select(["Binyan", "Tense"])
+        .collect()
+        .to_struct(name="Struct")
+        .value_counts()
+        .unnest("Struct")
+        .sort("count", descending=True)
+    )
+    return df.pivot(["Tense"], index="Binyan", values="count").fill_null(0).to_dicts()
 
 
 @callback(
@@ -93,32 +41,19 @@ def update_barchart_series(radio):
     [
         Input("table", "data"),
         Input("table", "selected_cells"),
-        Input("radiogroup", "value"),
     ],
 )
-def update_binyanim_bar_graph(data: DataList, selected_cells: DataList, radio) -> go.Figure:
-    """Trigger figure update on cell selection
-
-    Args:
-        data (DataList): The data contained in the table
-        selected_cells (DataList): The list of selected cells
-
-    Raises:
-        PreventUpdate: In case no cell is selected
-
-    Returns:
-        go.Figure: The resulting bar graph figure
-    """
+def update_binyanim_bar_graph(data: DataList, selected_cells: DataList) -> go.Figure:
     logger.info("Triggering table_select callback")
     if selected_cells is None:
-        return binyanim_barchart(radio)
+        return binyanim_barchart()
     roots = set()
     for cell in selected_cells:
         roots |= get_roots_from_cell(data, cell)
     if roots:
         logger.info(roots)
-        return binyanim_barchart(radio, list(roots))
-    return binyanim_barchart(radio)
+        return binyanim_barchart(list(roots))
+    return binyanim_barchart()
 
 
 def get_roots_from_cell(data: DataList, cell: Data) -> Set[str]:
@@ -365,25 +300,6 @@ layout = dmc.MantineProvider(
                         html.Div(
                             [
                                 chart,
-                                dmc.RadioGroup(
-                                    children=dmc.Group(
-                                        [
-                                            dmc.Radio(k, value=k)
-                                            for k in [
-                                                "Binyan",
-                                                "Tense",
-                                                "Binyan-Tense",
-                                                "Tense-Binyan",
-                                            ]
-                                        ],
-                                        my=10,
-                                    ),
-                                    id="radiogroup",
-                                    value="Binyan-Tense",
-                                    size="sm",
-                                    mb=10,
-                                    px=25,
-                                ),
                             ],
                         ),
                     ],
