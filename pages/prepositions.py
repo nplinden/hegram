@@ -1,102 +1,186 @@
 import dash
-from dash import callback, Input, Output, State, dcc
-from dash import html, no_update
-import dash_mantine_components as dmc
-from dash.dash_table import DataTable
-from pages.datatable_style import style
 import pandas as pd
+import dash_mantine_components as dmc
+from dash import html, callback, Input, Output, State, dcc
+from dash_iconify import DashIconify
 
 dash.register_page(__name__, path="/exercises/prepositions")
 
 flexion = pd.read_csv("data/prepositions.csv")
 
+_BG_NEUTRAL  = "#FFFFFF"
+_BG_REVEALED = "#EBF5FB"
 
-def build_table(hebrew, french):
-    return DataTable(
-        data=[
-            {"Hébreu": hebrew, "Français": french},
-        ],
-        columns=[
-            {"name": "Hébreu", "id": "Hébreu"},
-            {"name": "Français", "id": "Français"},
-        ],
-        **style,
+_COLOR_HEBREW = "#000000"
+_COLOR_FRENCH = "#2471A3"
+_COLOR_HIDDEN = "#AAAAAA"
+
+_CARD_STYLE = {
+    "borderRadius": "16px",
+    "border": "1px solid #e0e0e0",
+    "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
+    "overflow": "hidden",
+    "maxWidth": "400px",
+    "marginInline": "auto",
+    "marginBottom": "24px",
+}
+
+
+def _zone(label, value, color, is_rtl=False, font_size="3rem", border_top=False):
+    text_style = {
+        "fontFamily": '"Ezra SIL", sans-serif',
+        "fontSize": font_size,
+        "textAlign": "center",
+        "color": color,
+        "margin": "0",
+        "lineHeight": "1.3",
+    }
+    if is_rtl:
+        text_style["direction"] = "rtl"
+    border = {"borderTop": "1px solid rgba(0,0,0,0.1)"} if border_top else {}
+    return html.Div(
+        [dmc.Text(label, size="sm", c="dimmed", ta="center", mb=8), html.P(value, style=text_style)],
+        style={"padding": "24px 16px", "display": "flex", "flexDirection": "column",
+               "justifyContent": "center", "alignItems": "center", **border},
     )
 
 
-layout = dmc.MantineProvider(
-    children=[
-        html.H1("Exercice sur les prépositions"),
-        html.P("Une application simple pour se tester sur la connaissance des prépositions !"),
-        dmc.Flex(
-            [
-                dmc.Checkbox(
-                    labelPosition="right",
-                    label="Inclure les suffixes",
-                    variant="filled",
-                    size="sm",
-                    radius="sm",
-                    id="suffix-check",
-                ),
-            ],
-            direction={"base": "column", "sm": "row"},
-            gap={"base": "sm", "sm": "lg"},
-            justify={"sm": "center"},
-            mb=10,
-        ),
-        dmc.Flex(
-            [
-                dmc.Button("Nouvelle préposition", id="preposition-btn", color=dmc.DEFAULT_THEME["colors"]["dark"][6]),
-                dmc.Button("Solution", id="solution-btn", color=dmc.DEFAULT_THEME["colors"]["dark"][6]),
-            ],
-            direction={"base": "column", "sm": "row"},
-            gap={"base": "sm", "sm": "lg"},
-            justify={"sm": "center"},
-            mb=10,
-        ),
-        dcc.Store(id="solution-store", storage_type="session"),
-        html.Div(
-            children=[
-                DataTable(
-                    data=[
-                        {"Hébreu": "", "Français": ""},
-                    ],
-                    columns=[
-                        {"name": "Hébreu", "id": "Hébreu"},
-                        {"name": "Français", "id": "Français"},
-                    ],
-                    **style,
-                )
-            ],
-            id="preposition-div",
-            style={"textAlign": "center"},
-        ),
-    ]
-)
+def _neutral_card(row):
+    return html.Div(
+        [
+            _zone("Hébreu", row["hebrew"], _COLOR_HEBREW, is_rtl=True),
+            _zone("Français", "?", _COLOR_HIDDEN, font_size="2rem", border_top=True),
+        ],
+        style={**_CARD_STYLE, "backgroundColor": _BG_NEUTRAL},
+    )
 
 
-@callback(
-    Output("preposition-div", "children", allow_duplicate=True),
-    Output("solution-store", "data"),
-    Input("preposition-btn", "n_clicks"),
-    State("suffix-check", "checked"),
-    prevent_initial_call=True,
-)
-def generate_preposition(clicked, with_suffix):
+def _revealed_card(row):
+    return html.Div(
+        [
+            _zone("Hébreu", row["hebrew"], _COLOR_HEBREW, is_rtl=True),
+            _zone("Français", row["french"], _COLOR_FRENCH, font_size="2rem", border_top=True),
+        ],
+        style={**_CARD_STYLE, "backgroundColor": _BG_REVEALED},
+    )
+
+
+def _sample(with_suffix):
     if not with_suffix:
-        row = flexion[flexion["person"] == "base"].sample(n=1).iloc[0]
-    else:
-        row = flexion.sample(n=1).iloc[0]
-    return build_table(row["hebrew"], ""), [row.to_dict()]
+        return flexion[flexion["person"] == "base"].sample(n=1).iloc[0].to_dict()
+    return flexion.sample(n=1).iloc[0].to_dict()
+
+
+layout = dmc.MantineProvider(
+    html.Div(
+        [
+            dcc.Store(id="prep-store", storage_type="session"),
+            dcc.Interval(id="prep-init", interval=1, max_intervals=1),
+            dmc.Modal(
+                id="prep-intro-modal",
+                opened=False,
+                title="Exercice sur les prépositions",
+                children=[
+                    html.P(
+                        "Une préposition hébraïque s'affiche. "
+                        "Retrouvez sa traduction française. "
+                        "Activez les suffixes dans les paramètres pour inclure les formes avec pronoms suffixes."
+                    ),
+                ],
+            ),
+            dmc.Modal(
+                id="prep-settings-modal",
+                opened=False,
+                title="Paramètres",
+                children=[
+                    dmc.Checkbox(
+                        id="prep-suffix-check",
+                        label="Inclure les suffixes",
+                        checked=False,
+                        mb=8,
+                    ),
+                ],
+            ),
+            html.Div(id="prep-card"),
+            dmc.Flex(
+                [
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:info", width=20),
+                        id="prep-intro-btn",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:settings", width=20),
+                        id="prep-settings-btn",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
+                    dmc.Button(
+                        "Voir la solution",
+                        id="prep-action-btn",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                    ),
+                ],
+                justify="center",
+                align="center",
+                gap="md",
+                mb=24,
+            ),
+        ],
+        className="container",
+    )
+)
 
 
 @callback(
-    Output("preposition-div", "children", allow_duplicate=True),
-    Input("solution-btn", "n_clicks"),
-    State("solution-store", "data"),
+    Output("prep-intro-modal", "opened"),
+    Input("prep-intro-btn", "n_clicks"),
     prevent_initial_call=True,
 )
-def show_solution(clicked, data):
-    if not data:
-        return no_update
-    return build_table(data[0]["hebrew"], data[0]["french"])
+def open_intro_modal(_):
+    return True
+
+
+@callback(
+    Output("prep-settings-modal", "opened"),
+    Input("prep-settings-btn", "n_clicks"),
+    prevent_initial_call=True,
+)
+def open_settings_modal(_):
+    return True
+
+
+def _generate(with_suffix):
+    row = _sample(with_suffix)
+    return _neutral_card(row), "Voir la solution", {"row": row, "answered": False}
+
+
+@callback(
+    Output("prep-card", "children"),
+    Output("prep-action-btn", "children"),
+    Output("prep-store", "data"),
+    Input("prep-init", "n_intervals"),
+    State("prep-suffix-check", "checked"),
+    prevent_initial_call=True,
+)
+def initial_generate(_, with_suffix):
+    return _generate(with_suffix)
+
+
+@callback(
+    Output("prep-card", "children", allow_duplicate=True),
+    Output("prep-action-btn", "children", allow_duplicate=True),
+    Output("prep-store", "data", allow_duplicate=True),
+    Input("prep-action-btn", "n_clicks"),
+    State("prep-store", "data"),
+    State("prep-suffix-check", "checked"),
+    prevent_initial_call=True,
+)
+def handle_action(_, store, with_suffix):
+    if store is None or store.get("answered"):
+        return _generate(with_suffix)
+    row = store["row"]
+    return _revealed_card(row), "Nouvelle préposition", {**store, "answered": True}
