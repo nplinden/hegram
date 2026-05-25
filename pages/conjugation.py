@@ -150,7 +150,7 @@ def _build_word_html(word_id: int) -> str:
 
 
 def _build_pdf_html(samples: list[dict]) -> str:
-    answer_labels = ["Racine", "Binyan", "Temps", "Personne / Genre / Nombre"]
+    answer_labels = ["Racine", "Binyan", "Temps", "Personne"]
     questions_html = ""
     for i, s in enumerate(samples, 1):
         word_html = _build_word_html(s["WordId"])
