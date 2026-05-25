@@ -316,6 +316,21 @@ def get_root_select_data():
 _ROOT_DATA = get_root_select_data()
 
 
+def _compute_root_freq_data():
+    df = (
+        pl.scan_parquet("data/conjugation.parquet")
+        .group_by("Root")
+        .agg(pl.len().alias("count"))
+        .sort("count", descending=True)
+        .collect()
+    )
+    return df["Root"].to_list(), df["count"].to_list()
+
+
+_ROOTS_BY_FREQ, _ROOT_COUNTS = _compute_root_freq_data()
+_N_ROOTS = len(_ROOTS_BY_FREQ)
+
+
 def _answer_row(index, correct, guess, is_correct):
     if index == 0:
         icon = dmc.ActionIcon(
@@ -353,6 +368,35 @@ def _answer_row(index, correct, guess, is_correct):
         },
     )
 
+
+def _slider_marks():
+    positions = [1, 50, 100, 250, 500, 1000, _N_ROOTS]
+    seen = set()
+    marks = []
+    for p in positions:
+        v = min(p, _N_ROOTS)
+        if v not in seen:
+            seen.add(v)
+            marks.append({"value": v, "label": str(v)})
+    return marks
+
+
+root_freq_slider = html.Div(
+    [
+        dmc.Text("Fréquence des racines", size="sm", fw=500, mb=4),
+        dmc.RangeSlider(
+            id="conjugation-roots-slider",
+            min=1,
+            max=_N_ROOTS,
+            step=1,
+            value=[1, _N_ROOTS],
+            marks=_slider_marks(),
+            mb=24,
+            minRange=1,
+        ),
+    ],
+    mb=10,
+)
 
 root_select = dmc.MultiSelect(
     label="Racines autorisées",
@@ -468,6 +512,7 @@ def layout():
                 opened=False,
                 title="Paramètres",
                 children=[
+                    root_freq_slider,
                     root_select,
                     book_select,
                     binyan_select,
@@ -586,6 +631,18 @@ def layout():
 )
 def open_intro_modal(_):
     return True
+
+
+@callback(
+    Output("conjugation-roots-dropdown", "value"),
+    Input("conjugation-roots-slider", "value"),
+    prevent_initial_call=True,
+)
+def slider_to_root_select(slider_value):
+    lo, hi = slider_value
+    if lo == 1 and hi == _N_ROOTS:
+        return []
+    return _ROOTS_BY_FREQ[lo - 1 : hi]
 
 
 @callback(
