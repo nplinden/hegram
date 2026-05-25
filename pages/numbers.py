@@ -233,6 +233,8 @@ def _result_card(number, given_key, user_answers):
 layout = dmc.MantineProvider(
     html.Div(
         [
+            dcc.Store(id="numbers-store", storage_type="session"),
+            html.Div(id="numbers-card"),
             dmc.Flex(
                 [
                     dmc.Button(
@@ -254,8 +256,6 @@ layout = dmc.MantineProvider(
                 gap="md",
                 mb=24,
             ),
-            dcc.Store(id="numbers-store", storage_type="session"),
-            html.Div(id="numbers-card"),
             dmc.Accordion(
                 disableChevronRotation=False,
                 children=[
