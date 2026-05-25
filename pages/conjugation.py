@@ -153,7 +153,6 @@ def _build_pdf_html(samples: list[dict]) -> str:
     answer_labels = ["Racine", "Binyan", "Temps", "Personne"]
     questions_html = ""
     for i, s in enumerate(samples, 1):
-        word_html = _build_word_html(s["WordId"])
         verse_html = _build_verse_html(s["VerseId"], s["WordId"])
         ref = _verse_ref(s["VerseId"])
         answer_fields = "".join(
@@ -164,14 +163,11 @@ def _build_pdf_html(samples: list[dict]) -> str:
 <div class="question">
   <div class="question-number">Question {i}</div>
   <div class="cards-row">
-    <div class="verb-card">{word_html}</div>
+    <div class="answer-section">{answer_fields}</div>
     <div class="verse-card">
       {verse_html}
       <div class="verse-ref">{ref}</div>
     </div>
-  </div>
-  <div class="answer-section">
-    <div class="answer-row">{answer_fields}</div>
   </div>
 </div>"""
     css = """
@@ -244,14 +240,11 @@ body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; padd
   direction: ltr;
 }
 .answer-section {
+  flex: 0 0 25%;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 6px;
-}
-.answer-row {
-  display: flex;
-  gap: 10px;
-  width: 100%;
 }
 .answer-field {
   flex: 1;
