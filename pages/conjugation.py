@@ -1,3 +1,4 @@
+import base64 as _b64
 import dash
 import dash_mantine_components as dmc
 import json as _json
@@ -114,6 +115,189 @@ def french_passage(verse_id: int):
         fr_v_idx = min(verse - 1, len(fr_ch) - 1)
     text = fr_ch[fr_v_idx]
     return html.P([passage(verse_id), f" : {text}"])
+
+
+def _verse_ref(verse_id: int) -> str:
+    df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
+    book = en_to_fr_books[df["book"]]
+    return f"{book} {df['chapter']}:{df['verse']}"
+
+
+def _build_verse_html(verse_id: int, word_id: int) -> str:
+    df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
+    word_df = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect()
+    word = BeautifulSoup(word_df.to_dicts()[0]["html"], features="html.parser").find("span").string
+    soup = BeautifulSoup(df["html"], features="html.parser")
+    span = soup.find("span", string=word)
+    _hl(span)
+    prev = span.find_previous_sibling("span")
+    if prev:
+        consonants = [c for c in prev.get_text() if c in _HEBREW_CONSONANTS]
+        if consonants == ['\u05D5']:
+            _hl(prev)
+    soup.find("div")["class"] = ["fullverse"]
+    return str(soup)
+
+
+def _build_word_html(word_id: int) -> str:
+    row = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect().to_dicts()[0]
+    soup = BeautifulSoup(row["html"], features="html.parser")
+    soup.find("div")["class"] = ["singleword"]
+    return str(soup)
+
+
+def _pdf_font_b64() -> str:
+    with open("assets/SILEOT.woff", "rb") as f:
+        return _b64.b64encode(f.read()).decode()
+
+
+def _build_pdf_html(samples: list[dict]) -> str:
+    font_b64 = _pdf_font_b64()
+    answer_labels = [
+        ("Racine", "Binyan"),
+        ("Temps", "Personne / Genre / Nombre"),
+    ]
+    questions_html = ""
+    for i, s in enumerate(samples, 1):
+        word_html = _build_word_html(s["WordId"])
+        verse_html = _build_verse_html(s["VerseId"], s["WordId"])
+        ref = _verse_ref(s["VerseId"])
+        questions_html += f"""
+<div class="question">
+  <div class="question-number">Question {i}</div>
+  <div class="cards-row">
+    <div class="verb-card">{word_html}</div>
+    <div class="verse-card">
+      {verse_html}
+      <div class="verse-ref">{ref}</div>
+    </div>
+  </div>
+  <div class="answer-section">
+    {"".join(
+        f'<div class="answer-row">'
+        + "".join(
+            f'<div class="answer-field"><div class="answer-label">{label}</div><div class="answer-box"></div></div>'
+            for label in row
+        )
+        + '</div>'
+        for row in answer_labels
+    )}
+  </div>
+</div>"""
+    css = f"""
+@font-face {{
+  font-family: "Ezra SIL";
+  src: url("data:font/woff;base64,{font_b64}");
+  unicode-range: U+0590-U+05FF, U+FB1D-U+FB4F;
+}}
+* {{ box-sizing: border-box; margin: 0; padding: 0; }}
+body {{ font-family: "Ezra SIL", sans-serif; background: white; color: #111; }}
+.question {{
+  padding: 15mm 20mm;
+  page-break-after: always;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}}
+.question:last-child {{ page-break-after: avoid; }}
+.question-number {{
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}}
+.cards-row {{
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}}
+.verb-card {{
+  flex: 0 0 auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+}}
+.verse-card {{
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px 20px;
+}}
+.singleword {{
+  font-family: "Ezra SIL", sans-serif;
+  font-size: 3rem;
+  direction: rtl;
+}}
+.fullverse {{
+  font-family: "Ezra SIL", sans-serif;
+  font-size: 1.8rem;
+  direction: rtl;
+  line-height: 1.6;
+}}
+.hl {{
+  background-color: rgba(147, 197, 253, 0.6);
+  border-radius: 2px;
+}}
+.verse-ref {{
+  font-style: italic;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 10px;
+  direction: ltr;
+}}
+.answer-section {{
+  border-top: 1px solid #e0e0e0;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}}
+.answer-row {{
+  display: flex;
+  gap: 16px;
+}}
+.answer-field {{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}}
+.answer-label {{
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}}
+.answer-box {{
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  height: 38px;
+  background: white;
+}}
+@media print {{
+  body {{ margin: 0; }}
+  .question {{ padding: 10mm 15mm; min-height: unset; }}
+}}
+"""
+    return f"""<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Exercice de conjugaison</title>
+<style>{css}</style>
+</head>
+<body>
+{questions_html}
+</body>
+</html>"""
+
 
 
 @callback(
@@ -492,6 +676,7 @@ def layout():
         dash.html.Div(
             children=[
                 dcc.Store(id="solution-storage", storage_type="memory"),
+                dcc.Download(id="conj-pdf-download"),
             dmc.Modal(
                 id="conj-detail-modal",
                 opened=False,
@@ -524,6 +709,29 @@ def layout():
                     person_select,
                     gender_select,
                     number_select,
+                    dmc.Divider(my=12),
+                    dmc.Group(
+                        [
+                            dmc.NumberInput(
+                                id="conj-pdf-n-questions",
+                                label="Nombre de questions",
+                                min=1,
+                                max=50,
+                                step=1,
+                                value=10,
+                                style={"width": 160},
+                            ),
+                            dmc.Button(
+                                "Télécharger questionnaire",
+                                id="conj-pdf-btn",
+                                leftSection=DashIconify(icon="material-symbols:download", width=18),
+                                variant="outline",
+                                color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                                style={"alignSelf": "flex-end"},
+                            ),
+                        ],
+                        align="flex-end",
+                    ),
                 ],
             ),
             dmc.Flex(
@@ -671,3 +879,37 @@ def open_detail_modal(n_clicks_list):
     if any(n for n in n_clicks_list if n):
         return True
     raise PreventUpdate
+
+
+@callback(
+    Output("conj-pdf-download", "data"),
+    Input("conj-pdf-btn", "n_clicks"),
+    State("conj-pdf-n-questions", "value"),
+    State("conjugation-roots-dropdown", "value"),
+    State("conjugation-book-dropdown", "value"),
+    State("conjugation-binyan-dropdown", "value"),
+    State("conjugation-tense-dropdown", "value"),
+    State("conjugation-person-dropdown", "value"),
+    State("conjugation-gender-dropdown", "value"),
+    State("conjugation-number-dropdown", "value"),
+    prevent_initial_call=True,
+)
+def generate_pdf(_, n_questions, roots, book, binyanim, tenses, persons, genders, numbers):
+    if not n_questions:
+        raise PreventUpdate
+    df = pl.scan_parquet("data/conjugation.parquet")
+    filtered = df.filter(
+        pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
+        & pl.when(bool(binyanim)).then(pl.col("Binyan").is_in(binyanim)).otherwise(pl.lit(True))
+        & pl.when(bool(tenses)).then(pl.col("Tense").is_in(tenses)).otherwise(pl.lit(True))
+        & pl.when(bool(persons)).then(pl.col("Person").is_in(persons)).otherwise(pl.lit(True))
+        & pl.when(bool(genders)).then(pl.col("Gender").is_in(genders)).otherwise(pl.lit(True))
+        & pl.when(bool(numbers)).then(pl.col("Number").is_in(numbers)).otherwise(pl.lit(True))
+        & pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
+    ).collect()
+    if filtered.is_empty():
+        raise PreventUpdate
+    k = min(int(n_questions), len(filtered))
+    samples = filtered.sample(n=k).to_dicts()
+    html_content = _build_pdf_html(samples)
+    return dcc.send_string(html_content, filename="questionnaire_conjugaison.html")
