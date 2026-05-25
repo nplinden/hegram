@@ -274,7 +274,7 @@ def change_url(pathname):
 
 if __name__ == "__main__":
     if sys.argv[-1] == "debug":
-        app.run_server(
+        app.run(
             debug=True,
             port=7777,
             dev_tools_hot_reload=True,
