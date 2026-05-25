@@ -912,4 +912,6 @@ def generate_pdf(_, n_questions, roots, book, binyanim, tenses, persons, genders
     k = min(int(n_questions), len(filtered))
     samples = filtered.sample(n=k).to_dicts()
     html_content = _build_pdf_html(samples)
-    return dcc.send_string(html_content, filename="questionnaire_conjugaison.html")
+    import weasyprint
+    pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
+    return dcc.send_bytes(pdf_bytes, filename="questionnaire_conjugaison.pdf")
