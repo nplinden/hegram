@@ -1,98 +1,26 @@
 import dash
-import dash_mantine_components as dmc
-import pandas as pd
-from dash.dash_table import DataTable
-from dash import dcc, Input, Output, callback
-from pages.datatable_style import style
+from pages.conj_layout import make_page
 
 dash.register_page(__name__, path="/poual_strong")
 
-accompli = pd.DataFrame(
-    {
-        "Personne": ["1S", "2MS", "2FS", "3MS", "3FS", "1P", "2MP", "2FP", "3MP", "3FS"],
-        "Accompli": [
-            "יֻלַּדְתִּי",
-            "יֻלַּדְתָּ",
-            "יֻלַּדְתְּ",
-            "יֻלַּדְ",
-            "יֻלְּדָה",
-            "יֻלַּדְנוּ",
-            "יֻלַּדְתֶּם",
-            "יֻלַּדְתֶּן",
-            "יֻלְּדוּ",
-            "יֻלְּדוּ",
-        ],
-    }
+layout = make_page(
+    page_id="poual-strong",
+    title="Poual — Verbe fort",
+    root="ילד",
+    asset="assets/poual_strong.svg",
+    accompli=[
+        ("1S",  "יֻלַּדְתִּי"), ("2MS", "יֻלַּדְתָּ"),  ("2FS", "יֻלַּדְתְּ"),
+        ("3MS", "יֻלַּדְ"),     ("3FS", "יֻלְּדָה"),   ("1P",  "יֻלַּדְנוּ"),
+        ("2MP", "יֻלַּדְתֶּם"), ("2FP", "יֻלַּדְתֶּן"), ("3MP", "יֻלְּדוּ"),
+        ("3FP", "יֻלְּדוּ"),
+    ],
+    inaccompli=[
+        ("1S",  "אֲיֻלַּד"),   ("2MS", "תְּיֻלַּד"),   ("2FS", "תְּיֻלְּדִי"),
+        ("3MS", "יְיֻלַּד"),   ("3FS", "תְּיֻלַּד"),   ("1P",  "נְיֻלַּד"),
+        ("2MP", "תְּיֻלְּדוּ"), ("2FP", "תְּיֻלַּדְנָה"), ("3MP", "יְיֻלְּדוּ"),
+        ("3FP", "תְּיֻלַּדְנָה"),
+    ],
+    participe=[
+        ("MS", "מְיֻלַּד"), ("FS", "מְיֻלֶּדֶת"), ("MP", "מְיֻלָּדִים"), ("FP", "מְיֻלָּדוֹת"),
+    ],
 )
-inaccompli = pd.DataFrame(
-    {
-        "Personne": ["1S", "2MS", "2FS", "3MS", "3FS", "1P", "2MP", "2FP", "3MP", "3FS"],
-        "Inaccompli": [
-            "אֲיֻלַּד",
-            "תְּיֻלַּד",
-            "תְּיֻלְּדִי",
-            "יְיֻלַּד",
-            "תְּיֻלַּד",
-            "נְיֻלַּד",
-            "תְּיֻלְּדוּ",
-            "תְּיֻלַּדְנָה",
-            "יְיֻלְּדוּ",
-            "תְּיֻלַּדְנָה",
-        ],
-    }
-)
-
-participe = pd.DataFrame(
-    {
-        "Personne": ["MS", "FS", "MP", "FP"],
-        "P. Présent": [
-            "מְיֻלַּד",
-            "מְיֻלֶּדֶת",
-            "מְיֻלָּדִים",
-            "מְיֻלָּדוֹת",
-        ],
-    }
-)
-
-layout = dmc.MantineProvider(
-    [
-        dash.html.Div(
-            children=[
-                dash.html.H1(
-                    "Un verbe fort au poual: ילד",
-                ),
-                dmc.Button("Télécharger en pdf", color="black", mb=10, id="button-poual-strong"),
-                dcc.Download(id="download-poual-strong"),
-                dash.html.Div(
-                    [
-                        DataTable(
-                            data=accompli.to_dict("records"),
-                            columns=[{"name": i, "id": i} for i in accompli.columns],
-                            **style,
-                        ),
-                        DataTable(
-                            data=inaccompli.to_dict("records"),
-                            columns=[{"name": i, "id": i} for i in inaccompli.columns],
-                            **style,
-                        ),
-                        DataTable(
-                            data=participe.to_dict("records"),
-                            columns=[{"name": i, "id": i} for i in participe.columns],
-                            **style,
-                        ),
-                    ],
-                ),
-            ],
-            style={"font-family": "Ezra SIL", "maxWidth": "800px", "margin": "auto", "padding": "5px"},
-        )
-    ]
-)
-
-
-@callback(
-    Output("download-poual-strong", "data"),
-    Input("button-poual-strong", "n_clicks"),
-    prevent_initial_call=True,
-)
-def func(n_clicks):
-    return dcc.send_file("assets/poual_strong.svg")

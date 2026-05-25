@@ -1,133 +1,30 @@
 import dash
-import dash_mantine_components as dmc
-import pandas as pd
-from dash.dash_table import DataTable
-from dash import dcc, Input, Output, callback
-from pages.datatable_style import style
+from pages.conj_layout import make_page
 
 dash.register_page(__name__, path="/paal_peh_yodvav")
 
-accompli = pd.DataFrame(
-    {
-        "Personne": ["1S", "2MS", "2FS", "3MS", "3FS", "1P", "2MP", "2FP", "3M"],
-        "Accompli": [
-            "יָלַדְתִּי",
-            "יָלַדְתָּ",
-            "יָלַדְתְּ",
-            "יָלַד",
-            "יָֽלְדָה",
-            "יָלַדְנוּ",
-            "יְלַדְתֶּם",
-            "יְלַדְתֶּן",
-            "יָֽלְדוּ",
-        ],
-    }
+layout = make_page(
+    page_id="paal-peh-yodvav",
+    title="Paal — Verbe פ״יו",
+    root="ילד",
+    asset="assets/paal_peh_yodvav.svg",
+    absolu="יָלֹד",
+    construit="לָלֶדֶת",
+    accompli=[
+        ("1S",  "יָלַדְתִּי"), ("2MS", "יָלַדְתָּ"),  ("2FS", "יָלַדְתְּ"),
+        ("3MS", "יָלַד"),      ("3FS", "יָֽלְדָה"),   ("1P",  "יָלַדְנוּ"),
+        ("2MP", "יְלַדְתֶּם"), ("2FP", "יְלַדְתֶּן"), ("3M",  "יָֽלְדוּ"),
+    ],
+    inaccompli=[
+        ("1S",  "אֵלֵד"),    ("2MS", "תֵּלֵד"),    ("2FS", "תֵּלְדִי"),
+        ("3MS", "יֵלֵד"),    ("3FS", "תֵּלֵד"),    ("1P",  "נֵלֵד"),
+        ("2MP", "תֵּלְדוּ"), ("2FP", "תֵּלֵדְנָה, תֵּלַדְנָה"), ("3MP", "יֵלְדוּ"),
+        ("3FP", "תֵּלֵדְנָה, תֵּלַדְנָה"),
+    ],
+    imperatif=[
+        ("2MS", "לֵד"), ("2FS", "לְדִי"), ("2MP", "לְדוּ"), ("2FP", "לֵדְנָה"),
+    ],
+    participe=[
+        ("MS", "יוֹלֵד"), ("FS", "יוֹלֶדֶת"), ("MP", "יוֹלְדִים"), ("FP", "יוֹלְדוֹת"),
+    ],
 )
-
-inaccompli = pd.DataFrame(
-    {
-        "Personne": ["1S", "2MS", "2FS", "3MS", "3FS", "1P", "2MP", "2FP", "3MP", "3FS"],
-        "Inaccompli": [
-            "אֵלֵד",
-            "תֵּלֵד",
-            "תֵּלְדִי",
-            "יֵלֵד",
-            "תֵּלֵד",
-            "נֵלֵד",
-            "תֵּלְדוּ",
-            "תֵּלֵדְנָה, תֵּלַדְנָה",
-            "יֵלְדוּ",
-            "תֵּלֵדְנָה, תֵּלַדְנָה",
-        ],
-    }
-)
-
-imperatif = pd.DataFrame(
-    {
-        "Personne": ["2MS", "2FS", "2MP", "2FP"],
-        "Impératif": [
-            "לֵד",
-            "לְדִי",
-            "לְדוּ",
-            "לֵדְנָה",
-        ],
-    }
-)
-
-participe = pd.DataFrame(
-    {
-        "Personne": ["MS", "FS", "MP", "FP"],
-        "P. Présent": [
-            "יוֹלֵד",
-            "יוֹלֶדֶת",
-            "יוֹלְדִים",
-            "יוֹלְדוֹת",
-        ],
-    }
-)
-
-absolu = pd.DataFrame(
-    {
-        "Infinitif absolu": ["יָלֹד"],
-    }
-)
-
-construit = pd.DataFrame({"Infinitif construit": ["לָלֶדֶת"]})
-
-layout = dmc.MantineProvider(
-    [
-        dash.html.Div(
-            children=[
-                dash.html.H1(
-                    "Un verbe פ’’יו au paal : ילד",
-                ),
-                dmc.Button("Télécharger en pdf", color="black", mb=10, id="button-paal-peh-yodvav"),
-                dcc.Download(id="download-paal-peh-yodvav"),
-                dash.html.Div(
-                    [
-                        DataTable(
-                            data=absolu.to_dict("records"),
-                            columns=[{"name": i, "id": i} for i in absolu.columns],
-                            **style,
-                        ),
-                        DataTable(
-                            data=construit.to_dict("records"),
-                            columns=[{"name": i, "id": i} for i in construit.columns],
-                            **style,
-                        ),
-                        DataTable(
-                            data=accompli.to_dict("records"),
-                            columns=[{"name": i, "id": i} for i in accompli.columns],
-                            **style,
-                        ),
-                        DataTable(
-                            data=inaccompli.to_dict("records"),
-                            columns=[{"name": i, "id": i} for i in inaccompli.columns],
-                            **style,
-                        ),
-                        DataTable(
-                            data=imperatif.to_dict("records"),
-                            columns=[{"name": i, "id": i} for i in imperatif.columns],
-                            **style,
-                        ),
-                        DataTable(
-                            data=participe.to_dict("records"),
-                            columns=[{"name": i, "id": i} for i in participe.columns],
-                            **style,
-                        ),
-                    ],
-                ),
-            ],
-            style={"font-family": "Ezra SIL", "maxWidth": "800px", "margin": "auto", "padding": "5px"},
-        )
-    ]
-)
-
-
-@callback(
-    Output("download-paal-peh-yodvav", "data"),
-    Input("button-paal-peh-yodvav", "n_clicks"),
-    prevent_initial_call=True,
-)
-def func(n_clicks):
-    return dcc.send_file("assets/paal_peh_yodvav.svg")
