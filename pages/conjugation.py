@@ -51,16 +51,26 @@ _VERSE_CARD_STYLE = {
 dash.register_page(__name__, path="/exercises/conjugation")
 
 
+_HEBREW_CONSONANTS = set(chr(c) for c in range(0x05D0, 0x05EB))
+
+
 def build_verse(verse_id, word_id):
-    # print(verse_id, word_id)
     df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
     word_df = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect()
     word = BeautifulSoup(word_df.to_dicts()[0]["html"], features="html.parser").find("span").string
 
-    html = BeautifulSoup(df["html"], features="html.parser")
-    html.find("span", string=word)["class"].append("hl")
-    html.find("div")["class"] = ["fullverse"]
-    return convert_html_to_dash(str(html))
+    soup = BeautifulSoup(df["html"], features="html.parser")
+    span = soup.find("span", string=word)
+    span["class"].append("hl")
+
+    prev = span.find_previous_sibling("span")
+    if prev:
+        consonants = [c for c in prev.get_text() if c in _HEBREW_CONSONANTS]
+        if consonants == ['\u05D5']:  # single vav — prefix of wayyiqtol/waw-consecutive
+            prev["class"] = list(prev.get("class", [])) + ["hl"]
+
+    soup.find("div")["class"] = ["fullverse"]
+    return convert_html_to_dash(str(soup))
 
 
 def build_word(word_id):
