@@ -37,6 +37,15 @@ _ANSWER_CARD_STYLE = {
     "marginBottom": "24px",
 }
 
+_VERSE_CARD_STYLE = {
+    "borderRadius": "16px",
+    "border": "1px solid #e0e0e0",
+    "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
+    "backgroundColor": "#FFFFFF",
+    "padding": "24px",
+    "marginBottom": "16px",
+}
+
 dash.register_page(__name__, path="/exercises/conjugation")
 
 
@@ -92,7 +101,7 @@ def french_passage(verse_id: int):
     Output("clause-div", "children"),
     Output("word-div", "children"),
     Output("solution-storage", "data"),
-    Output("fullverse-div", "style"),
+    Output("verse-card", "style"),
     Output("solution-alert", "children"),
     Output("solution-alert", "title"),
     Output("solution-alert", "style"),
@@ -159,7 +168,7 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
             build_verse(verse, word),
             build_word(word),
             sample,
-            {"display": "block"},
+            {**_VERSE_CARD_STYLE, "display": "block"},
             no_update, no_update,
             {"display": "none"},
             no_update,
@@ -248,7 +257,7 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
         no_update,
         {**_ANSWER_CARD_STYLE, "display": "block", "backgroundColor": bg},
         french_passage(store["VerseId"]),
-        {"display": "block"},
+        {"display": "block", "borderTop": "1px solid rgba(0,0,0,0.1)", "marginTop": "16px", "paddingTop": "16px"},
         "Trouver un verbe",
         {"display": "none"},
         answer_panel,
@@ -511,12 +520,18 @@ def layout():
                 style={**_ANSWER_CARD_STYLE, "display": "none"},
             ),
             html.Div(
-                [html.P("Verset complet:")],
-                style={"display": "none"},
-                id="fullverse-div",
+                [
+                    dmc.Flex(children=[], id="clause-div", className="fullverse"),
+                    html.Div(
+                        [],
+                        id="frenchverse-div",
+                        className="frenchverse",
+                        style={"display": "none", "borderTop": "1px solid rgba(0,0,0,0.1)", "marginTop": "16px", "paddingTop": "16px"},
+                    ),
+                ],
+                id="verse-card",
+                style={**_VERSE_CARD_STYLE, "display": "none"},
             ),
-            dmc.Flex(children=[], id="clause-div", className="fullverse", mb=10),
-            dmc.Flex([], style={"display": "none"}, id="frenchverse-div", className="frenchverse", mb=10),
             dmc.Alert(
                 "",
                 title="",
