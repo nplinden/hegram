@@ -116,7 +116,6 @@ layout = dmc.MantineProvider(
                         variant="subtle",
                         color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                         size="lg",
-                        title="Télécharger en PDF",
                     ),
                 ],
                 justify="space-between",
