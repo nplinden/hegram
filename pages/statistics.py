@@ -229,6 +229,7 @@ chart = dmc.BarChart(
     ],
     type="stacked",
     barProps={"isAnimationActive": True},
+    tooltipProps={"content": {"function": "statisticsTooltip"}},
     xAxisLabel="Binyan",
     orientation="vertical",
     id="mantine-bargraph",
