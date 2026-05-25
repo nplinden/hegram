@@ -230,7 +230,6 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
     tense_guess_fr = en_to_fr["Tense"].get(tense_answer, tense_answer) if tense_answer else "—"
 
     answer_panel = [
-        dmc.Text("Analyse", size="sm", c="dimmed", ta="center", mb=8),
         _answer_row("Racine", root, root_answer or "—", root_ok),
         _answer_row("Binyan", binyan, binyan_answer or "—", binyan_ok),
         _answer_row("Temps", tense_fr, tense_guess_fr, tense_ok),
@@ -464,7 +463,6 @@ def layout():
                     [
                         html.Div(
                             [
-                                dmc.Text("Mot", size="sm", c="dimmed", ta="center", mb=8),
                                 html.Div(children=[], id="word-div"),
                             ],
                             style={
@@ -480,7 +478,6 @@ def layout():
                         ),
                         html.Div(
                             [
-                                dmc.Text("Analyse", size="sm", c="dimmed", ta="center", mb=8),
                                 html.Div(
                                     [
                                         dmc.Select(placeholder="Racine", value=None, data=_ROOT_DATA, searchable=True, id="root-answer"),
