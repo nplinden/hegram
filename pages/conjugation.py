@@ -156,7 +156,7 @@ def _build_pdf_html(samples: list[dict]) -> str:
         verse_html = _build_verse_html(s["VerseId"], s["WordId"])
         ref = _verse_ref(s["VerseId"])
         answer_fields = "".join(
-            f'<div class="answer-field"><div class="answer-label">{label}</div><div class="answer-box"></div></div>'
+            f'<div class="answer-field"><span class="answer-label">{label} :</span><span class="answer-line"></span></div>'
             for label in answer_labels
         )
         questions_html += f"""
@@ -249,21 +249,20 @@ body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; padd
 .answer-field {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 4px;
 }
 .answer-label {
   font-size: 0.6rem;
   font-weight: 600;
   color: #555;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
-.answer-box {
-  border: 1px solid #aaa;
-  border-radius: 3px;
-  height: 20px;
-  background: white;
+.answer-line {
+  flex: 1;
+  border-bottom: 1px solid #888;
+  height: 0.9em;
 }
 @media print {
   body { margin: 0; padding: 10mm 12mm; }
