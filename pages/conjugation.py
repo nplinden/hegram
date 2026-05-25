@@ -42,6 +42,8 @@ _VERSE_CARD_STYLE = {
     "border": "1px solid #e0e0e0",
     "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
     "backgroundColor": "#FFFFFF",
+    "maxWidth": "640px",
+    "marginInline": "auto",
     "padding": "24px",
     "marginBottom": "16px",
 }
