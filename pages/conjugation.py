@@ -87,7 +87,7 @@ def french_passage(verse_id: int):
     Output("solution-alert", "style"),
     Output("solution-alert", "color"),
     Output("notification", "children"),
-    Output("answer-div", "style"),
+    Output("answer-card", "style"),
     Output("frenchverse-div", "children"),
     Output("frenchverse-div", "style"),
     Output("conj-action-btn", "children"),
@@ -145,7 +145,7 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
             {"display": "none"},
             no_update,
             no_update,
-            {"display": "flex"},
+            {"display": "block"},
             no_update,
             {"display": "none"},
             "Vérifier",
@@ -329,8 +329,7 @@ def layout():
     return dmc.MantineProvider(
         dash.html.Div(
             children=[
-                dcc.Store(id="solution-storage", storage_type="local"),
-                dcc.Interval(id="conj-init", interval=1, max_intervals=1),
+                dcc.Store(id="solution-storage", storage_type="memory"),
             dmc.Modal(
                 id="conj-intro-modal",
                 opened=False,
@@ -391,32 +390,59 @@ def layout():
                 justify="center",
                 mb=16,
             ),
-            html.Div(children=[], id="word-div", style={"textAlign": "center"}),
             html.Div(
-                [
-                    html.P("Verset complet:"),
-                ],
+                html.Div(
+                    [
+                        html.Div(
+                            html.Div(children=[], id="word-div"),
+                            style={
+                                "flex": 1,
+                                "borderRight": "1px solid rgba(0,0,0,0.1)",
+                                "display": "flex",
+                                "alignItems": "center",
+                                "justifyContent": "center",
+                                "padding": "24px 16px",
+                                "minHeight": "200px",
+                            },
+                        ),
+                        html.Div(
+                            [
+                                dmc.Select(
+                                    placeholder="Racine", value=None, data=get_root_select_data(), searchable=True, id="root-answer"
+                                ),
+                                dmc.Select(placeholder="Binyan", value=None, data=dropdown_data["Binyan"], id="binyan-answer"),
+                                dmc.Select(placeholder="Temps", value=None, data=dropdown_data["Tense"], id="tense-answer"),
+                                dmc.Select(placeholder="Personne", value=None, data=answer_data, id="person-answer"),
+                            ],
+                            style={
+                                "flex": 1,
+                                "display": "flex",
+                                "flexDirection": "column",
+                                "gap": "12px",
+                                "padding": "24px 16px",
+                                "justifyContent": "center",
+                            },
+                        ),
+                    ],
+                    style={"display": "flex"},
+                ),
+                id="answer-card",
+                style={
+                    "borderRadius": "16px",
+                    "border": "1px solid #e0e0e0",
+                    "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
+                    "overflow": "hidden",
+                    "marginBottom": "24px",
+                    "display": "none",
+                },
+            ),
+            html.Div(
+                [html.P("Verset complet:")],
                 style={"display": "none"},
                 id="fullverse-div",
             ),
             dmc.Flex(children=[], id="clause-div", className="fullverse", mb=10),
             dmc.Flex([], style={"display": "none"}, id="frenchverse-div", className="frenchverse", mb=10),
-            dmc.Flex(
-                children=[
-                    dmc.Select(
-                        placeholder="Racine", value=None, data=get_root_select_data(), searchable=True, id="root-answer"
-                    ),
-                    dmc.Select(placeholder="Binyan", value=None, data=dropdown_data["Binyan"], id="binyan-answer"),
-                    dmc.Select(placeholder="Temps", value=None, data=dropdown_data["Tense"], id="tense-answer"),
-                    dmc.Select(placeholder="Personne", value=None, data=answer_data, id="person-answer"),
-                ],
-                style={"display": "none"},
-                direction={"base": "column", "sm": "row"},
-                gap={"base": "sm", "sm": "lg"},
-                justify={"sm": "center"},
-                mb=10,
-                id="answer-div",
-            ),
             dmc.Alert(
                 "",
                 title="",
@@ -447,12 +473,3 @@ def open_intro_modal(_):
 )
 def open_settings_modal(_):
     return True
-
-
-@callback(
-    Output("solution-storage", "data", allow_duplicate=True),
-    Input("conj-init", "n_intervals"),
-    prevent_initial_call=True,
-)
-def reset_store(_):
-    return {"answered": True}
