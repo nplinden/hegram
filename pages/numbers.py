@@ -234,6 +234,7 @@ layout = dmc.MantineProvider(
     html.Div(
         [
             dcc.Store(id="numbers-store", storage_type="session"),
+            dcc.Interval(id="numbers-init", interval=1, max_intervals=1),
             dmc.Modal(
                 id="numbers-intro-modal",
                 opened=False,
@@ -331,10 +332,35 @@ def open_settings_modal(_):
     return True
 
 
+def _generate(ranges, hint_types):
+    pool = _pool(ranges)
+    number = random.choice(pool)
+    allowed_given = [k for k in REPRESENTATIONS if k in (hint_types or REPRESENTATIONS)]
+    given_key = random.choice(allowed_given or REPRESENTATIONS)
+    return (
+        _neutral_card(number, given_key, pool),
+        "Vérifier",
+        {"number": number, "given_key": given_key, "answered": False},
+    )
+
+
 @callback(
     Output("numbers-card", "children"),
     Output("numbers-action-btn", "children"),
     Output("numbers-store", "data"),
+    Input("numbers-init", "n_intervals"),
+    State("numbers-range-check", "value"),
+    State("numbers-hint-type-check", "value"),
+    prevent_initial_call=True,
+)
+def initial_generate(_, ranges, hint_types):
+    return _generate(ranges, hint_types)
+
+
+@callback(
+    Output("numbers-card", "children", allow_duplicate=True),
+    Output("numbers-action-btn", "children", allow_duplicate=True),
+    Output("numbers-store", "data", allow_duplicate=True),
     Input("numbers-action-btn", "n_clicks"),
     State("numbers-store", "data"),
     State("numbers-range-check", "value"),
@@ -342,18 +368,11 @@ def open_settings_modal(_):
     State("numbers-select-name", "value"),
     State("numbers-select-arabic", "value"),
     State("numbers-select-numeral", "value"),
+    prevent_initial_call=True,
 )
-def handle_action(n_clicks, store, ranges, hint_types, name_val, arabic_val, numeral_val):
-    if n_clicks is None or store is None or store.get("answered"):
-        pool = _pool(ranges)
-        number = random.choice(pool)
-        allowed_given = [k for k in REPRESENTATIONS if k in (hint_types or REPRESENTATIONS)]
-        given_key = random.choice(allowed_given or REPRESENTATIONS)
-        return (
-            _neutral_card(number, given_key, pool),
-            "Vérifier",
-            {"number": number, "given_key": given_key, "answered": False},
-        )
+def handle_action(_, store, ranges, hint_types, name_val, arabic_val, numeral_val):
+    if store is None or store.get("answered"):
+        return _generate(ranges, hint_types)
     return (
         _result_card(
             store["number"],
