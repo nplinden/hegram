@@ -207,21 +207,22 @@ body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; }
 }
 .cards-row {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   align-items: flex-start;
+  width: 100%;
 }
 .verb-card {
-  flex: 0 0 auto;
+  flex: 0 0 25%;
   border: 1px solid #ccc;
   border-radius: 8px;
-  padding: 24px 32px;
+  padding: 24px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 140px;
 }
 .verse-card {
-  flex: 1;
+  flex: 0 0 calc(75% - 16px);
+  min-width: 0;
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 16px 20px;
