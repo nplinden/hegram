@@ -319,12 +319,13 @@ def _answer_row(index, correct, guess, is_correct):
             ],
             style={"display": "flex", "gap": "8px", "alignItems": "center"},
         )
-    children = [c for c in [icon, text_el] if c is not None]
+    children = [text_el] + ([icon] if icon else [])
     return html.Div(
         children,
         style={
             "display": "flex",
             "alignItems": "center",
+            "justifyContent": "space-between",
             "gap": "8px",
             "border": "1px solid rgba(0,0,0,0.12)",
             "borderRadius": "4px",
