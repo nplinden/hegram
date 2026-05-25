@@ -251,6 +251,7 @@ body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; padd
 .answer-row {
   display: flex;
   gap: 10px;
+  width: 100%;
 }
 .answer-field {
   flex: 1;
