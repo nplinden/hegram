@@ -233,6 +233,29 @@ def _result_card(number, given_key, user_answers):
 layout = dmc.MantineProvider(
     html.Div(
         [
+            dmc.Flex(
+                [
+                    dmc.Button(
+                        "Trouver un nombre",
+                        id="numbers-generate-btn",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                    ),
+                    html.Div(
+                        dmc.Button(
+                            "Vérifier",
+                            id="numbers-check-btn",
+                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        ),
+                        id="numbers-verify-section",
+                        style={"display": "none"},
+                    ),
+                ],
+                justify="center",
+                gap="md",
+                mb=24,
+            ),
+            dcc.Store(id="numbers-store", storage_type="session"),
+            html.Div(id="numbers-card"),
             dmc.Accordion(
                 disableChevronRotation=False,
                 children=[
@@ -307,29 +330,6 @@ layout = dmc.MantineProvider(
                 value="introduction",
                 id="numbers-accordion",
             ),
-            dmc.Flex(
-                [
-                    dmc.Button(
-                        "Trouver un nombre",
-                        id="numbers-generate-btn",
-                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                    ),
-                    html.Div(
-                        dmc.Button(
-                            "Vérifier",
-                            id="numbers-check-btn",
-                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                        ),
-                        id="numbers-verify-section",
-                        style={"display": "none"},
-                    ),
-                ],
-                justify="center",
-                gap="md",
-                mb=24,
-            ),
-            dcc.Store(id="numbers-store", storage_type="session"),
-            html.Div(id="numbers-card"),
         ],
         className="container",
     )
