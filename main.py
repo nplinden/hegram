@@ -26,6 +26,7 @@ app = Dash(
     title="Hegram",
     server=server,
     use_pages=True,
+    suppress_callback_exceptions=True,
     external_stylesheets=[dmc.styles.CHARTS, dmc.styles.NOTIFICATIONS, dmc.styles.ALL],
 )
 

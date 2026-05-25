@@ -50,7 +50,16 @@ _RANGE_FILTERS = {
 
 REPRESENTATIONS = ["arabic", "name", "numeral"]
 
-_HEBREW_INPUT_STYLE = {"fontFamily": '"Ezra SIL", sans-serif', "fontSize": "1.1rem", "direction": "rtl"}
+LABELS = {
+    "arabic":  "Numéral arabe",
+    "name":    "Nom hébreu",
+    "numeral": "Numéral hébreu",
+}
+
+_HEBREW_SELECT_STYLES = {
+    "input":  {"fontFamily": '"Ezra SIL", sans-serif', "fontSize": "1rem", "direction": "rtl"},
+    "option": {"fontFamily": '"Ezra SIL", sans-serif', "direction": "rtl"},
+}
 
 _BG_NEUTRAL   = "#FFFFFF"
 _BG_CORRECT   = "#D4EFDF"
@@ -60,7 +69,16 @@ _BG_PARTIAL   = "#FCF3CF"
 _COLOR_GIVEN   = "#000000"
 _COLOR_CORRECT = "#27AE60"
 _COLOR_WRONG   = "#A93226"
-_COLOR_UNKNOWN = "#AAAAAA"
+
+_CARD_STYLE = {
+    "borderRadius": "16px",
+    "border": "1px solid #e0e0e0",
+    "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
+    "overflow": "hidden",
+    "maxWidth": "400px",
+    "marginInline": "auto",
+    "marginBottom": "24px",
+}
 
 
 def _pool(ranges):
@@ -76,13 +94,12 @@ def _select_data(pool, key):
     return [{"value": n[key], "label": n[key]} for n in pool]
 
 
-def _zone(label_text, value, color, is_rtl=False, font_size="3rem", border_right=False, border_bottom=False):
+def _text_zone(label, value, color, is_rtl=False, font_size="3rem", border_right=False, border_bottom=False):
     borders = {}
     if border_right:
         borders["borderRight"] = "1px solid rgba(0,0,0,0.1)"
     if border_bottom:
         borders["borderBottom"] = "1px solid rgba(0,0,0,0.1)"
-
     text_style = {
         "fontFamily": '"Ezra SIL", sans-serif',
         "fontSize": font_size,
@@ -93,12 +110,8 @@ def _zone(label_text, value, color, is_rtl=False, font_size="3rem", border_right
     }
     if is_rtl:
         text_style["direction"] = "rtl"
-
     return html.Div(
-        [
-            dmc.Text(label_text, size="sm", c="dimmed", ta="center", mb=8),
-            html.P(value, style=text_style),
-        ],
+        [dmc.Text(label, size="sm", c="dimmed", ta="center", mb=8), html.P(value, style=text_style)],
         style={
             "padding": "24px 16px",
             "display": "flex",
@@ -111,45 +124,56 @@ def _zone(label_text, value, color, is_rtl=False, font_size="3rem", border_right
     )
 
 
-def _card(bg, name_val, name_color, arabic_val, arabic_color, numeral_val, numeral_color):
-    top = _zone(
-        "Nom hébreu", name_val, name_color,
-        is_rtl=True, font_size="2.5rem", border_bottom=True,
-    )
-    arabic = _zone(
-        "Numéral arabe", str(arabic_val), arabic_color,
-        font_size="3rem", border_right=True,
-    )
-    numeral = _zone(
-        "Numéral hébreu", numeral_val, numeral_color,
-        is_rtl=True, font_size="3rem",
-    )
+def _select_zone(label, select_component, border_right=False, border_bottom=False):
+    borders = {}
+    if border_right:
+        borders["borderRight"] = "1px solid rgba(0,0,0,0.1)"
+    if border_bottom:
+        borders["borderBottom"] = "1px solid rgba(0,0,0,0.1)"
     return html.Div(
-        [top, html.Div([arabic, numeral], style={"display": "flex"})],
+        [dmc.Text(label, size="sm", c="dimmed", ta="center", mb=8), select_component],
         style={
-            "backgroundColor": bg,
-            "borderRadius": "16px",
-            "border": "1px solid #e0e0e0",
-            "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
-            "overflow": "hidden",
-            "marginBottom": "24px",
-            "maxWidth": "400px",
-            "marginInline": "auto",
+            "padding": "16px",
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "center",
+            "alignItems": "stretch",
+            "flex": 1,
+            **borders,
         },
     )
 
 
-def _neutral_card(number, given_key):
-    def slot(key):
+def _make_select(key, pool):
+    return dmc.Select(
+        id=f"numbers-select-{key}",
+        data=_select_data(pool, key),
+        value=None,
+        searchable=True,
+        styles=_HEBREW_SELECT_STYLES if key in ("name", "numeral") else {},
+        comboboxProps={"withinPortal": True},
+    )
+
+
+def _neutral_card(number, given_key, pool):
+    def make_zone(key, border_right=False, border_bottom=False):
+        label = LABELS[key]
+        is_rtl = key in ("name", "numeral")
+        font_size = "2.5rem" if key == "name" else "3rem"
         if key == given_key:
             v = str(number[key]) if key == "arabic" else number[key]
-            return v, _COLOR_GIVEN
-        return "?", _COLOR_UNKNOWN
+            return _text_zone(label, v, _COLOR_GIVEN, is_rtl=is_rtl, font_size=font_size,
+                              border_right=border_right, border_bottom=border_bottom)
+        return _select_zone(label, _make_select(key, pool),
+                            border_right=border_right, border_bottom=border_bottom)
 
-    name_v, name_c     = slot("name")
-    arabic_v, arabic_c = slot("arabic")
-    num_v, num_c       = slot("numeral")
-    return _card(_BG_NEUTRAL, name_v, name_c, arabic_v, arabic_c, num_v, num_c)
+    top    = make_zone("name", border_bottom=True)
+    left   = make_zone("arabic", border_right=True)
+    right  = make_zone("numeral")
+    return html.Div(
+        [top, html.Div([left, right], style={"display": "flex"})],
+        style={**_CARD_STYLE, "backgroundColor": _BG_NEUTRAL},
+    )
 
 
 def _result_card(number, given_key, user_answers):
@@ -159,27 +183,21 @@ def _result_card(number, given_key, user_answers):
         if k == given_key:
             colors[k] = _COLOR_GIVEN
             continue
-        expected = str(number[k])
-        got = str(user_answers.get(k) or "")
-        if got == expected:
+        if str(user_answers.get(k) or "") == str(number[k]):
             colors[k] = _COLOR_CORRECT
             correct += 1
         else:
             colors[k] = _COLOR_WRONG
             wrong += 1
 
-    if wrong == 0:
-        bg = _BG_CORRECT
-    elif correct == 0:
-        bg = _BG_INCORRECT
-    else:
-        bg = _BG_PARTIAL
+    bg = _BG_CORRECT if wrong == 0 else (_BG_INCORRECT if correct == 0 else _BG_PARTIAL)
 
-    return _card(
-        bg,
-        number["name"],        colors["name"],
-        str(number["arabic"]), colors["arabic"],
-        number["numeral"],     colors["numeral"],
+    top   = _text_zone(LABELS["name"],    number["name"],        colors["name"],    is_rtl=True, font_size="2.5rem", border_bottom=True)
+    left  = _text_zone(LABELS["arabic"],  str(number["arabic"]), colors["arabic"],  font_size="3rem", border_right=True)
+    right = _text_zone(LABELS["numeral"], number["numeral"],     colors["numeral"], is_rtl=True, font_size="3rem")
+    return html.Div(
+        [top, html.Div([left, right], style={"display": "flex"})],
+        style={**_CARD_STYLE, "backgroundColor": bg},
     )
 
 
@@ -217,60 +235,9 @@ layout = dmc.MantineProvider(
             dcc.Store(id="numbers-store", storage_type="session"),
             html.Div(id="numbers-card"),
             html.Div(
-                id="numbers-answer-section",
+                id="numbers-verify-section",
                 style={"display": "none", "maxWidth": "400px", "marginInline": "auto"},
                 children=[
-                    dmc.Flex(
-                        [
-                            html.Div(
-                                id="numbers-select-name-wrapper",
-                                children=[
-                                    dmc.Text("Nom hébreu", size="sm", c="dimmed", ta="center", mb=4),
-                                    dmc.Select(
-                                        id="numbers-select-name",
-                                        data=[],
-                                        value=None,
-                                        searchable=True,
-                                        styles={"input": _HEBREW_INPUT_STYLE, "option": _HEBREW_INPUT_STYLE},
-                                        comboboxProps={"withinPortal": True},
-                                    ),
-                                ],
-                                style={"flex": 1},
-                            ),
-                            html.Div(
-                                id="numbers-select-arabic-wrapper",
-                                children=[
-                                    dmc.Text("Numéral arabe", size="sm", c="dimmed", ta="center", mb=4),
-                                    dmc.Select(
-                                        id="numbers-select-arabic",
-                                        data=[],
-                                        value=None,
-                                        searchable=True,
-                                        comboboxProps={"withinPortal": True},
-                                    ),
-                                ],
-                                style={"flex": 1},
-                            ),
-                            html.Div(
-                                id="numbers-select-numeral-wrapper",
-                                children=[
-                                    dmc.Text("Numéral hébreu", size="sm", c="dimmed", ta="center", mb=4),
-                                    dmc.Select(
-                                        id="numbers-select-numeral",
-                                        data=[],
-                                        value=None,
-                                        searchable=True,
-                                        styles={"input": _HEBREW_INPUT_STYLE, "option": _HEBREW_INPUT_STYLE},
-                                        comboboxProps={"withinPortal": True},
-                                    ),
-                                ],
-                                style={"flex": 1},
-                            ),
-                        ],
-                        direction={"base": "column", "sm": "row"},
-                        gap="lg",
-                        mb=16,
-                    ),
                     dmc.Flex(
                         dmc.Button(
                             "Vérifier",
@@ -290,16 +257,7 @@ layout = dmc.MantineProvider(
 
 @callback(
     Output("numbers-card", "children"),
-    Output("numbers-select-name-wrapper", "style"),
-    Output("numbers-select-arabic-wrapper", "style"),
-    Output("numbers-select-numeral-wrapper", "style"),
-    Output("numbers-select-name", "data"),
-    Output("numbers-select-arabic", "data"),
-    Output("numbers-select-numeral", "data"),
-    Output("numbers-select-name", "value"),
-    Output("numbers-select-arabic", "value"),
-    Output("numbers-select-numeral", "value"),
-    Output("numbers-answer-section", "style"),
+    Output("numbers-verify-section", "style"),
     Output("numbers-store", "data"),
     Input("numbers-generate-btn", "n_clicks"),
     State("numbers-range-check", "value"),
@@ -309,19 +267,8 @@ def generate_number(_, ranges):
     pool = _pool(ranges)
     number = random.choice(pool)
     given_key = random.choice(REPRESENTATIONS)
-
-    shown  = {"flex": 1}
-    hidden = {"display": "none"}
-
     return (
-        _neutral_card(number, given_key),
-        hidden if given_key == "name"    else shown,
-        hidden if given_key == "arabic"  else shown,
-        hidden if given_key == "numeral" else shown,
-        _select_data(pool, "name"),
-        _select_data(pool, "arabic"),
-        _select_data(pool, "numeral"),
-        None, None, None,
+        _neutral_card(number, given_key, pool),
         {"display": "block", "maxWidth": "400px", "marginInline": "auto"},
         {"number": number, "given_key": given_key},
     )
