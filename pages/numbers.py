@@ -111,6 +111,7 @@ def _text_zone(label, value, color, is_rtl=False, font_size="3rem", border_right
     }
     if is_rtl:
         text_style["direction"] = "rtl"
+    min_h = "130px" if font_size == "2.5rem" else "140px"
     return html.Div(
         [dmc.Text(label, size="sm", c="dimmed", ta="center", mb=8), html.P(value, style=text_style)],
         style={
@@ -120,12 +121,13 @@ def _text_zone(label, value, color, is_rtl=False, font_size="3rem", border_right
             "justifyContent": "center",
             "alignItems": "center",
             "flex": 1,
+            "minHeight": min_h,
             **borders,
         },
     )
 
 
-def _select_zone(label, select_component, border_right=False, border_bottom=False):
+def _select_zone(label, select_component, border_right=False, border_bottom=False, min_height="140px"):
     borders = {}
     if border_right:
         borders["borderRight"] = "1px solid rgba(0,0,0,0.1)"
@@ -134,12 +136,13 @@ def _select_zone(label, select_component, border_right=False, border_bottom=Fals
     return html.Div(
         [dmc.Text(label, size="sm", c="dimmed", ta="center", mb=8), select_component],
         style={
-            "padding": "16px",
+            "padding": "24px 16px",
             "display": "flex",
             "flexDirection": "column",
             "justifyContent": "center",
             "alignItems": "stretch",
             "flex": 1,
+            "minHeight": min_height,
             **borders,
         },
     )
@@ -190,11 +193,13 @@ def _neutral_card(number, given_key, pool):
                 style={
                     "padding": "24px 16px", "display": "flex", "flexDirection": "column",
                     "justifyContent": "center", "alignItems": "center", "flex": 1,
+                    "minHeight": "130px" if key == "name" else "140px",
                     **borders,
                 },
             )
         return _select_zone(label, select,
-                            border_right=border_right, border_bottom=border_bottom)
+                            border_right=border_right, border_bottom=border_bottom,
+                            min_height="130px" if key == "name" else "140px")
 
     top    = make_zone("name", border_bottom=True)
     left   = make_zone("arabic", border_right=True)
