@@ -224,8 +224,16 @@ def _result_card(number, given_key, user_answers):
     top   = _text_zone(LABELS["name"],    number["name"],        colors["name"],    is_rtl=True, font_size="2.5rem", border_bottom=True)
     left  = _text_zone(LABELS["arabic"],  str(number["arabic"]), colors["arabic"],  font_size="3rem", border_right=True)
     right = _text_zone(LABELS["numeral"], number["numeral"],     colors["numeral"], is_rtl=True, font_size="3rem")
+    _hidden = html.Div(
+        [
+            dmc.Select(id="numbers-select-name",    data=[], value=None),
+            dmc.Select(id="numbers-select-arabic",  data=[], value=None),
+            dmc.Select(id="numbers-select-numeral", data=[], value=None),
+        ],
+        style={"display": "none"},
+    )
     return html.Div(
-        [top, html.Div([left, right], style={"display": "flex"})],
+        [top, html.Div([left, right], style={"display": "flex"}), _hidden],
         style={**_CARD_STYLE, "backgroundColor": bg},
     )
 
