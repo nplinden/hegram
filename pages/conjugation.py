@@ -296,18 +296,18 @@ _ROOT_DATA = get_root_select_data()
 
 def _answer_row(label, correct, guess, is_correct):
     if is_correct:
-        content = dmc.Text(correct or "—", c="green.7", fw=600, size="sm")
+        content = dmc.Text(correct or "—", c="green.7", fw=600, size="lg")
     else:
         content = html.Div(
             [
-                dmc.Text(correct or "—", c="green.7", fw=600, size="sm"),
-                dmc.Text(guess or "—", c="red.6", size="sm",
+                dmc.Text(correct or "—", c="green.7", fw=600, size="lg"),
+                dmc.Text(guess or "—", c="red.6", size="lg",
                          style={"textDecoration": "line-through"}),
             ],
             style={"display": "flex", "gap": "8px", "alignItems": "center"},
         )
     return html.Div(
-        [dmc.Text(label, size="xs", c="dimmed", mb=2), content],
+        content,
         style={
             "border": "1px solid rgba(0,0,0,0.12)",
             "borderRadius": "4px",
