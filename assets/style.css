@@ -63,6 +63,8 @@ a:link h1 {
         display: grid;
         grid-template-columns: 1fr 1fr;
         align-items: stretch;
+        max-width: 1400px;
+        margin-inline: auto;
     }
 }
 
