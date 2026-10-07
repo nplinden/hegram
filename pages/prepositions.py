@@ -8,7 +8,7 @@ dash.register_page(__name__, path="/exercises/prepositions")
 
 flexion = pd.read_csv("data/prepositions.csv")
 
-_BG_NEUTRAL  = "#FFFFFF"
+_BG_NEUTRAL = "#FFFFFF"
 _BG_REVEALED = "#D4EFDF"
 
 _COLOR_HEBREW = "#000000"
@@ -41,8 +41,15 @@ def _zone(label, value, color, is_rtl=False, font_size="3rem", border_bottom=Fal
     min_h = "140px" if font_size == "3rem" else "120px"
     return html.Div(
         [dmc.Text(label, size="sm", c="dimmed", ta="center", mb=8), html.P(value, style=text_style)],
-        style={"padding": "24px 16px", "display": "flex", "flexDirection": "column",
-               "justifyContent": "center", "alignItems": "center", "minHeight": min_h, **border},
+        style={
+            "padding": "24px 16px",
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "center",
+            "alignItems": "center",
+            "minHeight": min_h,
+            **border,
+        },
     )
 
 

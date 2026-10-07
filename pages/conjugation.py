@@ -29,6 +29,7 @@ def _get_chapters(json_file: str) -> list:
             _book_cache[json_file] = _json.load(f)["chapters"]
     return _book_cache[json_file]
 
+
 COMMON_BINYANIM = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
 
 _ANSWER_CARD_STYLE = {
@@ -78,7 +79,7 @@ def build_verse(verse_id, word_id):
     prev = span.find_previous_sibling("span")
     if prev:
         consonants = [c for c in prev.get_text() if c in _HEBREW_CONSONANTS]
-        if consonants == ['\u05D5']:  # single vav — prefix of wayyiqtol/waw-consecutive
+        if consonants == ["\u05d5"]:  # single vav — prefix of wayyiqtol/waw-consecutive
             _hl(prev)
 
     soup.find("div")["class"] = ["fullverse"]
@@ -134,7 +135,7 @@ def _build_verse_html(verse_row: dict, word_html_str: str) -> str:
     prev = span.find_previous_sibling("span")
     if prev:
         consonants = [c for c in prev.get_text() if c in _HEBREW_CONSONANTS]
-        if consonants == ['\u05D5']:
+        if consonants == ["\u05d5"]:
             _hl(prev)
     soup.find("div")["class"] = ["fullverse"]
     return str(soup)
@@ -193,17 +194,11 @@ def _build_pdf_html(samples: list[dict], *, with_answers: bool = False) -> str:
     verse_ids = list({s["VerseId"] for s in samples})
     words = {
         r["id"]: r["html"]
-        for r in pl.scan_parquet("data/words.parquet")
-        .filter(pl.col("id").is_in(word_ids))
-        .collect()
-        .to_dicts()
+        for r in pl.scan_parquet("data/words.parquet").filter(pl.col("id").is_in(word_ids)).collect().to_dicts()
     }
     verses = {
         r["id"]: r
-        for r in pl.scan_parquet("data/verses.parquet")
-        .filter(pl.col("id").is_in(verse_ids))
-        .collect()
-        .to_dicts()
+        for r in pl.scan_parquet("data/verses.parquet").filter(pl.col("id").is_in(verse_ids)).collect().to_dicts()
     }
     answer_labels = ["Racine", "Binyan", "Temps", "Personne"]
     questions_html = ""
@@ -221,7 +216,7 @@ def _build_pdf_html(samples: list[dict], *, with_answers: bool = False) -> str:
                 f'<div class="answer-field">'
                 f'<span class="answer-label">{label} :</span>'
                 f'<span class="answer-value">{_escape(str(answer_values[label]))}</span>'
-                f'</div>'
+                f"</div>"
                 for label in answer_labels
             )
         else:
@@ -229,7 +224,7 @@ def _build_pdf_html(samples: list[dict], *, with_answers: bool = False) -> str:
                 f'<label class="answer-field" for="q{i}-{label.lower()}">'
                 f'<span class="answer-label">{label} :</span>'
                 f'<input class="answer-input" id="q{i}-{label.lower()}" name="q{i}-{label.lower()}" type="text" />'
-                f'</label>'
+                f"</label>"
                 for label in answer_labels
             )
         qnum_he = _hebrew_numeral(i)
@@ -396,7 +391,6 @@ button {
 </html>"""
 
 
-
 @callback(
     Output("clause-div", "children"),
     Output("word-div", "children"),
@@ -430,8 +424,21 @@ button {
     State("person-answer", "value"),
     prevent_initial_call=True,
 )
-def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
-                  store, root_answer, binyan_answer, tense_answer, person_answer):
+def handle_action(
+    _,
+    roots,
+    book,
+    binyanim,
+    tenses,
+    persons,
+    genders,
+    numbers,
+    store,
+    root_answer,
+    binyan_answer,
+    tense_answer,
+    person_answer,
+):
     if store is None or store.get("answered"):
         df = pl.scan_parquet("data/conjugation.parquet")
         filtered = df.filter(
@@ -445,7 +452,10 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
         ).collect()
         if filtered.is_empty():
             return (
-                no_update, no_update, no_update, no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
                 no_update,
                 dmc.Notification(
                     title="Erreur",
@@ -456,9 +466,17 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
                         color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                     ),
                 ),
-                no_update, no_update, no_update, no_update,
-                no_update, no_update, no_update,
-                no_update, no_update, no_update, no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
+                no_update,
             )
         sample = filtered.sample(n=1).to_dicts()[0]
         verse, word = sample["VerseId"], sample["WordId"]
@@ -476,7 +494,10 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
             {"display": "flex", "flexDirection": "column", "gap": "12px"},
             [],
             {"display": "none"},
-            None, None, None, None,
+            None,
+            None,
+            None,
+            None,
         )
 
     root = store["Root"]
@@ -544,8 +565,13 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
     detail_modal_content = [
         html.P(
             root,
-            style={"fontFamily": '"Ezra SIL", sans-serif', "fontSize": "3rem",
-                   "direction": "rtl", "textAlign": "center", "margin": "0 0 8px"},
+            style={
+                "fontFamily": '"Ezra SIL", sans-serif',
+                "fontSize": "3rem",
+                "direction": "rtl",
+                "textAlign": "center",
+                "margin": "0 0 8px",
+            },
         ),
         convert_html_to_dash("\n".join(html_parts)),
         chart,
@@ -565,7 +591,10 @@ def handle_action(_, roots, book, binyanim, tenses, persons, genders, numbers,
         {"display": "none"},
         answer_panel,
         {"display": "flex", "flexDirection": "column", "gap": "12px"},
-        no_update, no_update, no_update, no_update,
+        no_update,
+        no_update,
+        no_update,
+        no_update,
     )
 
 
@@ -629,8 +658,7 @@ def _answer_row(index, correct, guess, is_correct):
         text_el = html.Div(
             [
                 dmc.Text(correct or "—", c="green.7", fw=600, size="lg"),
-                dmc.Text(guess or "—", c="red.6", size="lg",
-                         style={"textDecoration": "line-through"}),
+                dmc.Text(guess or "—", c="red.6", size="lg", style={"textDecoration": "line-through"}),
             ],
             style={"display": "flex", "gap": "8px", "alignItems": "center"},
         )
@@ -768,6 +796,7 @@ solution_body = dmc.TableTbody(
     id="solution-body",
 )
 
+
 def layout():
     return dmc.MantineProvider(
         dash.html.Div(
@@ -776,174 +805,195 @@ def layout():
                 dcc.Store(id="conj-pdf-samples", storage_type="memory"),
                 dcc.Download(id="conj-pdf-download"),
                 dcc.Download(id="conj-correction-download"),
-            dmc.Modal(
-                id="conj-detail-modal",
-                opened=False,
-                size="xl",
-                children=[],
-            ),
-            dmc.Modal(
-                id="conj-intro-modal",
-                opened=False,
-                title="Exercice de conjugaison",
-                children=[
-                    html.P(
-                        "Une application d'exercice à la conjugaison en hébreu biblique. Cliquez sur \"Trouver un verbe\" pour choisir aléatoirement une forme verbale dans le corpus biblique. Essayez d'analyser la conjugaison de ce verbe ! Le verset correspondant est également fourni pour plus de contexte."
-                    ),
-                    html.P(
-                        'L\'icône "Paramètres" permet de restreindre le choix des formes verbales.'
-                    ),
-                ],
-            ),
-            dmc.Modal(
-                id="conj-settings-modal",
-                opened=False,
-                title="Paramètres",
-                children=[
-                    root_freq_slider,
-                    root_select,
-                    book_select,
-                    binyan_select,
-                    tense_select,
-                    person_select,
-                    gender_select,
-                    number_select,
-                    dmc.Divider(my=12),
-                    dmc.Group(
+                dmc.Modal(
+                    id="conj-detail-modal",
+                    opened=False,
+                    size="xl",
+                    children=[],
+                ),
+                dmc.Modal(
+                    id="conj-intro-modal",
+                    opened=False,
+                    title="Exercice de conjugaison",
+                    children=[
+                        html.P(
+                            "Une application d'exercice à la conjugaison en hébreu biblique. Cliquez sur \"Trouver un verbe\" pour choisir aléatoirement une forme verbale dans le corpus biblique. Essayez d'analyser la conjugaison de ce verbe ! Le verset correspondant est également fourni pour plus de contexte."
+                        ),
+                        html.P('L\'icône "Paramètres" permet de restreindre le choix des formes verbales.'),
+                    ],
+                ),
+                dmc.Modal(
+                    id="conj-settings-modal",
+                    opened=False,
+                    title="Paramètres",
+                    children=[
+                        root_freq_slider,
+                        root_select,
+                        book_select,
+                        binyan_select,
+                        tense_select,
+                        person_select,
+                        gender_select,
+                        number_select,
+                        dmc.Divider(my=12),
+                        dmc.Group(
+                            [
+                                dmc.NumberInput(
+                                    id="conj-pdf-n-questions",
+                                    label="Nombre de questions",
+                                    min=1,
+                                    max=50,
+                                    step=1,
+                                    value=10,
+                                    style={"width": 160},
+                                ),
+                                dmc.Stack(
+                                    [
+                                        dmc.Button(
+                                            "Télécharger questionnaire",
+                                            id="conj-pdf-btn",
+                                            leftSection=DashIconify(icon="material-symbols:download", width=18),
+                                            variant="outline",
+                                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                                        ),
+                                        dmc.Button(
+                                            "Télécharger corrigé",
+                                            id="conj-correction-btn",
+                                            leftSection=DashIconify(icon="material-symbols:download", width=18),
+                                            variant="light",
+                                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                                        ),
+                                    ],
+                                    gap="xs",
+                                    style={"alignSelf": "flex-end"},
+                                ),
+                            ],
+                            align="flex-end",
+                        ),
+                    ],
+                ),
+                dmc.Flex(
+                    [
+                        dmc.ActionIcon(
+                            DashIconify(icon="material-symbols:info", width=20),
+                            id="conj-intro-btn",
+                            variant="subtle",
+                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                            size="lg",
+                        ),
+                        dmc.ActionIcon(
+                            DashIconify(icon="material-symbols:settings", width=20),
+                            id="conj-settings-btn",
+                            variant="subtle",
+                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                            size="lg",
+                        ),
+                    ],
+                    justify="flex-end",
+                    align="center",
+                    gap="xs",
+                    mb=4,
+                ),
+                dmc.Button(
+                    "Trouver un verbe",
+                    id="conj-action-btn",
+                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                    radius="xl",
+                    size="md",
+                    fullWidth=True,
+                    style={"maxWidth": "640px", "marginInline": "auto", "display": "block", "marginBottom": "16px"},
+                ),
+                html.Div(
+                    html.Div(
                         [
-                            dmc.NumberInput(
-                                id="conj-pdf-n-questions",
-                                label="Nombre de questions",
-                                min=1,
-                                max=50,
-                                step=1,
-                                value=10,
-                                style={"width": 160},
-                            ),
-                            dmc.Stack(
+                            html.Div(
                                 [
-                                    dmc.Button(
-                                        "Télécharger questionnaire",
-                                        id="conj-pdf-btn",
-                                        leftSection=DashIconify(icon="material-symbols:download", width=18),
-                                        variant="outline",
-                                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                                    html.Div(children=[], id="word-div"),
+                                ],
+                                style={
+                                    "flex": 1,
+                                    "borderRight": "1px solid rgba(0,0,0,0.1)",
+                                    "display": "flex",
+                                    "flexDirection": "column",
+                                    "alignItems": "center",
+                                    "justifyContent": "center",
+                                    "padding": "24px 16px",
+                                    "minHeight": "200px",
+                                },
+                            ),
+                            html.Div(
+                                [
+                                    html.Div(
+                                        [
+                                            dmc.Select(
+                                                placeholder="Racine",
+                                                value=None,
+                                                data=_ROOT_DATA,
+                                                searchable=True,
+                                                id="root-answer",
+                                            ),
+                                            dmc.Select(
+                                                placeholder="Binyan",
+                                                value=None,
+                                                data=dropdown_data["Binyan"],
+                                                id="binyan-answer",
+                                            ),
+                                            dmc.Select(
+                                                placeholder="Temps",
+                                                value=None,
+                                                data=dropdown_data["Tense"],
+                                                id="tense-answer",
+                                            ),
+                                            dmc.Select(
+                                                placeholder="Personne", value=None, data=answer_data, id="person-answer"
+                                            ),
+                                        ],
+                                        id="answer-dropdowns",
+                                        style={"display": "flex", "flexDirection": "column", "gap": "12px"},
                                     ),
-                                    dmc.Button(
-                                        "Télécharger corrigé",
-                                        id="conj-correction-btn",
-                                        leftSection=DashIconify(icon="material-symbols:download", width=18),
-                                        variant="light",
-                                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                                    html.Div(
+                                        [],
+                                        id="answer-results",
+                                        style={"display": "none"},
                                     ),
                                 ],
-                                gap="xs",
-                                style={"alignSelf": "flex-end"},
+                                id="answer-panel",
+                                style={
+                                    "flex": 1,
+                                    "display": "flex",
+                                    "flexDirection": "column",
+                                    "gap": "12px",
+                                    "padding": "24px 16px",
+                                    "justifyContent": "center",
+                                },
                             ),
                         ],
-                        align="flex-end",
+                        style={"display": "flex"},
                     ),
-                ],
-            ),
-            dmc.Flex(
-                [
-                    dmc.ActionIcon(
-                        DashIconify(icon="material-symbols:info", width=20),
-                        id="conj-intro-btn",
-                        variant="subtle",
-                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                        size="lg",
-                    ),
-                    dmc.ActionIcon(
-                        DashIconify(icon="material-symbols:settings", width=20),
-                        id="conj-settings-btn",
-                        variant="subtle",
-                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                        size="lg",
-                    ),
-                ],
-                justify="flex-end",
-                align="center",
-                gap="xs",
-                mb=4,
-            ),
-            dmc.Button(
-                "Trouver un verbe",
-                id="conj-action-btn",
-                color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                radius="xl",
-                size="md",
-                fullWidth=True,
-                style={"maxWidth": "640px", "marginInline": "auto", "display": "block", "marginBottom": "16px"},
-            ),
-            html.Div(
+                    id="answer-card",
+                    style={**_ANSWER_CARD_STYLE, "display": "none"},
+                ),
                 html.Div(
                     [
+                        dmc.Flex(children=[], id="clause-div", className="fullverse"),
                         html.Div(
-                            [
-                                html.Div(children=[], id="word-div"),
-                            ],
+                            [],
+                            id="frenchverse-div",
+                            className="frenchverse",
                             style={
-                                "flex": 1,
-                                "borderRight": "1px solid rgba(0,0,0,0.1)",
-                                "display": "flex",
-                                "flexDirection": "column",
-                                "alignItems": "center",
-                                "justifyContent": "center",
-                                "padding": "24px 16px",
-                                "minHeight": "200px",
-                            },
-                        ),
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        dmc.Select(placeholder="Racine", value=None, data=_ROOT_DATA, searchable=True, id="root-answer"),
-                                        dmc.Select(placeholder="Binyan", value=None, data=dropdown_data["Binyan"], id="binyan-answer"),
-                                        dmc.Select(placeholder="Temps", value=None, data=dropdown_data["Tense"], id="tense-answer"),
-                                        dmc.Select(placeholder="Personne", value=None, data=answer_data, id="person-answer"),
-                                    ],
-                                    id="answer-dropdowns",
-                                    style={"display": "flex", "flexDirection": "column", "gap": "12px"},
-                                ),
-                                html.Div(
-                                    [],
-                                    id="answer-results",
-                                    style={"display": "none"},
-                                ),
-                            ],
-                            id="answer-panel",
-                            style={
-                                "flex": 1,
-                                "display": "flex",
-                                "flexDirection": "column",
-                                "gap": "12px",
-                                "padding": "24px 16px",
-                                "justifyContent": "center",
+                                "display": "none",
+                                "borderTop": "1px solid rgba(0,0,0,0.1)",
+                                "marginTop": "16px",
+                                "paddingTop": "16px",
                             },
                         ),
                     ],
-                    style={"display": "flex"},
+                    id="verse-card",
+                    style={**_VERSE_CARD_STYLE, "display": "none"},
                 ),
-                id="answer-card",
-                style={**_ANSWER_CARD_STYLE, "display": "none"},
-            ),
-            html.Div(
-                [
-                    dmc.Flex(children=[], id="clause-div", className="fullverse"),
-                    html.Div(
-                        [],
-                        id="frenchverse-div",
-                        className="frenchverse",
-                        style={"display": "none", "borderTop": "1px solid rgba(0,0,0,0.1)", "marginTop": "16px", "paddingTop": "16px"},
-                    ),
-                ],
-                id="verse-card",
-                style={**_VERSE_CARD_STYLE, "display": "none"},
-            ),
-        ],
-        className="container",
-    )
+            ],
+            className="container",
+        )
     )
 
 
@@ -1026,9 +1076,7 @@ def generate_pdf(_, n_questions, roots, book, binyanim, tenses, persons, genders
         samples = filtered.sample(n=k).to_dicts()
         html_content = _build_pdf_html(samples, with_answers=False)
         assets_dir = _os.path.abspath("assets")
-        pdf_bytes = _weasyprint.HTML(string=html_content, base_url=assets_dir).write_pdf(
-            pdf_forms=True
-        )
+        pdf_bytes = _weasyprint.HTML(string=html_content, base_url=assets_dir).write_pdf(pdf_forms=True)
         return dcc.send_bytes(pdf_bytes, filename="questionnaire_conjugaison.pdf"), samples
     except PreventUpdate:
         raise

@@ -73,13 +73,13 @@ def _grid(*children, mb=16):
     )
 
 
-def make_page(page_id, title, root, asset, accompli, inaccompli,
-              imperatif=None, participe=None, absolu=None, construit=None):
+def make_page(
+    page_id, title, root, asset, accompli, inaccompli, imperatif=None, participe=None, absolu=None, construit=None
+):
     rows = []
 
     if absolu is not None and construit is not None:
-        rows.append(_grid(_single_card("Infinitif absolu", absolu),
-                          _single_card("Infinitif construit", construit)))
+        rows.append(_grid(_single_card("Infinitif absolu", absolu), _single_card("Infinitif construit", construit)))
     elif absolu is not None:
         rows.append(html.Div(_single_card("Infinitif absolu", absolu), style={"marginBottom": "16px"}))
     elif construit is not None:
@@ -88,8 +88,7 @@ def make_page(page_id, title, root, asset, accompli, inaccompli,
     rows.append(_grid(_conj_card("Accompli", accompli), _conj_card("Inaccompli", inaccompli)))
 
     if imperatif is not None and participe is not None:
-        rows.append(_grid(_conj_card("Impératif", imperatif),
-                          _conj_card("Participe présent", participe), mb=0))
+        rows.append(_grid(_conj_card("Impératif", imperatif), _conj_card("Participe présent", participe), mb=0))
     elif participe is not None:
         rows.append(_conj_card("Participe présent", participe))
     elif imperatif is not None:

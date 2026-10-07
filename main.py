@@ -231,10 +231,10 @@ app.layout = dmc.MantineProvider(
                             ),
                         ],
                     ),
-                html.Div(
-                    _commit,
-                    style={"marginTop": "16px", "fontSize": "11px", "color": "#aaa"},
-                ),
+                    html.Div(
+                        _commit,
+                        style={"marginTop": "16px", "fontSize": "11px", "color": "#aaa"},
+                    ),
                 ],
                 p="md",
             ),

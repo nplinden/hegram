@@ -215,12 +215,12 @@ table = dash_table.DataTable(
     style_cell_conditional=[
         {
             "if": {"column_id": "Root"},
-            "font-family": "\"Ezra SIL\", sans-serif",
+            "font-family": '"Ezra SIL", sans-serif',
             "fontSize": 20,
         },
         {
             "if": {"column_id": "Class"},
-            "font-family": "\"Ezra SIL\", sans-serif",
+            "font-family": '"Ezra SIL", sans-serif',
             "fontSize": 20,
         },
     ],
@@ -259,6 +259,7 @@ chart = dmc.BarChart(
     className="mantine-barchart",
     px=25,
 )
+
 
 @callback(
     Output("stat-intro-modal", "opened"),
