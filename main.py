@@ -25,7 +25,8 @@ _GENERATED_DATA = ["data/conjugation.parquet", "data/verses.parquet", "data/word
 _missing = [f for f in _GENERATED_DATA if not Path(f).exists()]
 if _missing:
     logger.error(
-        "Missing generated data: {}. Build it first with `uv run python -m hegram.build_dataframes` (see README).",
+        "Missing generated data: {}. Build it first with "
+        "`uv run --group build python -m hegram.build_dataframes` (see README).",
         ", ".join(_missing),
     )
     sys.exit(1)

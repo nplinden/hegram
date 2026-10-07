@@ -1,12 +1,12 @@
 import dash
-import pandas as pd
+import polars as pl
 import dash_mantine_components as dmc
 from dash import html, callback, Input, Output, State, dcc
 from dash_iconify import DashIconify
 
 dash.register_page(__name__, path="/exercises/prepositions")
 
-flexion = pd.read_csv("data/prepositions.csv")
+flexion = pl.read_csv("data/prepositions.csv")
 
 _BG_NEUTRAL = "#FFFFFF"
 _BG_REVEALED = "#D4EFDF"
@@ -73,8 +73,8 @@ def _revealed_card(row):
 
 def _sample(with_suffix):
     if not with_suffix:
-        return flexion[flexion["person"] == "base"].sample(n=1).iloc[0].to_dict()
-    return flexion.sample(n=1).iloc[0].to_dict()
+        return flexion.filter(pl.col("person") == "base").sample(n=1).row(0, named=True)
+    return flexion.sample(n=1).row(0, named=True)
 
 
 layout = html.Div(

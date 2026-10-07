@@ -13,7 +13,7 @@ The corpus data is not versioned and must be generated once after cloning:
 ```bash
 git clone https://github.com/nplinden/hegram.git
 cd hegram
-uv run python -m hegram.build_dataframes
+uv run --group build python -m hegram.build_dataframes
 ```
 
 This produces:
