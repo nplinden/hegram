@@ -8,4 +8,6 @@ EXPOSE 7777
 
 RUN uv sync
 
+RUN uv run python -m hegram.build_dataframes
+
 CMD ["uv", "run", "main.py"]

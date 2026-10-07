@@ -1,0 +1,11 @@
+.venv
+__pycache__
+.ruff_cache
+.claude
+.vscode
+
+# Generated data: the image builds its own (see README)
+data/conjugation.parquet
+data/verses.parquet
+data/words.parquet
+data/definitions.json

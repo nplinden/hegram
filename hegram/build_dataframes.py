@@ -1,4 +1,5 @@
 import polars as pl
+from loguru import logger
 from tf.app import use
 
 
@@ -137,6 +138,14 @@ def build_words():
 
 
 if __name__ == "__main__":
+    logger.info("Building data/verses.parquet")
     build_verses()
+    logger.info("Building data/conjugation.parquet")
     build_conjugation()
+    logger.info("Building data/words.parquet")
     build_words()
+    logger.info("Fetching data/definitions.json")
+    from hegram.definitions import get_definitions  # importing the module builds the file if missing
+
+    get_definitions()
+    logger.info("Done")

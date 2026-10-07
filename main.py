@@ -1,6 +1,9 @@
 import subprocess
 import sys
+from pathlib import Path
+
 from flask import Flask
+from loguru import logger
 import dash_mantine_components as dmc
 from dash import (
     Dash,
@@ -17,6 +20,15 @@ from dash import (
     callback_context,
 )
 from dash_iconify import DashIconify
+
+_GENERATED_DATA = ["data/conjugation.parquet", "data/verses.parquet", "data/words.parquet"]
+_missing = [f for f in _GENERATED_DATA if not Path(f).exists()]
+if _missing:
+    logger.error(
+        "Missing generated data: {}. Build it first with `uv run python -m hegram.build_dataframes` (see README).",
+        ", ".join(_missing),
+    )
+    sys.exit(1)
 
 _dash_renderer._set_react_version("18.2.0")
 server = Flask("Hebrew Grammar")
