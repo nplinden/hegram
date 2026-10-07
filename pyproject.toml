@@ -19,6 +19,7 @@ dependencies = [
     "pyarrow>=19.0.1",
     "requests>=2.32.3",
     "text-fabric>=12.6.2",
+    "weasyprint>=70.0",
 ]
 [tool.ruff]
 line-length = 120

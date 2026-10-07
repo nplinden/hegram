@@ -4,6 +4,7 @@ import weasyprint as _weasyprint
 import dash
 import dash_mantine_components as dmc
 import json as _json
+from html import escape as _escape
 from dash import html, no_update
 import polars as pl
 from bs4 import BeautifulSoup, NavigableString
@@ -139,7 +140,55 @@ def _build_verse_html(verse_row: dict, word_html_str: str) -> str:
     return str(soup)
 
 
-def _build_pdf_html(samples: list[dict]) -> str:
+def _hebrew_numeral(n: int) -> str:
+    if n <= 0:
+        return str(n)
+
+    ones = {1: "א", 2: "ב", 3: "ג", 4: "ד", 5: "ה", 6: "ו", 7: "ז", 8: "ח", 9: "ט"}
+    tens = {10: "י", 20: "כ", 30: "ל", 40: "מ", 50: "נ", 60: "ס", 70: "ע", 80: "פ", 90: "צ"}
+    hundreds = {100: "ק", 200: "ר", 300: "ש", 400: "ת"}
+
+    letters = []
+
+    while n >= 400:
+        letters.append(hundreds[400])
+        n -= 400
+
+    for value in (300, 200, 100):
+        if n >= value:
+            letters.append(hundreds[value])
+            n -= value
+
+    if n == 15:
+        letters.append("טו")
+        n = 0
+    elif n == 16:
+        letters.append("טז")
+        n = 0
+
+    if n:
+        for value in (90, 80, 70, 60, 50, 40, 30, 20, 10):
+            if n >= value:
+                letters.append(tens[value])
+                n -= value
+                break
+        if n:
+            letters.append(ones[n])
+
+    raw = "".join(letters)
+    if len(raw) == 1:
+        return raw
+    return raw
+
+
+def _sample_person_label(row: dict) -> str:
+    number = {"Singular": "S", "Plural": "P"}.get(row.get("Number", ""), "")
+    person = {"1": "1", "2": "2", "3": "3"}.get(str(row.get("Person", "")), "")
+    gender = {"M": "M", "F": "F"}.get(row.get("Gender", ""), "")
+    return f"{person}{gender}{number}" or "—"
+
+
+def _build_pdf_html(samples: list[dict], *, with_answers: bool = False) -> str:
     word_ids = list({s["WordId"] for s in samples})
     verse_ids = list({s["VerseId"] for s in samples})
     words = {
@@ -161,13 +210,32 @@ def _build_pdf_html(samples: list[dict]) -> str:
     for i, s in enumerate(samples, 1):
         verse_html = _build_verse_html(verses[s["VerseId"]], words[s["WordId"]])
         ref = _verse_ref(verses[s["VerseId"]])
-        answer_fields = "".join(
-            f'<div class="answer-field"><span class="answer-label">{label} :</span><span class="answer-line"></span></div>'
-            for label in answer_labels
-        )
+        if with_answers:
+            answer_values = {
+                "Racine": s["Root"],
+                "Binyan": s["Binyan"],
+                "Temps": en_to_fr["Tense"].get(s["Tense"], s["Tense"]),
+                "Personne": _sample_person_label(s),
+            }
+            answer_fields = "".join(
+                f'<div class="answer-field">'
+                f'<span class="answer-label">{label} :</span>'
+                f'<span class="answer-value">{_escape(str(answer_values[label]))}</span>'
+                f'</div>'
+                for label in answer_labels
+            )
+        else:
+            answer_fields = "".join(
+                f'<label class="answer-field" for="q{i}-{label.lower()}">'
+                f'<span class="answer-label">{label} :</span>'
+                f'<input class="answer-input" id="q{i}-{label.lower()}" name="q{i}-{label.lower()}" type="text" />'
+                f'</label>'
+                for label in answer_labels
+            )
+        qnum_he = _hebrew_numeral(i)
         questions_html += f"""
 <div class="question">
-  <div class="question-number">Question {i}</div>
+    <div class="question-number-he">{qnum_he}</div>
   <div class="cards-row">
     <div class="answer-section">{answer_fields}</div>
     <div class="verse-card">
@@ -183,29 +251,39 @@ def _build_pdf_html(samples: list[dict]) -> str:
   unicode-range: U+0590-U+05FF, U+FB1D-U+FB4F;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; padding: 12mm 15mm; }
+body { font-family: "Ezra SIL", sans-serif; background: white; color: #000; padding: 12mm 15mm; }
+.question, .question * { color: #000; }
 .question {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #ddd;
+    position: relative;
+    padding-right: 12mm;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
   break-inside: avoid;
 }
-.question:last-child { border-bottom: none; margin-bottom: 0; }
-.question-number {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #999;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.question:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+.question-number-he {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: "Ezra SIL", sans-serif;
+    font-size: 1rem;
+    color: #000;
+    line-height: 1;
 }
 .cards-row {
   display: flex;
   gap: 12px;
-  align-items: stretch;
+    align-items: flex-start;
   width: 100%;
+    min-width: 0;
 }
 .verb-card {
   flex: 0 0 25%;
@@ -218,6 +296,7 @@ body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; padd
 }
 .verse-card {
   flex: 0 0 calc(75% - 12px);
+    align-self: stretch;
   min-width: 0;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -241,34 +320,64 @@ body { font-family: "Ezra SIL", sans-serif; background: white; color: #111; padd
 .verse-ref {
   font-style: italic;
   font-size: 0.7rem;
-  color: #666;
+    color: #000;
   margin-top: 4px;
   direction: ltr;
 }
 .answer-section {
   flex: 0 0 25%;
+    min-width: 0;
+    max-width: 25%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+    justify-content: flex-start;
   gap: 6px;
 }
 .answer-field {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  gap: 4px;
+        flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    align-items: end;
+    column-gap: 4px;
+    min-width: 0;
 }
 .answer-label {
   font-size: 0.6rem;
   font-weight: 600;
-  color: #555;
+    color: #000;
   white-space: nowrap;
   line-height: 1;
 }
-.answer-line {
-  flex: 1;
-  border-bottom: 1px solid #888;
+.answer-value {
+        width: 100%;
+        min-width: 0;
+        border-bottom: 2px solid #888;
+        padding: 1px 2px;
+        font-size: 0.9rem;
+        font-family: sans-serif;
+        line-height: 1.2;
+}
+.answer-input {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    border: none;
+    border-bottom: 2px solid #888;
+    border-radius: 0;
+    background: transparent;
+    padding: 1px 2px;
+    font-size: 0.9rem;
+    font-family: sans-serif;
+    line-height: 1.2;
+    appearance: auto;
+    -webkit-appearance: auto;
+}
+input,
+select,
+textarea,
+button {
+    appearance: auto;
+    -webkit-appearance: auto;
 }
 @media print {
   body { margin: 0; padding: 10mm 12mm; }
@@ -664,7 +773,9 @@ def layout():
         dash.html.Div(
             children=[
                 dcc.Store(id="solution-storage", storage_type="memory"),
+                dcc.Store(id="conj-pdf-samples", storage_type="memory"),
                 dcc.Download(id="conj-pdf-download"),
+                dcc.Download(id="conj-correction-download"),
             dmc.Modal(
                 id="conj-detail-modal",
                 opened=False,
@@ -709,12 +820,24 @@ def layout():
                                 value=10,
                                 style={"width": 160},
                             ),
-                            dmc.Button(
-                                "Télécharger questionnaire",
-                                id="conj-pdf-btn",
-                                leftSection=DashIconify(icon="material-symbols:download", width=18),
-                                variant="outline",
-                                color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                            dmc.Stack(
+                                [
+                                    dmc.Button(
+                                        "Télécharger questionnaire",
+                                        id="conj-pdf-btn",
+                                        leftSection=DashIconify(icon="material-symbols:download", width=18),
+                                        variant="outline",
+                                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                                    ),
+                                    dmc.Button(
+                                        "Télécharger corrigé",
+                                        id="conj-correction-btn",
+                                        leftSection=DashIconify(icon="material-symbols:download", width=18),
+                                        variant="light",
+                                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                                    ),
+                                ],
+                                gap="xs",
                                 style={"alignSelf": "flex-end"},
                             ),
                         ],
@@ -871,6 +994,7 @@ def open_detail_modal(n_clicks_list):
 
 @callback(
     Output("conj-pdf-download", "data"),
+    Output("conj-pdf-samples", "data"),
     Input("conj-pdf-btn", "n_clicks"),
     State("conj-pdf-n-questions", "value"),
     State("conjugation-roots-dropdown", "value"),
@@ -900,12 +1024,62 @@ def generate_pdf(_, n_questions, roots, book, binyanim, tenses, persons, genders
             raise PreventUpdate
         k = min(int(n_questions), len(filtered))
         samples = filtered.sample(n=k).to_dicts()
-        html_content = _build_pdf_html(samples)
+        html_content = _build_pdf_html(samples, with_answers=False)
         assets_dir = _os.path.abspath("assets")
-        pdf_bytes = _weasyprint.HTML(string=html_content, base_url=assets_dir).write_pdf()
-        return dcc.send_bytes(pdf_bytes, filename="questionnaire_conjugaison.pdf")
+        pdf_bytes = _weasyprint.HTML(string=html_content, base_url=assets_dir).write_pdf(
+            pdf_forms=True
+        )
+        return dcc.send_bytes(pdf_bytes, filename="questionnaire_conjugaison.pdf"), samples
     except PreventUpdate:
         raise
     except Exception:
         logger.exception("PDF generation failed")
+        raise PreventUpdate
+
+
+@callback(
+    Output("conj-correction-download", "data"),
+    Input("conj-correction-btn", "n_clicks"),
+    State("conj-pdf-samples", "data"),
+    State("conj-pdf-n-questions", "value"),
+    State("conjugation-roots-dropdown", "value"),
+    State("conjugation-book-dropdown", "value"),
+    State("conjugation-binyan-dropdown", "value"),
+    State("conjugation-tense-dropdown", "value"),
+    State("conjugation-person-dropdown", "value"),
+    State("conjugation-gender-dropdown", "value"),
+    State("conjugation-number-dropdown", "value"),
+    prevent_initial_call=True,
+)
+def generate_correction_pdf(_, saved_samples, n_questions, roots, book, binyanim, tenses, persons, genders, numbers):
+    try:
+        if saved_samples:
+            samples = saved_samples
+        else:
+            if not n_questions:
+                raise PreventUpdate
+            df = pl.scan_parquet("data/conjugation.parquet")
+            filtered = df.filter(
+                pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
+                & pl.when(bool(binyanim)).then(pl.col("Binyan").is_in(binyanim)).otherwise(pl.lit(True))
+                & pl.when(bool(tenses)).then(pl.col("Tense").is_in(tenses)).otherwise(pl.lit(True))
+                & pl.when(bool(persons)).then(pl.col("Person").is_in(persons)).otherwise(pl.lit(True))
+                & pl.when(bool(genders)).then(pl.col("Gender").is_in(genders)).otherwise(pl.lit(True))
+                & pl.when(bool(numbers)).then(pl.col("Number").is_in(numbers)).otherwise(pl.lit(True))
+                & pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
+            ).collect()
+            if filtered.is_empty():
+                raise PreventUpdate
+            k = min(int(n_questions), len(filtered))
+            samples = filtered.sample(n=k).to_dicts()
+        if not samples:
+            raise PreventUpdate
+        html_content = _build_pdf_html(samples, with_answers=True)
+        assets_dir = _os.path.abspath("assets")
+        pdf_bytes = _weasyprint.HTML(string=html_content, base_url=assets_dir).write_pdf()
+        return dcc.send_bytes(pdf_bytes, filename="corrige_conjugaison.pdf")
+    except PreventUpdate:
+        raise
+    except Exception:
+        logger.exception("Correction PDF generation failed")
         raise PreventUpdate
