@@ -1,7 +1,7 @@
 [project]
 name = "hegram"
 version = "0.1.0"
-description = "Add your description here"
+description = "A web app for learning Biblical Hebrew: verb statistics from the Hebrew Bible, conjugation exercises and grammar tables"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
