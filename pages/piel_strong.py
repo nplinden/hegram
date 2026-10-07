@@ -4,10 +4,8 @@ from pages.conj_layout import make_page
 dash.register_page(__name__, path="/piel_strong")
 
 layout = make_page(
-    page_id="piel-strong",
     title="Piel — Verbe fort",
     root="דבר",
-    asset="piel_strong.svg",
     absolu="דַּבֵּר",
     construit="לְדַבֵּר",
     accompli=[

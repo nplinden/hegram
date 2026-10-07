@@ -4,10 +4,8 @@ from pages.conj_layout import make_page
 dash.register_page(__name__, path="/niphal_strong")
 
 layout = make_page(
-    page_id="niphal-strong",
     title="Niphal — Verbe fort",
     root="קדשׁ",
-    asset="niphal_strong.svg",
     absolu="נִקְדֹּשׁ, הִקָּדֹשׁ",
     construit="(לְ)הִקָּדֵשׁ",
     accompli=[

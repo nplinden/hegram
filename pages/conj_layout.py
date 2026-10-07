@@ -1,8 +1,5 @@
 import dash_mantine_components as dmc
-from dash import dcc, Input, Output, callback, html
-from dash_iconify import DashIconify
-
-from hegram.paths import ASSETS_DIR
+from dash import html
 
 _HEADER_STYLE = {
     "padding": "12px 20px",
@@ -67,9 +64,7 @@ def _grid(*children, mb=16):
     )
 
 
-def make_page(
-    page_id, title, root, asset, accompli, inaccompli, imperatif=None, participe=None, absolu=None, construit=None
-):
+def make_page(title, root, accompli, inaccompli, imperatif=None, participe=None, absolu=None, construit=None):
     rows = []
 
     if absolu is not None and construit is not None:
@@ -88,37 +83,12 @@ def make_page(
     elif imperatif is not None:
         rows.append(_conj_card("Impératif", imperatif))
 
-    layout = html.Div(
+    return html.Div(
         [
-            dcc.Download(id=f"download-{page_id}"),
-            dmc.Flex(
-                [
-                    html.Div(style={"width": "36px"}),
-                    html.H1(title, style={"margin": 0, "flex": 1, "textAlign": "center"}),
-                    dmc.ActionIcon(
-                        DashIconify(icon="material-symbols:download", width=20),
-                        id=f"btn-{page_id}",
-                        variant="subtle",
-                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                        size="lg",
-                    ),
-                ],
-                align="center",
-                mb=16,
-            ),
+            html.H1(title, style={"margin": "0 0 16px", "textAlign": "center"}),
             html.Div(_single_card("Racine", root), style={"marginBottom": "16px"}),
             *rows,
         ],
         className="container",
         style={"maxWidth": "860px", "marginInline": "auto"},
     )
-
-    @callback(
-        Output(f"download-{page_id}", "data"),
-        Input(f"btn-{page_id}", "n_clicks"),
-        prevent_initial_call=True,
-    )
-    def _download(_):
-        return dcc.send_file(ASSETS_DIR / asset)
-
-    return layout

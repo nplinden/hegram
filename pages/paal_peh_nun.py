@@ -4,10 +4,8 @@ from pages.conj_layout import make_page
 dash.register_page(__name__, path="/paal_peh_nun")
 
 layout = make_page(
-    page_id="paal-peh-nun",
     title="Paal — Verbe פ״נ",
     root="נפל",
-    asset="paal_peh_nun.svg",
     absolu="נָפוֹל",
     construit="לִנְפֹּל",
     accompli=[

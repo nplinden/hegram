@@ -4,10 +4,8 @@ from pages.conj_layout import make_page
 dash.register_page(__name__, path="/hitpael_strong")
 
 layout = make_page(
-    page_id="hitpael-strong",
     title="Hitpael — Verbe fort",
     root="פלל",
-    asset="hitpael_strong.svg",
     absolu="הִתְפַּלֵּל",
     construit="(לְ)הִתְפַּלֵּל",
     accompli=[

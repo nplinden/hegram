@@ -4,10 +4,8 @@ from pages.conj_layout import make_page
 dash.register_page(__name__, path="/poual_strong")
 
 layout = make_page(
-    page_id="poual-strong",
     title="Poual — Verbe fort",
     root="ילד",
-    asset="poual_strong.svg",
     accompli=[
         ("1S", "יֻלַּדְתִּי"),
         ("2MS", "יֻלַּדְתָּ"),

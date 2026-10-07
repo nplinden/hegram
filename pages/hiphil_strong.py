@@ -4,10 +4,8 @@ from pages.conj_layout import make_page
 dash.register_page(__name__, path="/hiphil_strong")
 
 layout = make_page(
-    page_id="hiphil-strong",
     title="Hiphil — Verbe fort",
     root="מלכ",
-    asset="hiphil_strong.svg",
     absolu="הַמְלֵךְ",
     construit="לְהַמְלִיךְ",
     accompli=[
