@@ -1,0 +1,38 @@
+name: Docker image
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Builds the image, including the corpus data (see README). Layers are cached between runs,
+      # so the system packages, dependencies and data are only rebuilt when their inputs change.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: hegram:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # A successful build doesn't mean the app starts: check that gunicorn boots and serves the pages.
+      - name: Smoke test
+        run: |
+          docker run -d --name hegram -p 7777:7777 hegram:ci
+          for i in $(seq 1 30); do
+            curl -sf -o /dev/null http://localhost:7777/ && break
+            sleep 2
+          done
+          for page in / /statistics /exercises/conjugation /paal_strong; do
+            curl -sf -o /dev/null "http://localhost:7777$page" || { echo "GET $page failed"; docker logs hegram; exit 1; }
+            echo "GET $page OK"
+          done
