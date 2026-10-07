@@ -3,11 +3,11 @@ from dash import callback, Output, Input
 from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
 from hegram.definitions import definitions
+from hegram.stats import ROOT_BINYAN_COUNTS, binyan_tense_counts
 from hegram.utils import htmlify, convert_html_to_dash
 from loguru import logger
 from hebrew import Hebrew
 from typing import Dict, List, Set, Any, Tuple
-import polars as pl
 
 import dash_mantine_components as dmc
 from dash import html, dash_table
@@ -16,24 +16,6 @@ dash.register_page(__name__, path="/statistics")
 
 DataList = List[Dict[str, Any]]
 Data = Dict[str, str | int]
-
-COMMON_BINYANIM = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
-
-
-def binyanim_barchart(roots=None):
-    df = pl.scan_parquet("data/conjugation.parquet").filter(
-        pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
-        & pl.col("Binyan").is_in(COMMON_BINYANIM)
-    )
-    df = (
-        df.select(["Binyan", "Tense"])
-        .collect()
-        .to_struct(name="Struct")
-        .value_counts()
-        .unnest("Struct")
-        .sort("count", descending=True)
-    )
-    return df.pivot(["Tense"], index="Binyan", values="count").fill_null(0).to_dicts()
 
 
 @callback(
@@ -46,14 +28,14 @@ def binyanim_barchart(roots=None):
 def update_binyanim_bar_graph(data: DataList, selected_cells: DataList):
     logger.info("Triggering table_select callback")
     if selected_cells is None:
-        return binyanim_barchart()
+        return binyan_tense_counts()
     roots = set()
     for cell in selected_cells:
         roots |= get_roots_from_cell(data, cell)
     if roots:
         logger.info(roots)
-        return binyanim_barchart(list(roots))
-    return binyanim_barchart()
+        return binyan_tense_counts(list(roots))
+    return binyan_tense_counts()
 
 
 def get_roots_from_cell(data: DataList, cell: Data) -> Set[str]:
@@ -99,20 +81,7 @@ def update_table(
     Returns:
         Tuple[DataList, DataList, DataList]: The table data, list of columns, and tooltip data
     """
-    df = (
-        pl.scan_parquet("data/conjugation.parquet")
-        .select(["Root", "Binyan"])
-        .collect()
-        .to_struct("Struct")
-        .value_counts()
-        .unnest("Struct")
-        .pivot("Binyan", index="Root", values="count")
-        .fill_null(0)
-        .select(["Root"] + COMMON_BINYANIM)
-        .with_columns(Total=pl.sum_horizontal(COMMON_BINYANIM))
-        .sort("Total", descending=True)
-        .filter(pl.col("Total") > 0)
-    )
+    df = ROOT_BINYAN_COUNTS
     if len(sort_by):
         key = sort_by[0]["column_id"]
         asc = sort_by[0]["direction"] == "asc"
@@ -186,21 +155,7 @@ def update_table_page_number(page_size: int) -> int:
     Returns:
         int: The total number of pages
     """
-    df = (
-        pl.scan_parquet("data/conjugation.parquet")
-        .select(["Root", "Binyan"])
-        .collect()
-        .to_struct("Struct")
-        .value_counts()
-        .unnest("Struct")
-        .pivot("Binyan", index="Root", values="count")
-        .fill_null(0)
-        .select(["Root"] + COMMON_BINYANIM)
-        .with_columns(Total=pl.sum_horizontal(COMMON_BINYANIM))
-        .sort("Total", descending=True)
-        .filter(pl.col("Total") > 0)
-    )
-    nroot = len(df)
+    nroot = len(ROOT_BINYAN_COUNTS)
     return nroot // page_size + int((nroot % page_size) != 0)
 
 

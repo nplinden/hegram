@@ -16,6 +16,7 @@ from hegram.mechon_mamre import verse_to_url, en_to_fr_books
 
 from hegram.data import dropdown_data, en_to_fr, answer_data, roots_data
 from hegram.definitions import definitions
+from hegram.stats import binyan_tense_counts
 from hegram.utils import convert_html_to_dash, htmlify
 from hebrew import Hebrew
 
@@ -29,8 +30,6 @@ def _get_chapters(json_file: str) -> list:
             _book_cache[json_file] = _json.load(f)["chapters"]
     return _book_cache[json_file]
 
-
-COMMON_BINYANIM = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
 
 _ANSWER_CARD_STYLE = {
     "borderRadius": "16px",
@@ -536,7 +535,7 @@ def handle_action(
     chart = dmc.BarChart(
         h=450,
         dataKey="Binyan",
-        data=barchart(root),
+        data=binyan_tense_counts([root]),
         series=[
             {"name": "Qatal", "color": "red.6"},
             {"name": "Yiqtol", "color": "green.6"},
@@ -613,21 +612,6 @@ def handle_action(
         no_update,
         no_update,
     )
-
-
-def barchart(root):
-    df = pl.scan_parquet("data/conjugation.parquet").filter(
-        (pl.col("Root") == root) & (pl.col("Binyan").is_in(COMMON_BINYANIM))
-    )
-    df = (
-        df.select(["Binyan", "Tense"])
-        .collect()
-        .to_struct(name="Struct")
-        .value_counts()
-        .unnest("Struct")
-        .sort("count", descending=True)
-    )
-    return df.pivot(["Tense"], index="Binyan", values="count").fill_null(0).to_dicts()
 
 
 def data_from_list(items):
