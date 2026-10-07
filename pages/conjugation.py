@@ -67,23 +67,16 @@ def _hl(span):
         span.insert_after(NavigableString(" "))
 
 
+def _verse_words(verse_rows: list[dict]) -> dict[int, str]:
+    """Fetch the html of every word in the given verses, keyed by word id."""
+    in_verses = pl.any_horizontal([pl.col("id").is_between(r["WordId_min"], r["WordId_max"]) for r in verse_rows])
+    df = pl.scan_parquet("data/words.parquet").filter(in_verses).select(["id", "html"]).collect()
+    return dict(df.iter_rows())
+
+
 def build_verse(verse_id, word_id):
-    df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
-    word_df = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect()
-    word = BeautifulSoup(word_df.to_dicts()[0]["html"], features="html.parser").find("span").string
-
-    soup = BeautifulSoup(df["html"], features="html.parser")
-    span = soup.find("span", string=word)
-    _hl(span)
-
-    prev = span.find_previous_sibling("span")
-    if prev:
-        consonants = [c for c in prev.get_text() if c in _HEBREW_CONSONANTS]
-        if consonants == ["\u05d5"]:  # single vav — prefix of wayyiqtol/waw-consecutive
-            _hl(prev)
-
-    soup.find("div")["class"] = ["fullverse"]
-    return convert_html_to_dash(str(soup))
+    verse_row = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
+    return convert_html_to_dash(_build_verse_html(verse_row, _verse_words([verse_row]), word_id))
 
 
 def build_word(word_id):
@@ -127,17 +120,26 @@ def _verse_ref(verse_row: dict) -> str:
     return f"{book} {verse_row['chapter']}:{verse_row['verse']}"
 
 
-def _build_verse_html(verse_row: dict, word_html_str: str) -> str:
-    word = BeautifulSoup(word_html_str, features="html.parser").find("span").string
-    soup = BeautifulSoup(verse_row["html"], features="html.parser")
-    span = soup.find("span", string=word)
-    _hl(span)
-    prev = span.find_previous_sibling("span")
-    if prev:
+def _build_verse_html(verse_row: dict, words_html: dict[int, str], word_id: int) -> str:
+    # Rebuild the verse word by word rather than searching the verse html for the
+    # verb's text: the same form can occur several times in a verse, and the verse
+    # html sometimes merges several words into a single span.
+    soup = BeautifulSoup('<div class="fullverse"></div>', features="html.parser")
+    prev = target = None
+    for wid in range(verse_row["WordId_min"], verse_row["WordId_max"] + 1):
+        span = BeautifulSoup(words_html[wid], features="html.parser").find("span")
+        if span is None:  # word with no surface text, e.g. an elided article
+            continue
+        soup.div.append(span)
+        if wid < word_id:
+            prev = span
+        elif wid == word_id:
+            target = span
+    _hl(target)
+    if prev is not None:
         consonants = [c for c in prev.get_text() if c in _HEBREW_CONSONANTS]
-        if consonants == ["\u05d5"]:
+        if consonants == ["\u05d5"]:  # single vav — prefix of wayyiqtol/waw-consecutive
             _hl(prev)
-    soup.find("div")["class"] = ["fullverse"]
     return str(soup)
 
 
@@ -190,20 +192,16 @@ def _sample_person_label(row: dict) -> str:
 
 
 def _build_pdf_html(samples: list[dict], *, with_answers: bool = False) -> str:
-    word_ids = list({s["WordId"] for s in samples})
     verse_ids = list({s["VerseId"] for s in samples})
-    words = {
-        r["id"]: r["html"]
-        for r in pl.scan_parquet("data/words.parquet").filter(pl.col("id").is_in(word_ids)).collect().to_dicts()
-    }
     verses = {
         r["id"]: r
         for r in pl.scan_parquet("data/verses.parquet").filter(pl.col("id").is_in(verse_ids)).collect().to_dicts()
     }
+    words = _verse_words(list(verses.values()))
     answer_labels = ["Racine", "Binyan", "Temps", "Personne"]
     questions_html = ""
     for i, s in enumerate(samples, 1):
-        verse_html = _build_verse_html(verses[s["VerseId"]], words[s["WordId"]])
+        verse_html = _build_verse_html(verses[s["VerseId"]], words, s["WordId"])
         ref = _verse_ref(verses[s["VerseId"]])
         if with_answers:
             answer_values = {
