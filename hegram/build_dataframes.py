@@ -7,6 +7,8 @@ import requests
 from loguru import logger
 from tf.app import use
 
+from hegram.paths import DATA_DIR
+
 STRONGS_URL = "https://raw.githubusercontent.com/openscriptures/strongs/refs/heads/master/hebrew/StrongHebrewG.xml"
 
 
@@ -37,7 +39,7 @@ def build_verses():
         .sort("VerseId", descending=False)
     )
     complete = pl.concat([df, word_df], how="horizontal")
-    complete.write_parquet("data/verses.parquet")
+    complete.write_parquet(DATA_DIR / "verses.parquet")
 
 
 def build_conjugation():
@@ -128,7 +130,7 @@ def build_conjugation():
             ]
         )
     conjugation = pl.DataFrame(data, schema=header)
-    conjugation.write_parquet("data/conjugation.parquet")
+    conjugation.write_parquet(DATA_DIR / "conjugation.parquet")
 
 
 def build_words():
@@ -141,7 +143,7 @@ def build_words():
         html = A.plain(v, _asString=True, withPassage=False)
         htmls.append([v, html])
     df = pl.DataFrame(data=htmls, schema=["id", "html"], orient="row")
-    df.write_parquet("data/words.parquet")
+    df.write_parquet(DATA_DIR / "words.parquet")
 
 
 osis = "{http://www.bibletechnologies.net/2003/OSIS/namespace}"
@@ -214,7 +216,7 @@ def build_definitions():
         entry = Entry(entry_node)
         if entry.morph == "v" and entry.lang == "heb":
             verbs.setdefault(entry.root, []).append(entry.definitions)
-    with open("data/definitions.json", "w", encoding="utf-8") as f:
+    with open(DATA_DIR / "definitions.json", "w", encoding="utf-8") as f:
         json.dump(verbs, f, indent=2)
 
 

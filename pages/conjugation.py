@@ -15,18 +15,19 @@ from hegram.corpus import CONJUGATION, verse_row, word_row
 from hegram.data import TENSE_SERIES, answer_data, dropdown_data, en_to_fr
 from hegram.definitions import definitions
 from hegram.pdf import render_pdf
+from hegram.paths import BIBLE_FR_DIR
 from hegram.stats import binyan_tense_counts
 from hegram.utils import convert_html_to_dash, htmlify
 from hegram.verses import build_verse_html, verse_words
 from hebrew import Hebrew
 
-_book_index = _json.load(open("json/index.json", encoding="utf-8"))
+_book_index = _json.loads((BIBLE_FR_DIR / "index.json").read_text(encoding="utf-8"))
 _book_cache: dict = {}
 
 
 def _get_chapters(json_file: str) -> list:
     if json_file not in _book_cache:
-        with open(f"json/{json_file}", encoding="utf-8") as f:
+        with open(BIBLE_FR_DIR / json_file, encoding="utf-8") as f:
             _book_cache[json_file] = _json.load(f)["chapters"]
     return _book_cache[json_file]
 

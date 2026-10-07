@@ -4,9 +4,11 @@ import dash_mantine_components as dmc
 from dash import html, callback, Input, Output, State, dcc
 from dash_iconify import DashIconify
 
+from hegram.paths import DATA_DIR
+
 dash.register_page(__name__, path="/exercises/prepositions")
 
-flexion = pl.read_csv("data/prepositions.csv")
+flexion = pl.read_csv(DATA_DIR / "prepositions.csv")
 
 _BG_NEUTRAL = "#FFFFFF"
 _BG_REVEALED = "#D4EFDF"

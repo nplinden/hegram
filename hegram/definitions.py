@@ -1,9 +1,10 @@
 import json
-from pathlib import Path
+
+from hegram.paths import DATA_DIR
 
 # Verb definitions from the Strong's Hebrew dictionary, keyed by root without vowel points.
 # Built by hegram.build_dataframes; the app only reads it.
-DEFINITIONS_PATH = Path("data/definitions.json")
+DEFINITIONS_PATH = DATA_DIR / "definitions.json"
 
 
 def load_definitions() -> dict:

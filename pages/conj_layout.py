@@ -2,6 +2,8 @@ import dash_mantine_components as dmc
 from dash import dcc, Input, Output, callback, html
 from dash_iconify import DashIconify
 
+from hegram.paths import ASSETS_DIR
+
 _HEADER_STYLE = {
     "padding": "12px 20px",
     "backgroundColor": "#F8F9FA",
@@ -117,6 +119,6 @@ def make_page(
         prevent_initial_call=True,
     )
     def _download(_):
-        return dcc.send_file(asset)
+        return dcc.send_file(ASSETS_DIR / asset)
 
     return layout

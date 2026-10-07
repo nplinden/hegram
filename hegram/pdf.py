@@ -7,6 +7,7 @@ import weasyprint
 from hegram.books import en_to_fr_books
 from hegram.corpus import VERSES
 from hegram.data import en_to_fr
+from hegram.paths import ASSETS_DIR
 from hegram.verses import build_verse_html, verse_words
 
 _CSS = (Path(__file__).parent / "pdf.css").read_text(encoding="utf-8")
@@ -125,5 +126,5 @@ def render_pdf(samples: list[dict], *, with_answers: bool = False) -> bytes:
     The questionnaire gets fillable form fields. The fonts are resolved against the assets folder.
     """
     html_content = build_pdf_html(samples, with_answers=with_answers)
-    document = weasyprint.HTML(string=html_content, base_url=str(Path("assets").absolute()))
+    document = weasyprint.HTML(string=html_content, base_url=str(ASSETS_DIR))
     return document.write_pdf(pdf_forms=not with_answers)

@@ -7,7 +7,7 @@ layout = make_page(
     page_id="poual-strong",
     title="Poual — Verbe fort",
     root="ילד",
-    asset="assets/poual_strong.svg",
+    asset="poual_strong.svg",
     accompli=[
         ("1S", "יֻלַּדְתִּי"),
         ("2MS", "יֻלַּדְתָּ"),

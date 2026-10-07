@@ -6,12 +6,14 @@ these frames instead of reading the parquet files on every request.
 
 import polars as pl
 
+from hegram.paths import DATA_DIR
+
 # One row per verb occurrence: WordId, VerseId, Book, Root, Binyan, Tense, Person, Gender, Number…
-CONJUGATION = pl.read_parquet("data/conjugation.parquet")
+CONJUGATION = pl.read_parquet(DATA_DIR / "conjugation.parquet")
 # One row per verse: id, book, chapter, verse, html, WordId_min, WordId_max.
-VERSES = pl.read_parquet("data/verses.parquet")
+VERSES = pl.read_parquet(DATA_DIR / "verses.parquet")
 # One row per word: id, html.
-WORDS = pl.read_parquet("data/words.parquet")
+WORDS = pl.read_parquet(DATA_DIR / "words.parquet")
 
 
 def verse_row(verse_id: int) -> dict:

@@ -1,9 +1,10 @@
 import subprocess
 import sys
-from pathlib import Path
 
 from flask import Flask
 from loguru import logger
+
+from hegram.paths import DATA_DIR, ROOT
 import dash_mantine_components as dmc
 from dash import (
     Dash,
@@ -21,13 +22,8 @@ from dash import (
 )
 from dash_iconify import DashIconify
 
-_GENERATED_DATA = [
-    "data/conjugation.parquet",
-    "data/verses.parquet",
-    "data/words.parquet",
-    "data/definitions.json",
-]
-_missing = [f for f in _GENERATED_DATA if not Path(f).exists()]
+_GENERATED_DATA = ["conjugation.parquet", "verses.parquet", "words.parquet", "definitions.json"]
+_missing = [f"data/{f}" for f in _GENERATED_DATA if not (DATA_DIR / f).exists()]
 if _missing:
     logger.error(
         "Missing generated data: {}. Build it first with "
@@ -58,7 +54,7 @@ def update_navlinks(pathname):
 
 
 try:
-    _commit = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], text=True).strip()
+    _commit = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], text=True, cwd=ROOT).strip()
 except (FileNotFoundError, subprocess.CalledProcessError):
     _commit = ""
 
