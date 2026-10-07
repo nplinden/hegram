@@ -1,6 +1,8 @@
 import polars as pl
 from bs4 import BeautifulSoup, NavigableString
 
+from hegram.corpus import WORDS
+
 _HEBREW_CONSONANTS = set(chr(c) for c in range(0x05D0, 0x05EB))
 
 
@@ -14,7 +16,7 @@ def _hl(span):
 def verse_words(verse_rows: list[dict]) -> dict[int, str]:
     """Fetch the html of every word in the given verses, keyed by word id."""
     in_verses = pl.any_horizontal([pl.col("id").is_between(r["WordId_min"], r["WordId_max"]) for r in verse_rows])
-    df = pl.scan_parquet("data/words.parquet").filter(in_verses).select(["id", "html"]).collect()
+    df = WORDS.filter(in_verses).select(["id", "html"])
     return dict(df.iter_rows())
 
 

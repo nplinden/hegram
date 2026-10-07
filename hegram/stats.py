@@ -1,5 +1,6 @@
 import polars as pl
 
+from hegram.corpus import CONJUGATION
 from hegram.data import COMMON_BINYANIM
 
 
@@ -9,12 +10,17 @@ def binyan_tense_counts(roots=None) -> list[dict]:
     Args:
         roots: Restrict the count to these roots. Every root is counted when empty or None.
     """
-    df = pl.scan_parquet("data/conjugation.parquet").filter(pl.col("Binyan").is_in(COMMON_BINYANIM))
+    if not roots:
+        return ALL_ROOTS_BINYAN_TENSE_COUNTS
+    return _binyan_tense_counts(roots)
+
+
+def _binyan_tense_counts(roots=None) -> list[dict]:
+    df = CONJUGATION.filter(pl.col("Binyan").is_in(COMMON_BINYANIM))
     if roots:
         df = df.filter(pl.col("Root").is_in(roots))
     df = (
         df.select(["Binyan", "Tense"])
-        .collect()
         .to_struct(name="Struct")
         .value_counts()
         .unnest("Struct")
@@ -25,9 +31,7 @@ def binyan_tense_counts(roots=None) -> list[dict]:
 
 def _root_binyan_counts() -> pl.DataFrame:
     return (
-        pl.scan_parquet("data/conjugation.parquet")
-        .select(["Root", "Binyan"])
-        .collect()
+        CONJUGATION.select(["Root", "Binyan"])
         .to_struct("Struct")
         .value_counts()
         .unnest("Struct")
@@ -40,6 +44,11 @@ def _root_binyan_counts() -> pl.DataFrame:
     )
 
 
+# The corpus never changes while the app runs, so the tables that don't depend on a selection are
+# computed once. Callers must not modify them.
+
 # Occurrences of each root per common binyan, plus a Total column, most frequent roots first.
-# The corpus never changes while the app runs, so this is computed once.
 ROOT_BINYAN_COUNTS = _root_binyan_counts()
+
+# The binyan/tense chart over every root, the statistics page's default chart.
+ALL_ROOTS_BINYAN_TENSE_COUNTS = _binyan_tense_counts()

@@ -5,6 +5,7 @@ import polars as pl
 import weasyprint
 
 from hegram.books import en_to_fr_books
+from hegram.corpus import VERSES
 from hegram.data import en_to_fr
 from hegram.verses import build_verse_html, verse_words
 
@@ -63,10 +64,7 @@ def sample_person_label(row: dict) -> str:
 
 def build_pdf_html(samples: list[dict], *, with_answers: bool = False) -> str:
     verse_ids = list({s["VerseId"] for s in samples})
-    verses = {
-        r["id"]: r
-        for r in pl.scan_parquet("data/verses.parquet").filter(pl.col("id").is_in(verse_ids)).collect().to_dicts()
-    }
+    verses = {r["id"]: r for r in VERSES.filter(pl.col("id").is_in(verse_ids)).to_dicts()}
     words = verse_words(list(verses.values()))
     answer_labels = ["Racine", "Binyan", "Temps", "Personne"]
     questions_html = ""

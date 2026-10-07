@@ -11,6 +11,7 @@ from loguru import logger
 from hegram.books import en_to_fr_books
 from hegram.mechon_mamre import verse_to_url
 
+from hegram.corpus import CONJUGATION, verse_row, word_row
 from hegram.data import TENSE_SERIES, answer_data, dropdown_data, en_to_fr
 from hegram.definitions import definitions
 from hegram.pdf import render_pdf
@@ -65,19 +66,18 @@ def _error_notification(message):
 
 
 def build_verse(verse_id, word_id):
-    verse_row = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
-    return convert_html_to_dash(build_verse_html(verse_row, verse_words([verse_row]), word_id))
+    row = verse_row(verse_id)
+    return convert_html_to_dash(build_verse_html(row, verse_words([row]), word_id))
 
 
 def build_word(word_id):
-    word_df = pl.scan_parquet("data/words.parquet").filter(pl.col("id") == word_id).collect().to_dicts()[0]
-    html = BeautifulSoup(word_df["html"], features="html.parser")
+    html = BeautifulSoup(word_row(word_id)["html"], features="html.parser")
     html.find("div")["class"] = ["singleword"]
     return convert_html_to_dash(str(html))
 
 
 def passage(verse_id: int):
-    df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
+    df = verse_row(verse_id)
     book = en_to_fr_books[df["book"]]
     chapter, verse = df["chapter"], df["verse"]
     name = f"{book} {chapter}:{verse}"
@@ -91,7 +91,7 @@ def passage(verse_id: int):
 
 
 def french_passage(verse_id: int):
-    df = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
+    df = verse_row(verse_id)
     book, chapter, verse = df["book"], df["chapter"], df["verse"]
     entry = _book_index[book]
     chapters = _get_chapters(entry["json_file"])
@@ -117,10 +117,7 @@ def filter_conjugations(roots, books, binyanim, tenses, persons, genders, number
         "Number": numbers,
     }
     conditions = [pl.col(column).is_in(values) for column, values in filters.items() if values]
-    df = pl.scan_parquet("data/conjugation.parquet")
-    if conditions:
-        df = df.filter(conditions)
-    return df.collect()
+    return CONJUGATION.filter(conditions) if conditions else CONJUGATION
 
 
 # Every component handle_action can update, by name.
@@ -306,7 +303,7 @@ def _check_answer(store, root_answer, binyan_answer, tense_answer, person_answer
 
 
 def get_root_select_data():
-    roots = pl.scan_parquet("data/conjugation.parquet").select(["Root"]).unique().sort(["Root"]).collect().to_series()
+    roots = CONJUGATION["Root"].unique().sort()
     data = [{"label": v, "value": v} for v in roots]
     return data
 
@@ -315,13 +312,7 @@ _ROOT_DATA = get_root_select_data()
 
 
 def _roots_by_frequency() -> list[str]:
-    df = (
-        pl.scan_parquet("data/conjugation.parquet")
-        .group_by("Root")
-        .agg(pl.len().alias("count"))
-        .sort(["count", "Root"], descending=[True, False])
-        .collect()
-    )
+    df = CONJUGATION.group_by("Root").agg(pl.len().alias("count")).sort(["count", "Root"], descending=[True, False])
     return df["Root"].to_list()
 
 
