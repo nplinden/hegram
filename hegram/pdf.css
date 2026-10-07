@@ -1,12 +1,12 @@
 @font-face {
   font-family: "Ezra SIL";
   src: url("SILEOT.woff");
-  unicode-range: U+0590-U+05FF, U+FB1D-U+FB4F;
+  unicode-range: U+0590-05FF, U+FB1D-FB4F;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-/* WeasyPrint ignores unicode-range and Ezra SIL also has Latin letters, so Ezra SIL is only named
-   on Hebrew elements; everything else is Arial. */
-body { font-family: Arial, sans-serif; background: white; color: #000; padding: 12mm 15mm; }
+/* Hebrew in Ezra SIL, everything else in Arial: the Ezra SIL face only covers the Hebrew blocks
+   (unicode-range above, whose second bound must not repeat "U+"), so other characters fall through. */
+body { font-family: "Ezra SIL", Arial, sans-serif; background: white; color: #000; padding: 12mm 15mm; }
 .question, .question * { color: #000; }
 .question {
   display: flex;
@@ -109,11 +109,8 @@ body { font-family: Arial, sans-serif; background: white; color: #000; padding: 
         border-bottom: 2px solid #888;
         padding: 1px 2px;
         font-size: 0.9rem;
-        font-family: Arial, sans-serif;
+        font-family: "Ezra SIL", Arial, sans-serif;
         line-height: 1.2;
-}
-.answer-value.hebrew {
-    font-family: "Ezra SIL", Arial, sans-serif;
 }
 .answer-input {
     width: 100%;
@@ -125,7 +122,7 @@ body { font-family: Arial, sans-serif; background: white; color: #000; padding: 
     background: transparent;
     padding: 1px 2px;
     font-size: 0.9rem;
-    font-family: Arial, sans-serif;
+    font-family: "Ezra SIL", Arial, sans-serif;
     line-height: 1.2;
     appearance: auto;
     -webkit-appearance: auto;

@@ -8,10 +8,12 @@
     --fs-400: 1rem;
 }
 
+/* Hebrew and Hebrew presentation forms only. Note the range syntax: U+0590-05FF, not U+0590-U+05FF,
+   which is invalid and makes the browser drop the whole descriptor, so Ezra SIL would render Latin too. */
 @font-face {
     font-family: "Ezra SIL";
     src: url(SILEOT.woff);
-    unicode-range: U+0590-U+05FF, U+FB1D-U+FB4F;
+    unicode-range: U+0590-05FF, U+FB1D-FB4F;
 }
 
 body {
