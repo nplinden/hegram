@@ -164,7 +164,9 @@ app.layout = dmc.MantineProvider(
             "collapsed": {"mobile": True, "desktop": False},
         },
         id="appshell",
-    )
+    ),
+    # Mantine components set their own font, so they get the same stack as the rest of the page.
+    theme={"fontFamily": "var(--font)", "headings": {"fontFamily": "var(--font)"}},
 )
 
 

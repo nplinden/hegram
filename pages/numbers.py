@@ -57,8 +57,8 @@ LABELS = {
 }
 
 _HEBREW_SELECT_STYLES = {
-    "input": {"fontFamily": '"Ezra SIL", sans-serif', "fontSize": "1rem", "direction": "rtl"},
-    "option": {"fontFamily": '"Ezra SIL", sans-serif', "direction": "rtl"},
+    "input": {"fontFamily": "var(--font)", "fontSize": "1rem", "direction": "rtl"},
+    "option": {"fontFamily": "var(--font)", "direction": "rtl"},
 }
 
 _BG_NEUTRAL = "#FFFFFF"
@@ -97,7 +97,7 @@ def _text_zone(label, value, color, is_rtl=False, font_size="3rem", border_right
     if border_bottom:
         borders["borderBottom"] = "1px solid rgba(0,0,0,0.1)"
     text_style = {
-        "fontFamily": '"Ezra SIL", sans-serif',
+        "fontFamily": "var(--font)",
         "fontSize": font_size,
         "textAlign": "center",
         "color": color,
@@ -170,7 +170,7 @@ def _neutral_card(number, given_key, pool):
             if border_bottom:
                 borders["borderBottom"] = "1px solid rgba(0,0,0,0.1)"
             text_style = {
-                "fontFamily": '"Ezra SIL", sans-serif',
+                "fontFamily": "var(--font)",
                 "fontSize": font_size,
                 "textAlign": "center",
                 "color": _COLOR_GIVEN,

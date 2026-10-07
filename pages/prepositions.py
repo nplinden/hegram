@@ -26,7 +26,7 @@ _CARD_STYLE = {
 
 def _zone(label, value, color, is_rtl=False, font_size="3rem", border_bottom=False):
     text_style = {
-        "fontFamily": '"Ezra SIL", sans-serif',
+        "fontFamily": "var(--font)",
         "fontSize": font_size,
         "textAlign": "center",
         "color": color,

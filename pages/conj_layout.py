@@ -19,7 +19,7 @@ _ROW_STYLE = {
 }
 
 _HEB_STYLE = {
-    "fontFamily": '"Ezra SIL", sans-serif',
+    "fontFamily": "var(--font)",
     "fontSize": "1.8rem",
     "direction": "rtl",
     "textAlign": "right",

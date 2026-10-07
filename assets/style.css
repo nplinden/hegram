@@ -1,4 +1,7 @@
 :root {
+    /* Hebrew in Ezra SIL, everything else in Arial: the Ezra SIL face only covers the Hebrew
+       blocks (unicode-range below), so other characters fall through to Arial. */
+    --font: "Ezra SIL", Arial, sans-serif;
     --fs-xl: 5rem;
     --fs-600: 1.5rem;
     --fs-500: 1.25rem;
@@ -11,18 +14,12 @@
     unicode-range: U+0590-U+05FF, U+FB1D-U+FB4F;
 }
 
-@font-face {
-    font-family: "Ezra SIL";
-    src: local('Segoe UI'), local('Helvetica Neue'), local('Arial'),
-         local('Roboto'), local('Noto Sans');
-}
-
 body {
-    font-family: "Ezra SIL", sans-serif;
+    font-family: var(--font);
 }
 
 .consonantal {
-    font-family: "Ezra SIL", sans-serif;
+    font-family: var(--font);
 }
 
 .link,
@@ -35,7 +32,7 @@ body {
 }
 
 #title {
-    font-family: "Ezra SIL", sans-serif;
+    font-family: var(--font);
     font-weight: bold;
     font-size: 1.5rem;
     text-decoration: underline;
@@ -46,7 +43,7 @@ body {
 a h1,
 a:visited h1,
 a:link h1 {
-    font-family: "Ezra SIL", sans-serif;
+    font-family: var(--font);
     font-weight: bold;
     text-decoration: underline;
     text-decoration-color: black !important;
@@ -75,20 +72,20 @@ a:link h1 {
 /*}*/
 
 .fullverse {
-    font-family: "Ezra SIL", sans-serif;
+    font-family: var(--font);
     font-size: 2rem;
     direction: rtl !important;
 }
 
 .singleword {
-    font-family: "Ezra SIL", sans-serif;
+    font-family: var(--font);
     font-size: 3rem;
     direction: rtl !important;
 }
 
 .definition-title {
     font-size: 5rem;
-    font-family: "Ezra SIL", sans-serif;
+    font-family: var(--font);
     margin: 5px;
 }
 
@@ -99,4 +96,10 @@ a:link h1 {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
     overflow: hidden;
     background-color: #ffffff;
+}
+
+/* DataTable's page counter sets its own monospace font. */
+.dash-table-container .previous-next-container .page-number {
+    font-family: var(--font);
+    font-variant-numeric: tabular-nums;
 }

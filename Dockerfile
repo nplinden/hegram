@@ -1,8 +1,8 @@
 FROM ghcr.io/astral-sh/uv:bookworm-slim
 
-# System libraries WeasyPrint needs to render the PDF worksheets, and the Noto fonts the worksheets use.
+# System libraries WeasyPrint needs to render the PDF worksheets, and Liberation Sans, which stands in for Arial.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-noto-core \
+    && apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-liberation2 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

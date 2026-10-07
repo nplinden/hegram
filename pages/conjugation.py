@@ -274,7 +274,7 @@ def _check_answer(store, root_answer, binyan_answer, tense_answer, person_answer
         html.P(
             root,
             style={
-                "fontFamily": '"Ezra SIL", sans-serif',
+                "fontFamily": "var(--font)",
                 "fontSize": "3rem",
                 "direction": "rtl",
                 "textAlign": "center",

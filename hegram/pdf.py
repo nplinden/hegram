@@ -82,7 +82,8 @@ def build_pdf_html(samples: list[dict], *, with_answers: bool = False) -> str:
             answer_fields = "".join(
                 f'<div class="answer-field">'
                 f'<span class="answer-label">{label} :</span>'
-                f'<span class="answer-value">{escape(str(answer_values[label]))}</span>'
+                f'<span class="answer-value{" hebrew" if label == "Racine" else ""}">'
+                f"{escape(str(answer_values[label]))}</span>"
                 f"</div>"
                 for label in answer_labels
             )

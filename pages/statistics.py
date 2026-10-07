@@ -133,7 +133,7 @@ def update_definition(active_cell: Data, data: DataList):
         html.P(
             str(root),
             style={
-                "fontFamily": '"Ezra SIL", sans-serif',
+                "fontFamily": "var(--font)",
                 "fontSize": "3rem",
                 "direction": "rtl",
                 "textAlign": "center",
@@ -167,16 +167,16 @@ table = dash_table.DataTable(
     page_size=12,
     page_count=100,
     page_action="custom",
-    style_cell={"fontSize": 20, "fontFamily": "monospace"},
+    style_cell={"fontSize": 20, "fontFamily": "var(--font)", "fontVariantNumeric": "tabular-nums"},
     style_cell_conditional=[
         {
             "if": {"column_id": "Root"},
-            "font-family": '"Ezra SIL", sans-serif',
+            "font-family": "var(--font)",
             "fontSize": 20,
         },
         {
             "if": {"column_id": "Class"},
-            "font-family": '"Ezra SIL", sans-serif',
+            "font-family": "var(--font)",
             "fontSize": 20,
         },
     ],
