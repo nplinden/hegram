@@ -56,18 +56,61 @@ try:
 except (FileNotFoundError, subprocess.CalledProcessError):
     _commit = ""
 
-icons = {
-    "Conjugation": DashIconify(icon="material-symbols:exercise", height=16),
-    "Statistics": DashIconify(icon="material-symbols:bar-chart", height=16),
-    "Learning": DashIconify(icon="material-symbols:book-ribbon", height=16),
-}
-
-buttons = [
-    dmc.Button("Home", variant="subtle", color="gray"),
-    dmc.Button("Blog", variant="subtle", color="gray"),
-    dmc.Button("Contacts", variant="subtle", color="gray"),
-    dmc.Button("Support", variant="subtle", color="gray"),
+# Sidebar menu. Top-level entries are (label, icon, target), nested entries are (label, target).
+# A target is either a page module, which makes a link, or a list of entries, which makes a group.
+NAV_MENU = [
+    ("Statistiques", "material-symbols:bar-chart", "pages.statistics"),
+    (
+        "Exercices",
+        "material-symbols:exercise",
+        [
+            ("Conjugaison", "pages.conjugation"),
+            ("Prépositions", "pages.prepositions"),
+            ("Nombres", "pages.numbers"),
+        ],
+    ),
+    (
+        "Conjugaison",
+        "material-symbols:book-ribbon",
+        [
+            (
+                "Paal",
+                [
+                    ("Verbe fort", "pages.paal_strong"),
+                    ("Verbe פ’’נ", "pages.paal_peh_nun"),
+                    ("Verbe פ’’יו", "pages.paal_peh_yodvav"),
+                ],
+            ),
+            ("Piel", [("Verbe fort", "pages.piel_strong")]),
+            (
+                "Niphal",
+                [
+                    ("Verbe fort", "pages.niphal_strong"),
+                    ("Verbe פ’’יו", "pages.niphal_peh_yodvav"),
+                ],
+            ),
+            ("Poual", [("Verbe fort", "pages.poual_strong")]),
+            ("Hiphil", [("Verbe fort", "pages.hiphil_strong")]),
+            ("Hitpael", [("Verbe fort", "pages.hitpael_strong")]),
+        ],
+    ),
 ]
+
+
+def nav_link(label, target, **props):
+    if isinstance(target, str):
+        path = page_registry[target]["relative_path"]
+        # The id lets update_navlinks highlight the link of the current page.
+        return dmc.NavLink(label=label, href=path, id={"type": "navlink", "index": path}, **props)
+    return dmc.NavLink(label=label, childrenOffset=28, children=[nav_link(*entry) for entry in target], **props)
+
+
+def nav_menu():
+    return [
+        nav_link(label, target, color="black", leftSection=DashIconify(icon=icon, height=16))
+        for label, icon, target in NAV_MENU
+    ]
+
 
 app.layout = dmc.MantineProvider(
     dmc.AppShell(
@@ -96,153 +139,7 @@ app.layout = dmc.MantineProvider(
             html.Div(id="notification"),
             dmc.AppShellNavbar(
                 children=[
-                    # html.H1("Hegram by ניקולא לינדן", id="title"),
-                    dmc.NavLink(
-                        label="Statistiques",
-                        color="black",
-                        href=page_registry["pages.statistics"]["relative_path"],
-                        id={"type": "navlink", "index": page_registry["pages.statistics"]["relative_path"]},
-                        leftSection=DashIconify(icon="material-symbols:bar-chart", height=16),
-                    ),
-                    dmc.NavLink(
-                        label="Exercices",
-                        color="black",
-                        leftSection=DashIconify(icon="material-symbols:exercise", height=16),
-                        childrenOffset=28,
-                        children=[
-                            dmc.NavLink(
-                                label="Conjugaison",
-                                id={"type": "navlink", "index": page_registry["pages.conjugation"]["relative_path"]},
-                                href=page_registry["pages.conjugation"]["relative_path"],
-                            ),
-                            dmc.NavLink(
-                                label="Prépositions",
-                                id={"type": "navlink", "index": page_registry["pages.prepositions"]["relative_path"]},
-                                href=page_registry["pages.prepositions"]["relative_path"],
-                            ),
-                            dmc.NavLink(
-                                label="Nombres",
-                                id={"type": "navlink", "index": page_registry["pages.numbers"]["relative_path"]},
-                                href=page_registry["pages.numbers"]["relative_path"],
-                            ),
-                        ],
-                    ),
-                    dmc.NavLink(
-                        label="Conjugaison",
-                        color="black",
-                        leftSection=DashIconify(icon="material-symbols:book-ribbon", height=16),
-                        childrenOffset=28,
-                        children=[
-                            dmc.NavLink(
-                                label="Paal",
-                                childrenOffset=28,
-                                children=[
-                                    dmc.NavLink(
-                                        label="Verbe fort",
-                                        href=page_registry["pages.paal_strong"]["relative_path"],
-                                        id={
-                                            "type": "navlink",
-                                            "index": page_registry["pages.paal_strong"]["relative_path"],
-                                        },
-                                    ),
-                                    dmc.NavLink(
-                                        label="Verbe פ’’נ",
-                                        href=page_registry["pages.paal_peh_nun"]["relative_path"],
-                                        id={
-                                            "type": "navlink",
-                                            "index": page_registry["pages.paal_peh_nun"]["relative_path"],
-                                        },
-                                    ),
-                                    dmc.NavLink(
-                                        label="Verbe פ’’יו",
-                                        href=page_registry["pages.paal_peh_yodvav"]["relative_path"],
-                                        id={
-                                            "type": "navlink",
-                                            "index": page_registry["pages.paal_peh_yodvav"]["relative_path"],
-                                        },
-                                    ),
-                                ],
-                            ),
-                            dmc.NavLink(
-                                label="Piel",
-                                childrenOffset=28,
-                                children=[
-                                    dmc.NavLink(
-                                        label="Verbe fort",
-                                        href=page_registry["pages.piel_strong"]["relative_path"],
-                                        id={
-                                            "type": "navlink",
-                                            "index": page_registry["pages.piel_strong"]["relative_path"],
-                                        },
-                                    ),
-                                ],
-                            ),
-                            dmc.NavLink(
-                                label="Niphal",
-                                childrenOffset=28,
-                                children=[
-                                    dmc.NavLink(
-                                        label="Verbe fort",
-                                        href=page_registry["pages.niphal_strong"]["relative_path"],
-                                        id={
-                                            "type": "navlink",
-                                            "index": page_registry["pages.niphal_strong"]["relative_path"],
-                                        },
-                                    ),
-                                    dmc.NavLink(
-                                        label="Verbe פ’’יו",
-                                        href=page_registry["pages.niphal_peh_yodvav"]["relative_path"],
-                                        id={
-                                            "type": "navlink",
-                                            "index": page_registry["pages.niphal_peh_yodvav"]["relative_path"],
-                                        },
-                                    ),
-                                ],
-                            ),
-                            dmc.NavLink(
-                                label="Poual",
-                                childrenOffset=28,
-                                children=[
-                                    dmc.NavLink(
-                                        label="Verbe fort",
-                                        href=page_registry["pages.poual_strong"]["relative_path"],
-                                        id={
-                                            "type": "navlink",
-                                            "index": page_registry["pages.poual_strong"]["relative_path"],
-                                        },
-                                    ),
-                                ],
-                            ),
-                            dmc.NavLink(
-                                label="Hiphil",
-                                childrenOffset=28,
-                                children=[
-                                    dmc.NavLink(
-                                        label="Verbe fort",
-                                        href=page_registry["pages.hiphil_strong"]["relative_path"],
-                                        id={
-                                            "type": "navlink",
-                                            "index": page_registry["pages.hiphil_strong"]["relative_path"],
-                                        },
-                                    ),
-                                ],
-                            ),
-                            dmc.NavLink(
-                                label="Hitpael",
-                                childrenOffset=28,
-                                children=[
-                                    dmc.NavLink(
-                                        label="Verbe fort",
-                                        href=page_registry["pages.hitpael_strong"]["relative_path"],
-                                        id={
-                                            "type": "navlink",
-                                            "index": page_registry["pages.hitpael_strong"]["relative_path"],
-                                        },
-                                    ),
-                                ],
-                            ),
-                        ],
-                    ),
+                    *nav_menu(),
                     html.Div(
                         _commit,
                         style={"marginTop": "16px", "fontSize": "11px", "color": "#aaa"},
