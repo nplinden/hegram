@@ -14,7 +14,6 @@ dependencies = [
     "loguru>=0.7.3",
     "plotly>=5.24.1",
     "polars>=1.26.0",
-    "requests>=2.32.3",
     "weasyprint>=70.0",
 ]
 
@@ -22,7 +21,7 @@ dependencies = [
 # Notebooks for exploring the data, installed by default by `uv sync` and `uv run`.
 dev = ["jupyter>=1.1.1"]
 # Builds the corpus data, see README: `uv run --group build python -m hegram.build_dataframes`.
-build = ["text-fabric>=12.6.2"]
+build = ["requests>=2.32.3", "text-fabric>=12.6.2"]
 
 [tool.ruff]
 line-length = 120

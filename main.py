@@ -21,7 +21,12 @@ from dash import (
 )
 from dash_iconify import DashIconify
 
-_GENERATED_DATA = ["data/conjugation.parquet", "data/verses.parquet", "data/words.parquet"]
+_GENERATED_DATA = [
+    "data/conjugation.parquet",
+    "data/verses.parquet",
+    "data/words.parquet",
+    "data/definitions.json",
+]
 _missing = [f for f in _GENERATED_DATA if not Path(f).exists()]
 if _missing:
     logger.error(
