@@ -2,14 +2,6 @@ import dash_mantine_components as dmc
 from dash import dcc, Input, Output, callback, html
 from dash_iconify import DashIconify
 
-_CARD_STYLE = {
-    "borderRadius": "16px",
-    "border": "1px solid #e0e0e0",
-    "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
-    "overflow": "hidden",
-    "backgroundColor": "#FFFFFF",
-}
-
 _HEADER_STYLE = {
     "padding": "12px 20px",
     "backgroundColor": "#F8F9FA",
@@ -47,7 +39,7 @@ def _conj_card(title, pairs):
     ]
     return html.Div(
         [html.Div(dmc.Text(title, fw=600, size="md"), style=_HEADER_STYLE), *rows],
-        style=_CARD_STYLE,
+        className="card",
     )
 
 
@@ -60,7 +52,7 @@ def _single_card(title, form):
                 style={"padding": "20px", "textAlign": "center"},
             ),
         ],
-        style=_CARD_STYLE,
+        className="card",
     )
 
 

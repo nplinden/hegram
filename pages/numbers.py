@@ -72,10 +72,6 @@ _COLOR_CORRECT = "#27AE60"
 _COLOR_WRONG = "#A93226"
 
 _CARD_STYLE = {
-    "borderRadius": "16px",
-    "border": "1px solid #e0e0e0",
-    "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
-    "overflow": "hidden",
     "maxWidth": "400px",
     "marginInline": "auto",
     "marginBottom": "24px",
@@ -214,6 +210,7 @@ def _neutral_card(number, given_key, pool):
     right = make_zone("numeral")
     return html.Div(
         [top, html.Div([left, right], style={"display": "flex"})],
+        className="card",
         style={**_CARD_STYLE, "backgroundColor": _BG_NEUTRAL},
     )
 
@@ -249,6 +246,7 @@ def _result_card(number, given_key, user_answers):
     )
     return html.Div(
         [top, html.Div([left, right], style={"display": "flex"}), _hidden],
+        className="card",
         style={**_CARD_STYLE, "backgroundColor": bg},
     )
 

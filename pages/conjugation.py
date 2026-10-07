@@ -12,9 +12,10 @@ from dash import callback, Input, Output, State, dcc, ALL
 from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
 from loguru import logger
-from hegram.mechon_mamre import verse_to_url, en_to_fr_books
+from hegram.books import en_to_fr_books
+from hegram.mechon_mamre import verse_to_url
 
-from hegram.data import dropdown_data, en_to_fr, answer_data, roots_data
+from hegram.data import TENSE_SERIES, answer_data, dropdown_data, en_to_fr, roots_data
 from hegram.definitions import definitions
 from hegram.stats import binyan_tense_counts
 from hegram.utils import convert_html_to_dash, htmlify
@@ -32,21 +33,12 @@ def _get_chapters(json_file: str) -> list:
 
 
 _ANSWER_CARD_STYLE = {
-    "borderRadius": "16px",
-    "border": "1px solid #e0e0e0",
-    "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
-    "overflow": "hidden",
-    "backgroundColor": "#FFFFFF",
     "maxWidth": "640px",
     "marginInline": "auto",
     "marginBottom": "24px",
 }
 
 _VERSE_CARD_STYLE = {
-    "borderRadius": "16px",
-    "border": "1px solid #e0e0e0",
-    "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
-    "backgroundColor": "#FFFFFF",
     "maxWidth": "640px",
     "marginInline": "auto",
     "padding": "24px",
@@ -536,16 +528,7 @@ def handle_action(
         h=450,
         dataKey="Binyan",
         data=binyan_tense_counts([root]),
-        series=[
-            {"name": "Qatal", "color": "red.6"},
-            {"name": "Yiqtol", "color": "green.6"},
-            {"name": "Wayyiqtol", "color": "indigo.6"},
-            {"name": "Imperative", "color": "grape.6"},
-            {"name": "Infinitive (abslute)", "color": "teal.6"},
-            {"name": "Infinitive (construct)", "color": "yellow.6"},
-            {"name": "Participle", "color": "pink.6"},
-            {"name": "Participle (passive)", "color": "lime.6"},
-        ],
+        series=TENSE_SERIES,
         type="stacked",
         barProps={"isAnimationActive": True},
         xAxisLabel="Binyan",
@@ -975,6 +958,7 @@ def layout():
                         style={"display": "flex"},
                     ),
                     id="answer-card",
+                    className="card",
                     style={**_ANSWER_CARD_STYLE, "display": "none"},
                 ),
                 html.Div(
@@ -993,6 +977,7 @@ def layout():
                         ),
                     ],
                     id="verse-card",
+                    className="card",
                     style={**_VERSE_CARD_STYLE, "display": "none"},
                 ),
             ],

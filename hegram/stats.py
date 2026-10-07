@@ -1,6 +1,6 @@
 import polars as pl
 
-COMMON_BINYANIM = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
+from hegram.data import COMMON_BINYANIM
 
 
 def binyan_tense_counts(roots=None) -> list[dict]:

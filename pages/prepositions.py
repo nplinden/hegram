@@ -16,10 +16,6 @@ _COLOR_FRENCH = "#27AE60"
 _COLOR_HIDDEN = "#AAAAAA"
 
 _CARD_STYLE = {
-    "borderRadius": "16px",
-    "border": "1px solid #e0e0e0",
-    "boxShadow": "0 4px 16px rgba(0,0,0,0.12)",
-    "overflow": "hidden",
     "maxWidth": "400px",
     "marginInline": "auto",
     "marginBottom": "24px",
@@ -59,6 +55,7 @@ def _neutral_card(row):
             _zone("Hébreu", row["hebrew"], _COLOR_HEBREW, is_rtl=True, border_bottom=True),
             _zone("Français", "?", _COLOR_HIDDEN, font_size="2rem"),
         ],
+        className="card",
         style={**_CARD_STYLE, "backgroundColor": _BG_NEUTRAL},
     )
 
@@ -69,6 +66,7 @@ def _revealed_card(row):
             _zone("Hébreu", row["hebrew"], _COLOR_HEBREW, is_rtl=True, border_bottom=True),
             _zone("Français", row["french"], _COLOR_FRENCH, font_size="2rem"),
         ],
+        className="card",
         style={**_CARD_STYLE, "backgroundColor": _BG_REVEALED},
     )
 

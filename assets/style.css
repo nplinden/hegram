@@ -91,3 +91,12 @@ a:link h1 {
     font-family: "Ezra SIL", sans-serif;
     margin: 5px;
 }
+
+/* Rounded, shadowed card used across pages. Size and spacing are set by each page. */
+.card {
+    border-radius: 16px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    background-color: #ffffff;
+}

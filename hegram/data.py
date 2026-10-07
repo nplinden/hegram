@@ -1,62 +1,23 @@
+from hegram.books import book_dropdown_data
+
+COMMON_BINYANIM = ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]
+
+# Bar chart series, one per tense, for the binyan/tense charts.
+TENSE_SERIES = [
+    {"name": "Qatal", "color": "red.6"},
+    {"name": "Yiqtol", "color": "green.6"},
+    {"name": "Wayyiqtol", "color": "indigo.6"},
+    {"name": "Imperative", "color": "grape.6"},
+    {"name": "Infinitive (abslute)", "color": "teal.6"},
+    {"name": "Infinitive (construct)", "color": "yellow.6"},
+    {"name": "Participle", "color": "pink.6"},
+    {"name": "Participle (passive)", "color": "lime.6"},
+]
+
 dropdown_data = {
-    "Book": [
-        {
-            "group": "Torah",
-            "items": [
-                {"value": "Genesis", "label": "La Genèse"},
-                {"value": "Exodus", "label": "L'Exode"},
-                {"value": "Leviticus", "label": "Le Lévitique"},
-                {"value": "Numbers", "label": "Les Nombres"},
-                {"value": "Deuteronomy", "label": "Le Deutéronome"},
-            ],
-        },
-        {
-            "group": "Nevi'im",
-            "items": [
-                {"value": "Joshua", "label": "Josué"},
-                {"value": "Judges", "label": "Les Juges"},
-                {"value": "1_Samuel", "label": "1 Samuel"},
-                {"value": "2_Samuel", "label": "2 Samuel"},
-                {"value": "1_Kings", "label": "1 Rois"},
-                {"value": "2_Kings", "label": "2 Rois"},
-                {"value": "Isaiah", "label": "Isaïe"},
-                {"value": "Jeremiah", "label": "Jérémie"},
-                {"value": "Ezekiel", "label": "Ézéchiel"},
-                {"value": "Hosea", "label": "Osée"},
-                {"value": "Joel", "label": "Joël"},
-                {"value": "Amos", "label": "Amos"},
-                {"value": "Obadiah", "label": "Obadia"},
-                {"value": "Jonah", "label": "Jonas"},
-                {"value": "Micah", "label": "Michée"},
-                {"value": "Nahum", "label": "Nahoum"},
-                {"value": "Habakkuk", "label": "Habacuc"},
-                {"value": "Zephaniah", "label": "Cephania"},
-                {"value": "Haggai", "label": "Haggaï"},
-                {"value": "Zechariah", "label": "Zacharie"},
-                {"value": "Malachi", "label": "Malachie"},
-            ],
-        },
-        {
-            "group": "Ketouvim",
-            "items": [
-                {"value": "Psalms", "label": "Les Psaumes"},
-                {"value": "Job", "label": "Job"},
-                {"value": "Proverbs", "label": "Les Proverbes"},
-                {"value": "Ruth", "label": "Ruth"},
-                {"value": "Song_of_songs", "label": "Le Cantique des Cantiques"},
-                {"value": "Ecclesiastes", "label": "L’Ecclésiaste"},
-                {"value": "Lamentations", "label": "Les Lamentations"},
-                {"value": "Esther", "label": "Esther"},
-                {"value": "Daniel", "label": "Daniel"},
-                {"value": "Ezra", "label": "Ezra"},
-                {"value": "Nehemiah", "label": "Néhémie"},
-                {"value": "1_Chronicles", "label": "1 Chroniques"},
-                {"value": "2_Chronicles", "label": "2 Chroniques"},
-            ],
-        },
-    ],
+    "Book": book_dropdown_data,
     "Binyan": [
-        {"group": "Communs", "items": ["Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]},
+        {"group": "Communs", "items": COMMON_BINYANIM},
         {
             "group": "Rares",
             "items": [

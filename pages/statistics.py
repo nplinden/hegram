@@ -2,6 +2,7 @@ import dash
 from dash import callback, Output, Input
 from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
+from hegram.data import COMMON_BINYANIM, TENSE_SERIES
 from hegram.definitions import definitions
 from hegram.stats import ROOT_BINYAN_COUNTS, binyan_tense_counts
 from hegram.utils import htmlify, convert_html_to_dash
@@ -186,7 +187,7 @@ table = dash_table.DataTable(
 )
 
 dropdown = dmc.MultiSelect(
-    data=[{"value": k, "label": k} for k in ["Total", "Paal", "Piel", "Hifil", "Hitpael", "Hofal", "Pual", "Nifal"]],
+    data=[{"value": k, "label": k} for k in ["Total"] + COMMON_BINYANIM],
     value=["Total"],
     id="dropdown",
     mb=10,
@@ -196,16 +197,7 @@ chart = dmc.BarChart(
     h=560,
     dataKey="Binyan",
     data=[],
-    series=[
-        {"name": "Qatal", "color": "red.6"},
-        {"name": "Yiqtol", "color": "green.6"},
-        {"name": "Wayyiqtol", "color": "indigo.6"},
-        {"name": "Imperative", "color": "grape.6"},
-        {"name": "Infinitive (abslute)", "color": "teal.6"},
-        {"name": "Infinitive (construct)", "color": "yellow.6"},
-        {"name": "Participle", "color": "pink.6"},
-        {"name": "Participle (passive)", "color": "lime.6"},
-    ],
+    series=TENSE_SERIES,
     type="stacked",
     barProps={"isAnimationActive": True},
     xAxisLabel="Binyan",
