@@ -2,7 +2,6 @@ import dash
 import random
 import dash_mantine_components as dmc
 from dash import html, callback, Input, Output, State, dcc
-from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
 
 dash.register_page(__name__, path="/exercises/numbers")

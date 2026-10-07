@@ -51,10 +51,7 @@ def hebrew_numeral(n: int) -> str:
         if n:
             letters.append(ones[n])
 
-    raw = "".join(letters)
-    if len(raw) == 1:
-        return raw
-    return raw
+    return "".join(letters)
 
 
 def sample_person_label(row: dict) -> str:

@@ -11,7 +11,7 @@ from loguru import logger
 from hegram.books import en_to_fr_books
 from hegram.mechon_mamre import verse_to_url
 
-from hegram.data import TENSE_SERIES, answer_data, dropdown_data, en_to_fr, roots_data
+from hegram.data import TENSE_SERIES, answer_data, dropdown_data, en_to_fr
 from hegram.definitions import definitions
 from hegram.pdf import render_pdf
 from hegram.stats import binyan_tense_counts
@@ -216,7 +216,6 @@ def handle_action(
         )
 
     root = store["Root"]
-    tense = en_to_fr["Tense"][store["Tense"]]
     binyan = store["Binyan"]
     number = {"Singular": "S", "Plural": "P"}.get(store["Number"], "")
     person = {"1": "1", "2": "2", "3": "3"}.get(store.get("Person", ""), "")
@@ -230,7 +229,6 @@ def handle_action(
         html_parts.append(htmlify(d))
     html_parts.append("</div>")
 
-    solution = f"{binyan} {tense} {rest}"
     chart = dmc.BarChart(
         h=450,
         dataKey="Binyan",
@@ -252,11 +250,11 @@ def handle_action(
     n_correct = sum([root_ok, binyan_ok, tense_ok, person_ok])
 
     if n_correct == 4:
-        bg, alert_color = "#D4EFDF", "green"
+        bg = "#D4EFDF"
     elif n_correct == 0:
-        bg, alert_color = "#FADBD8", "red"
+        bg = "#FADBD8"
     else:
-        bg, alert_color = "#FFF9C4", "yellow"
+        bg = "#FFF9C4"
 
     tense_fr = en_to_fr["Tense"][store["Tense"]]
     tense_guess_fr = en_to_fr["Tense"].get(tense_answer, tense_answer) if tense_answer else "—"
@@ -304,10 +302,6 @@ def handle_action(
     )
 
 
-def data_from_list(items):
-    return [{"value": k, "label": k} for k in items]
-
-
 def get_root_select_data():
     roots = pl.scan_parquet("data/conjugation.parquet").select(["Root"]).unique().sort(["Root"]).collect().to_series()
     data = [{"label": v, "value": v} for v in roots]
@@ -317,18 +311,18 @@ def get_root_select_data():
 _ROOT_DATA = get_root_select_data()
 
 
-def _compute_root_freq_data():
+def _roots_by_frequency() -> list[str]:
     df = (
         pl.scan_parquet("data/conjugation.parquet")
         .group_by("Root")
         .agg(pl.len().alias("count"))
-        .sort("count", descending=True)
+        .sort(["count", "Root"], descending=[True, False])
         .collect()
     )
-    return df["Root"].to_list(), df["count"].to_list()
+    return df["Root"].to_list()
 
 
-_ROOTS_BY_FREQ, _ROOT_COUNTS = _compute_root_freq_data()
+_ROOTS_BY_FREQ = _roots_by_frequency()
 _N_ROOTS = len(_ROOTS_BY_FREQ)
 
 
@@ -404,7 +398,7 @@ root_freq_slider = dmc.Box(
 
 root_select = dmc.MultiSelect(
     label="Racines autorisées",
-    data=roots_data,
+    data=[{"label": root, "value": root} for root in _ROOTS_BY_FREQ],
     value=[],
     id="conjugation-roots-dropdown",
     mb=10,
@@ -456,35 +450,6 @@ number_select = dmc.MultiSelect(
     value=[],
     id="conjugation-number-dropdown",
     mb=10,
-)
-
-solution_head = dmc.TableThead(
-    dmc.TableTr(
-        [
-            dmc.TableTh("Racine"),
-            dmc.TableTh("Binyan"),
-            dmc.TableTh("Temps"),
-            dmc.TableTh("Personne"),
-            dmc.TableTh("Genre"),
-            dmc.TableTh("Nombre"),
-        ]
-    )
-)
-
-solution_body = dmc.TableTbody(
-    [
-        dmc.TableTr(
-            [
-                dmc.TableTd(""),
-                dmc.TableTd(""),
-                dmc.TableTd(""),
-                dmc.TableTd(""),
-                dmc.TableTd(""),
-                dmc.TableTd(""),
-            ]
-        )
-    ],
-    id="solution-body",
 )
 
 
