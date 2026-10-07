@@ -118,6 +118,10 @@ answer_data = [
     {"label": "3P", "value": "3P"},
     {"label": "3MP", "value": "3MP"},
     {"label": "3FP", "value": "3FP"},
+    {"label": "MS", "value": "MS"},
+    {"label": "FS", "value": "FS"},
+    {"label": "MP", "value": "MP"},
+    {"label": "FP", "value": "FP"},
     {"label": "", "value": ""},
 ]
 
