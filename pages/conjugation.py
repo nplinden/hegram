@@ -123,41 +123,60 @@ def filter_conjugations(roots, books, binyanim, tenses, persons, genders, number
     return df.collect()
 
 
+# Every component handle_action can update, by name.
+_ACTION_OUTPUTS = {
+    "verse": Output("clause-div", "children"),
+    "word": Output("word-div", "children"),
+    "store": Output("solution-storage", "data"),
+    "verse_card_style": Output("verse-card", "style"),
+    "detail_modal": Output("conj-detail-modal", "children"),
+    "notification": Output("notification", "children"),
+    "answer_card_style": Output("answer-card", "style"),
+    "french_verse": Output("frenchverse-div", "children"),
+    "french_verse_style": Output("frenchverse-div", "style"),
+    "button_label": Output("conj-action-btn", "children"),
+    "dropdowns_style": Output("answer-dropdowns", "style"),
+    "results": Output("answer-results", "children"),
+    "results_style": Output("answer-results", "style"),
+    "root_answer": Output("root-answer", "value"),
+    "binyan_answer": Output("binyan-answer", "value"),
+    "tense_answer": Output("tense-answer", "value"),
+    "person_answer": Output("person-answer", "value"),
+}
+
+_STACK_STYLE = {"display": "flex", "flexDirection": "column", "gap": "12px"}
+_HIDDEN = {"display": "none"}
+
+
+def _action_update(**updates):
+    """Build handle_action's return value: the given outputs, every other output left unchanged."""
+    unknown = updates.keys() - _ACTION_OUTPUTS.keys()
+    if unknown:
+        raise KeyError(f"Unknown handle_action outputs: {sorted(unknown)}")
+    return {name: updates.get(name, no_update) for name in _ACTION_OUTPUTS}
+
+
 @callback(
-    Output("clause-div", "children"),
-    Output("word-div", "children"),
-    Output("solution-storage", "data"),
-    Output("verse-card", "style"),
-    Output("conj-detail-modal", "children"),
-    Output("notification", "children"),
-    Output("answer-card", "style"),
-    Output("frenchverse-div", "children"),
-    Output("frenchverse-div", "style"),
-    Output("conj-action-btn", "children"),
-    Output("answer-dropdowns", "style"),
-    Output("answer-results", "children"),
-    Output("answer-results", "style"),
-    Output("root-answer", "value"),
-    Output("binyan-answer", "value"),
-    Output("tense-answer", "value"),
-    Output("person-answer", "value"),
-    Input("conj-action-btn", "n_clicks"),
-    State("conjugation-roots-dropdown", "value"),
-    State("conjugation-book-dropdown", "value"),
-    State("conjugation-binyan-dropdown", "value"),
-    State("conjugation-tense-dropdown", "value"),
-    State("conjugation-person-dropdown", "value"),
-    State("conjugation-gender-dropdown", "value"),
-    State("conjugation-number-dropdown", "value"),
-    State("solution-storage", "data"),
-    State("root-answer", "value"),
-    State("binyan-answer", "value"),
-    State("tense-answer", "value"),
-    State("person-answer", "value"),
+    output=_ACTION_OUTPUTS,
+    inputs={
+        "n_clicks": Input("conj-action-btn", "n_clicks"),
+        "roots": State("conjugation-roots-dropdown", "value"),
+        "book": State("conjugation-book-dropdown", "value"),
+        "binyanim": State("conjugation-binyan-dropdown", "value"),
+        "tenses": State("conjugation-tense-dropdown", "value"),
+        "persons": State("conjugation-person-dropdown", "value"),
+        "genders": State("conjugation-gender-dropdown", "value"),
+        "numbers": State("conjugation-number-dropdown", "value"),
+        "store": State("solution-storage", "data"),
+        "root_answer": State("root-answer", "value"),
+        "binyan_answer": State("binyan-answer", "value"),
+        "tense_answer": State("tense-answer", "value"),
+        "person_answer": State("person-answer", "value"),
+    },
     prevent_initial_call=True,
 )
 def handle_action(
-    _,
+    n_clicks,
     roots,
     book,
     binyanim,
@@ -171,50 +190,37 @@ def handle_action(
     tense_answer,
     person_answer,
 ):
+    """Draw a new verb, or check the answer to the current one, depending on the exercise state."""
     if store is None or store.get("answered"):
-        filtered = filter_conjugations(roots, book, binyanim, tenses, persons, genders, numbers)
-        if filtered.is_empty():
-            return (
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                _error_notification(_NO_VERB_MESSAGE),
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-                no_update,
-            )
-        sample = filtered.sample(n=1).to_dicts()[0]
-        verse, word = sample["VerseId"], sample["WordId"]
-        return (
-            build_verse(verse, word),
-            build_word(word),
-            sample,
-            {**_VERSE_CARD_STYLE, "display": "block"},
-            no_update,
-            no_update,
-            {**_ANSWER_CARD_STYLE, "display": "block"},
-            no_update,
-            {"display": "none"},
-            "Vérifier",
-            {"display": "flex", "flexDirection": "column", "gap": "12px"},
-            [],
-            {"display": "none"},
-            None,
-            None,
-            None,
-            None,
-        )
+        return _draw_verb(roots, book, binyanim, tenses, persons, genders, numbers)
+    return _check_answer(store, root_answer, binyan_answer, tense_answer, person_answer)
 
+
+def _draw_verb(roots, book, binyanim, tenses, persons, genders, numbers):
+    filtered = filter_conjugations(roots, book, binyanim, tenses, persons, genders, numbers)
+    if filtered.is_empty():
+        return _action_update(notification=_error_notification(_NO_VERB_MESSAGE))
+    sample = filtered.sample(n=1).to_dicts()[0]
+    verse, word = sample["VerseId"], sample["WordId"]
+    return _action_update(
+        verse=build_verse(verse, word),
+        word=build_word(word),
+        store=sample,
+        verse_card_style={**_VERSE_CARD_STYLE, "display": "block"},
+        answer_card_style={**_ANSWER_CARD_STYLE, "display": "block"},
+        french_verse_style=_HIDDEN,
+        button_label="Vérifier",
+        dropdowns_style=_STACK_STYLE,
+        results=[],
+        results_style=_HIDDEN,
+        root_answer=None,
+        binyan_answer=None,
+        tense_answer=None,
+        person_answer=None,
+    )
+
+
+def _check_answer(store, root_answer, binyan_answer, tense_answer, person_answer):
     root = store["Root"]
     binyan = store["Binyan"]
     number = {"Singular": "S", "Plural": "P"}.get(store["Number"], "")
@@ -281,24 +287,21 @@ def handle_action(
         chart,
     ]
 
-    return (
-        no_update,
-        no_update,
-        {**store, "answered": True},
-        no_update,
-        detail_modal_content,
-        no_update,
-        {**_ANSWER_CARD_STYLE, "display": "block", "backgroundColor": bg},
-        french_passage(store["VerseId"]),
-        {"display": "block", "borderTop": "1px solid rgba(0,0,0,0.1)", "marginTop": "16px", "paddingTop": "16px"},
-        "Trouver un verbe",
-        {"display": "none"},
-        answer_panel,
-        {"display": "flex", "flexDirection": "column", "gap": "12px"},
-        no_update,
-        no_update,
-        no_update,
-        no_update,
+    return _action_update(
+        store={**store, "answered": True},
+        detail_modal=detail_modal_content,
+        answer_card_style={**_ANSWER_CARD_STYLE, "display": "block", "backgroundColor": bg},
+        french_verse=french_passage(store["VerseId"]),
+        french_verse_style={
+            "display": "block",
+            "borderTop": "1px solid rgba(0,0,0,0.1)",
+            "marginTop": "16px",
+            "paddingTop": "16px",
+        },
+        button_label="Trouver un verbe",
+        dropdowns_style=_HIDDEN,
+        results=answer_panel,
+        results_style=_STACK_STYLE,
     )
 
 
@@ -607,7 +610,7 @@ def layout():
                                         ),
                                     ],
                                     id="answer-dropdowns",
-                                    style={"display": "flex", "flexDirection": "column", "gap": "12px"},
+                                    style=_STACK_STYLE,
                                 ),
                                 html.Div(
                                     [],
