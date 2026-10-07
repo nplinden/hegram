@@ -9,6 +9,7 @@ dependencies = [
     "dash-iconify>=0.1.2",
     "dash-mantine-components>=0.15.3",
     "dash>=2.18.2",
+    "flask-compress>=1.15",
     "gunicorn>=23.0.0",
     "hebrew>=0.8.1",
     "loguru>=0.7.3",
