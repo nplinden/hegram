@@ -60,6 +60,23 @@ dash.register_page(__name__, path="/exercises/conjugation")
 _HEBREW_CONSONANTS = set(chr(c) for c in range(0x05D0, 0x05EB))
 
 
+_NO_VERB_MESSAGE = "Aucun verbe ne satisfait ces filtres !"
+_NO_QUESTION_COUNT_MESSAGE = "Indiquez un nombre de questions."
+_PDF_FAILED_MESSAGE = "La génération du PDF a échoué. Veuillez réessayer."
+
+
+def _error_notification(message):
+    return dmc.Notification(
+        title="Erreur",
+        action="show",
+        message=message,
+        icon=DashIconify(
+            icon="material-symbols:error-outline-rounded",
+            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+        ),
+    )
+
+
 def _hl(span):
     span["class"].append("hl")
     if span.string and span.string.endswith(" "):
@@ -455,15 +472,7 @@ def handle_action(
                 no_update,
                 no_update,
                 no_update,
-                dmc.Notification(
-                    title="Erreur",
-                    action="show",
-                    message="Aucun verbe ne satisfait ces filtres !",
-                    icon=DashIconify(
-                        icon="material-symbols:error-outline-rounded",
-                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                    ),
-                ),
+                _error_notification(_NO_VERB_MESSAGE),
                 no_update,
                 no_update,
                 no_update,
@@ -1043,6 +1052,7 @@ def open_detail_modal(n_clicks_list):
 @callback(
     Output("conj-pdf-download", "data"),
     Output("conj-pdf-samples", "data"),
+    Output("notification", "children", allow_duplicate=True),
     Input("conj-pdf-btn", "n_clicks"),
     State("conj-pdf-n-questions", "value"),
     State("conjugation-roots-dropdown", "value"),
@@ -1054,10 +1064,14 @@ def open_detail_modal(n_clicks_list):
     State("conjugation-number-dropdown", "value"),
     prevent_initial_call=True,
 )
-def generate_pdf(_, n_questions, roots, book, binyanim, tenses, persons, genders, numbers):
+def generate_pdf(n_clicks, n_questions, roots, book, binyanim, tenses, persons, genders, numbers):
+    # The notification output lives outside this page, so Dash ignores prevent_initial_call
+    # and fires this callback when the page loads: only act on an actual click.
+    if not n_clicks:
+        raise PreventUpdate
+    if not n_questions:
+        return no_update, no_update, _error_notification(_NO_QUESTION_COUNT_MESSAGE)
     try:
-        if not n_questions:
-            raise PreventUpdate
         df = pl.scan_parquet("data/conjugation.parquet")
         filtered = df.filter(
             pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
@@ -1069,22 +1083,21 @@ def generate_pdf(_, n_questions, roots, book, binyanim, tenses, persons, genders
             & pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
         ).collect()
         if filtered.is_empty():
-            raise PreventUpdate
+            return no_update, no_update, _error_notification(_NO_VERB_MESSAGE)
         k = min(int(n_questions), len(filtered))
         samples = filtered.sample(n=k).to_dicts()
         html_content = _build_pdf_html(samples, with_answers=False)
         assets_dir = _os.path.abspath("assets")
         pdf_bytes = _weasyprint.HTML(string=html_content, base_url=assets_dir).write_pdf(pdf_forms=True)
-        return dcc.send_bytes(pdf_bytes, filename="questionnaire_conjugaison.pdf"), samples
-    except PreventUpdate:
-        raise
+        return dcc.send_bytes(pdf_bytes, filename="questionnaire_conjugaison.pdf"), samples, no_update
     except Exception:
         logger.exception("PDF generation failed")
-        raise PreventUpdate
+        return no_update, no_update, _error_notification(_PDF_FAILED_MESSAGE)
 
 
 @callback(
     Output("conj-correction-download", "data"),
+    Output("notification", "children", allow_duplicate=True),
     Input("conj-correction-btn", "n_clicks"),
     State("conj-pdf-samples", "data"),
     State("conj-pdf-n-questions", "value"),
@@ -1097,13 +1110,18 @@ def generate_pdf(_, n_questions, roots, book, binyanim, tenses, persons, genders
     State("conjugation-number-dropdown", "value"),
     prevent_initial_call=True,
 )
-def generate_correction_pdf(_, saved_samples, n_questions, roots, book, binyanim, tenses, persons, genders, numbers):
+def generate_correction_pdf(
+    n_clicks, saved_samples, n_questions, roots, book, binyanim, tenses, persons, genders, numbers
+):
+    # See generate_pdf: only act on an actual click.
+    if not n_clicks:
+        raise PreventUpdate
+    if not saved_samples and not n_questions:
+        return no_update, _error_notification(_NO_QUESTION_COUNT_MESSAGE)
     try:
         if saved_samples:
             samples = saved_samples
         else:
-            if not n_questions:
-                raise PreventUpdate
             df = pl.scan_parquet("data/conjugation.parquet")
             filtered = df.filter(
                 pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
@@ -1115,17 +1133,13 @@ def generate_correction_pdf(_, saved_samples, n_questions, roots, book, binyanim
                 & pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
             ).collect()
             if filtered.is_empty():
-                raise PreventUpdate
+                return no_update, _error_notification(_NO_VERB_MESSAGE)
             k = min(int(n_questions), len(filtered))
             samples = filtered.sample(n=k).to_dicts()
-        if not samples:
-            raise PreventUpdate
         html_content = _build_pdf_html(samples, with_answers=True)
         assets_dir = _os.path.abspath("assets")
         pdf_bytes = _weasyprint.HTML(string=html_content, base_url=assets_dir).write_pdf()
-        return dcc.send_bytes(pdf_bytes, filename="corrige_conjugaison.pdf")
-    except PreventUpdate:
-        raise
+        return dcc.send_bytes(pdf_bytes, filename="corrige_conjugaison.pdf"), no_update
     except Exception:
         logger.exception("Correction PDF generation failed")
-        raise PreventUpdate
+        return no_update, _error_notification(_PDF_FAILED_MESSAGE)
