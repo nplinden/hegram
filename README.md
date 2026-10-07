@@ -41,9 +41,19 @@ The app is served on http://localhost:5844. Use `uv run main.py debug` for hot r
 
 ## Docker
 
-The image builds the data itself, so building it needs network access:
+Every push to `main` publishes an image to `ghcr.io/nplinden/hegram`. The sample [compose.yaml](compose.yaml)
+runs it on http://localhost:5844:
+
+```bash
+docker compose up -d            # pull the published image and start it
+docker compose up -d --build    # or build it from this repository
+```
+
+To build and run the image without Compose:
 
 ```bash
 docker build -t hegram .
 docker run -p 5844:5844 hegram
 ```
+
+The image builds the data itself, so building it needs network access.
