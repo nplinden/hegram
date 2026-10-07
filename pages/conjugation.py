@@ -63,6 +63,7 @@ _HEBREW_CONSONANTS = set(chr(c) for c in range(0x05D0, 0x05EB))
 _NO_VERB_MESSAGE = "Aucun verbe ne satisfait ces filtres !"
 _NO_QUESTION_COUNT_MESSAGE = "Indiquez un nombre de questions."
 _PDF_FAILED_MESSAGE = "La génération du PDF a échoué. Veuillez réessayer."
+_NO_QUESTIONNAIRE_MESSAGE = "Téléchargez d'abord le questionnaire."
 
 
 def _error_notification(message):
@@ -866,6 +867,7 @@ def layout():
                                         dmc.Button(
                                             "Télécharger corrigé",
                                             id="conj-correction-btn",
+                                            disabled=True,
                                             leftSection=DashIconify(icon="material-symbols:download", width=18),
                                             variant="light",
                                             color=dmc.DEFAULT_THEME["colors"]["dark"][6],
@@ -1096,46 +1098,29 @@ def generate_pdf(n_clicks, n_questions, roots, book, binyanim, tenses, persons, 
 
 
 @callback(
+    Output("conj-correction-btn", "disabled"),
+    Input("conj-pdf-samples", "data"),
+)
+def enable_correction_btn(samples):
+    # The answer key is built from the questionnaire's verbs, so it is only available
+    # once a questionnaire has been downloaded.
+    return not samples
+
+
+@callback(
     Output("conj-correction-download", "data"),
     Output("notification", "children", allow_duplicate=True),
     Input("conj-correction-btn", "n_clicks"),
     State("conj-pdf-samples", "data"),
-    State("conj-pdf-n-questions", "value"),
-    State("conjugation-roots-dropdown", "value"),
-    State("conjugation-book-dropdown", "value"),
-    State("conjugation-binyan-dropdown", "value"),
-    State("conjugation-tense-dropdown", "value"),
-    State("conjugation-person-dropdown", "value"),
-    State("conjugation-gender-dropdown", "value"),
-    State("conjugation-number-dropdown", "value"),
     prevent_initial_call=True,
 )
-def generate_correction_pdf(
-    n_clicks, saved_samples, n_questions, roots, book, binyanim, tenses, persons, genders, numbers
-):
+def generate_correction_pdf(n_clicks, samples):
     # See generate_pdf: only act on an actual click.
     if not n_clicks:
         raise PreventUpdate
-    if not saved_samples and not n_questions:
-        return no_update, _error_notification(_NO_QUESTION_COUNT_MESSAGE)
+    if not samples:
+        return no_update, _error_notification(_NO_QUESTIONNAIRE_MESSAGE)
     try:
-        if saved_samples:
-            samples = saved_samples
-        else:
-            df = pl.scan_parquet("data/conjugation.parquet")
-            filtered = df.filter(
-                pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
-                & pl.when(bool(binyanim)).then(pl.col("Binyan").is_in(binyanim)).otherwise(pl.lit(True))
-                & pl.when(bool(tenses)).then(pl.col("Tense").is_in(tenses)).otherwise(pl.lit(True))
-                & pl.when(bool(persons)).then(pl.col("Person").is_in(persons)).otherwise(pl.lit(True))
-                & pl.when(bool(genders)).then(pl.col("Gender").is_in(genders)).otherwise(pl.lit(True))
-                & pl.when(bool(numbers)).then(pl.col("Number").is_in(numbers)).otherwise(pl.lit(True))
-                & pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
-            ).collect()
-            if filtered.is_empty():
-                return no_update, _error_notification(_NO_VERB_MESSAGE)
-            k = min(int(n_questions), len(filtered))
-            samples = filtered.sample(n=k).to_dicts()
         html_content = _build_pdf_html(samples, with_answers=True)
         assets_dir = _os.path.abspath("assets")
         pdf_bytes = _weasyprint.HTML(string=html_content, base_url=assets_dir).write_pdf()
