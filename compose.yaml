@@ -13,9 +13,9 @@ services:
     ports:
       - "5844:5844"
     restart: unless-stopped
-    # The image has no curl, so the check uses its Python to request the home page.
+    # Healthy when the home page answers; -f makes curl fail on an HTTP error status.
     healthcheck:
-      test: ["CMD", "/app/.venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5844/', timeout=5)"]
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:5844/"]
       interval: 30s
       timeout: 10s
       start_period: 30s

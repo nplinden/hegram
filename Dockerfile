@@ -1,8 +1,9 @@
 FROM ghcr.io/astral-sh/uv:bookworm-slim
 
-# System libraries WeasyPrint needs to render the PDF worksheets, and Liberation Sans, which stands in for Arial.
+# System libraries WeasyPrint needs to render the PDF worksheets, Liberation Sans, which stands in for Arial,
+# and curl for health checks.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-liberation2 \
+    && apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-liberation2 curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
