@@ -1,13 +1,9 @@
-import base64 as _b64
-import os as _os
-import weasyprint as _weasyprint
 import dash
 import dash_mantine_components as dmc
 import json as _json
-from html import escape as _escape
 from dash import html, no_update
 import polars as pl
-from bs4 import BeautifulSoup, NavigableString
+from bs4 import BeautifulSoup
 from dash import callback, Input, Output, State, dcc, ALL
 from dash.exceptions import PreventUpdate
 from dash_iconify import DashIconify
@@ -17,8 +13,10 @@ from hegram.mechon_mamre import verse_to_url
 
 from hegram.data import TENSE_SERIES, answer_data, dropdown_data, en_to_fr, roots_data
 from hegram.definitions import definitions
+from hegram.pdf import render_pdf
 from hegram.stats import binyan_tense_counts
 from hegram.utils import convert_html_to_dash, htmlify
+from hegram.verses import build_verse_html, verse_words
 from hebrew import Hebrew
 
 _book_index = _json.load(open("json/index.json", encoding="utf-8"))
@@ -48,9 +46,6 @@ _VERSE_CARD_STYLE = {
 dash.register_page(__name__, path="/exercises/conjugation")
 
 
-_HEBREW_CONSONANTS = set(chr(c) for c in range(0x05D0, 0x05EB))
-
-
 _NO_VERB_MESSAGE = "Aucun verbe ne satisfait ces filtres !"
 _NO_QUESTION_COUNT_MESSAGE = "Indiquez un nombre de questions."
 _PDF_FAILED_MESSAGE = "La génération du PDF a échoué. Veuillez réessayer."
@@ -69,23 +64,9 @@ def _error_notification(message):
     )
 
 
-def _hl(span):
-    span["class"].append("hl")
-    if span.string and span.string.endswith(" "):
-        span.string.replace_with(span.string[:-1])
-        span.insert_after(NavigableString(" "))
-
-
-def _verse_words(verse_rows: list[dict]) -> dict[int, str]:
-    """Fetch the html of every word in the given verses, keyed by word id."""
-    in_verses = pl.any_horizontal([pl.col("id").is_between(r["WordId_min"], r["WordId_max"]) for r in verse_rows])
-    df = pl.scan_parquet("data/words.parquet").filter(in_verses).select(["id", "html"]).collect()
-    return dict(df.iter_rows())
-
-
 def build_verse(verse_id, word_id):
     verse_row = pl.scan_parquet("data/verses.parquet").filter(pl.col("id") == verse_id).collect().to_dicts()[0]
-    return convert_html_to_dash(_build_verse_html(verse_row, _verse_words([verse_row]), word_id))
+    return convert_html_to_dash(build_verse_html(verse_row, verse_words([verse_row]), word_id))
 
 
 def build_word(word_id):
@@ -122,280 +103,6 @@ def french_passage(verse_id: int):
         fr_v_idx = min(verse - 1, len(fr_ch) - 1)
     text = fr_ch[fr_v_idx]
     return html.P([passage(verse_id), f" : {text}"])
-
-
-def _verse_ref(verse_row: dict) -> str:
-    book = en_to_fr_books[verse_row["book"]]
-    return f"{book} {verse_row['chapter']}:{verse_row['verse']}"
-
-
-def _build_verse_html(verse_row: dict, words_html: dict[int, str], word_id: int) -> str:
-    # Rebuild the verse word by word rather than searching the verse html for the
-    # verb's text: the same form can occur several times in a verse, and the verse
-    # html sometimes merges several words into a single span.
-    soup = BeautifulSoup('<div class="fullverse"></div>', features="html.parser")
-    prev = target = None
-    for wid in range(verse_row["WordId_min"], verse_row["WordId_max"] + 1):
-        span = BeautifulSoup(words_html[wid], features="html.parser").find("span")
-        if span is None:  # word with no surface text, e.g. an elided article
-            continue
-        soup.div.append(span)
-        if wid < word_id:
-            prev = span
-        elif wid == word_id:
-            target = span
-    _hl(target)
-    if prev is not None:
-        consonants = [c for c in prev.get_text() if c in _HEBREW_CONSONANTS]
-        if consonants == ["\u05d5"]:  # single vav — prefix of wayyiqtol/waw-consecutive
-            _hl(prev)
-    return str(soup)
-
-
-def _hebrew_numeral(n: int) -> str:
-    if n <= 0:
-        return str(n)
-
-    ones = {1: "א", 2: "ב", 3: "ג", 4: "ד", 5: "ה", 6: "ו", 7: "ז", 8: "ח", 9: "ט"}
-    tens = {10: "י", 20: "כ", 30: "ל", 40: "מ", 50: "נ", 60: "ס", 70: "ע", 80: "פ", 90: "צ"}
-    hundreds = {100: "ק", 200: "ר", 300: "ש", 400: "ת"}
-
-    letters = []
-
-    while n >= 400:
-        letters.append(hundreds[400])
-        n -= 400
-
-    for value in (300, 200, 100):
-        if n >= value:
-            letters.append(hundreds[value])
-            n -= value
-
-    if n == 15:
-        letters.append("טו")
-        n = 0
-    elif n == 16:
-        letters.append("טז")
-        n = 0
-
-    if n:
-        for value in (90, 80, 70, 60, 50, 40, 30, 20, 10):
-            if n >= value:
-                letters.append(tens[value])
-                n -= value
-                break
-        if n:
-            letters.append(ones[n])
-
-    raw = "".join(letters)
-    if len(raw) == 1:
-        return raw
-    return raw
-
-
-def _sample_person_label(row: dict) -> str:
-    number = {"Singular": "S", "Plural": "P"}.get(row.get("Number", ""), "")
-    person = {"1": "1", "2": "2", "3": "3"}.get(str(row.get("Person", "")), "")
-    gender = {"M": "M", "F": "F"}.get(row.get("Gender", ""), "")
-    return f"{person}{gender}{number}" or "—"
-
-
-def _build_pdf_html(samples: list[dict], *, with_answers: bool = False) -> str:
-    verse_ids = list({s["VerseId"] for s in samples})
-    verses = {
-        r["id"]: r
-        for r in pl.scan_parquet("data/verses.parquet").filter(pl.col("id").is_in(verse_ids)).collect().to_dicts()
-    }
-    words = _verse_words(list(verses.values()))
-    answer_labels = ["Racine", "Binyan", "Temps", "Personne"]
-    questions_html = ""
-    for i, s in enumerate(samples, 1):
-        verse_html = _build_verse_html(verses[s["VerseId"]], words, s["WordId"])
-        ref = _verse_ref(verses[s["VerseId"]])
-        if with_answers:
-            answer_values = {
-                "Racine": s["Root"],
-                "Binyan": s["Binyan"],
-                "Temps": en_to_fr["Tense"].get(s["Tense"], s["Tense"]),
-                "Personne": _sample_person_label(s),
-            }
-            answer_fields = "".join(
-                f'<div class="answer-field">'
-                f'<span class="answer-label">{label} :</span>'
-                f'<span class="answer-value">{_escape(str(answer_values[label]))}</span>'
-                f"</div>"
-                for label in answer_labels
-            )
-        else:
-            answer_fields = "".join(
-                f'<label class="answer-field" for="q{i}-{label.lower()}">'
-                f'<span class="answer-label">{label} :</span>'
-                f'<input class="answer-input" id="q{i}-{label.lower()}" name="q{i}-{label.lower()}" type="text" />'
-                f"</label>"
-                for label in answer_labels
-            )
-        qnum_he = _hebrew_numeral(i)
-        questions_html += f"""
-<div class="question">
-    <div class="question-number-he">{qnum_he}</div>
-  <div class="cards-row">
-    <div class="answer-section">{answer_fields}</div>
-    <div class="verse-card">
-      {verse_html}
-      <div class="verse-ref">{ref}</div>
-    </div>
-  </div>
-</div>"""
-    css = """
-@font-face {
-  font-family: "Ezra SIL";
-  src: url("SILEOT.woff");
-  unicode-range: U+0590-U+05FF, U+FB1D-U+FB4F;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: "Ezra SIL", sans-serif; background: white; color: #000; padding: 12mm 15mm; }
-.question, .question * { color: #000; }
-.question {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-    position: relative;
-    padding-right: 12mm;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-  break-inside: avoid;
-}
-.question:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-.question-number-he {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    font-family: "Ezra SIL", sans-serif;
-    font-size: 1rem;
-    color: #000;
-    line-height: 1;
-}
-.cards-row {
-  display: flex;
-  gap: 12px;
-    align-items: flex-start;
-  width: 100%;
-    min-width: 0;
-}
-.verb-card {
-  flex: 0 0 25%;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 8px 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.verse-card {
-  flex: 0 0 calc(75% - 12px);
-    align-self: stretch;
-  min-width: 0;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 8px 12px;
-}
-.singleword {
-  font-family: "Ezra SIL", sans-serif;
-  font-size: 1.6rem;
-  direction: rtl;
-}
-.fullverse {
-  font-family: "Ezra SIL", sans-serif;
-  font-size: 1rem;
-  direction: rtl;
-  line-height: 1.5;
-}
-.hl {
-  background-color: rgba(147, 197, 253, 0.6);
-  border-radius: 2px;
-}
-.verse-ref {
-  font-style: italic;
-  font-size: 0.7rem;
-    color: #000;
-  margin-top: 4px;
-  direction: ltr;
-}
-.answer-section {
-  flex: 0 0 25%;
-    min-width: 0;
-    max-width: 25%;
-  display: flex;
-  flex-direction: column;
-    justify-content: flex-start;
-  gap: 6px;
-}
-.answer-field {
-        flex: 0 0 auto;
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    align-items: end;
-    column-gap: 4px;
-    min-width: 0;
-}
-.answer-label {
-  font-size: 0.6rem;
-  font-weight: 600;
-    color: #000;
-  white-space: nowrap;
-  line-height: 1;
-}
-.answer-value {
-        width: 100%;
-        min-width: 0;
-        border-bottom: 2px solid #888;
-        padding: 1px 2px;
-        font-size: 0.9rem;
-        font-family: sans-serif;
-        line-height: 1.2;
-}
-.answer-input {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    border: none;
-    border-bottom: 2px solid #888;
-    border-radius: 0;
-    background: transparent;
-    padding: 1px 2px;
-    font-size: 0.9rem;
-    font-family: sans-serif;
-    line-height: 1.2;
-    appearance: auto;
-    -webkit-appearance: auto;
-}
-input,
-select,
-textarea,
-button {
-    appearance: auto;
-    -webkit-appearance: auto;
-}
-@media print {
-  body { margin: 0; padding: 10mm 12mm; }
-}
-"""
-    return f"""<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<title>Exercice de conjugaison</title>
-<style>{css}</style>
-</head>
-<body>
-{questions_html}
-</body>
-</html>"""
 
 
 def filter_conjugations(roots, books, binyanim, tenses, persons, genders, numbers) -> pl.DataFrame:
@@ -1059,9 +766,7 @@ def generate_pdf(n_clicks, n_questions, roots, book, binyanim, tenses, persons, 
             return no_update, no_update, _error_notification(_NO_VERB_MESSAGE)
         k = min(int(n_questions), len(filtered))
         samples = filtered.sample(n=k).to_dicts()
-        html_content = _build_pdf_html(samples, with_answers=False)
-        assets_dir = _os.path.abspath("assets")
-        pdf_bytes = _weasyprint.HTML(string=html_content, base_url=assets_dir).write_pdf(pdf_forms=True)
+        pdf_bytes = render_pdf(samples, with_answers=False)
         return dcc.send_bytes(pdf_bytes, filename="questionnaire_conjugaison.pdf"), samples, no_update
     except Exception:
         logger.exception("PDF generation failed")
@@ -1092,9 +797,7 @@ def generate_correction_pdf(n_clicks, samples):
     if not samples:
         return no_update, _error_notification(_NO_QUESTIONNAIRE_MESSAGE)
     try:
-        html_content = _build_pdf_html(samples, with_answers=True)
-        assets_dir = _os.path.abspath("assets")
-        pdf_bytes = _weasyprint.HTML(string=html_content, base_url=assets_dir).write_pdf()
+        pdf_bytes = render_pdf(samples, with_answers=True)
         return dcc.send_bytes(pdf_bytes, filename="corrige_conjugaison.pdf"), no_update
     except Exception:
         logger.exception("Correction PDF generation failed")
