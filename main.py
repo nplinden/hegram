@@ -189,8 +189,8 @@ if __name__ == "__main__":
     if sys.argv[-1] == "debug":
         app.run(
             debug=True,
-            port=7777,
+            port=5844,
             dev_tools_hot_reload=True,
         )
     else:
-        app.run(port=7777, host="0.0.0.0")
+        app.run(port=5844, host="0.0.0.0")

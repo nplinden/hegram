@@ -9,7 +9,7 @@ WORKDIR /app
 
 COPY . /app
 
-EXPOSE 7777
+EXPOSE 5844
 
 # Install the exact versions pinned in uv.lock; fails if the lock is out of date with pyproject.toml.
 RUN uv sync --locked --no-dev --group build
@@ -17,4 +17,4 @@ RUN uv sync --locked --no-dev --group build
 RUN uv run --no-sync python -m hegram.build_dataframes
 
 # 2 workers so a slow PDF in one doesn't block the other (~330 MB each at peak), 4 threads each for light requests.
-CMD ["uv", "run", "--no-sync", "gunicorn", "--bind", "0.0.0.0:7777", "--workers", "2", "--threads", "4", "--timeout", "60", "wsgi:server"]
+CMD ["uv", "run", "--no-sync", "gunicorn", "--bind", "0.0.0.0:5844", "--workers", "2", "--threads", "4", "--timeout", "60", "wsgi:server"]

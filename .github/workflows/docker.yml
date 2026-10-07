@@ -44,13 +44,13 @@ jobs:
       # A successful build doesn't mean the app starts: check that gunicorn boots and serves the pages.
       - name: Smoke test
         run: |
-          docker run -d --name hegram -p 7777:7777 hegram:ci
+          docker run -d --name hegram -p 5844:5844 hegram:ci
           for i in $(seq 1 30); do
-            curl -sf -o /dev/null http://localhost:7777/ && break
+            curl -sf -o /dev/null http://localhost:5844/ && break
             sleep 2
           done
           for page in / /statistics /exercises/conjugation /paal_strong; do
-            curl -sf -o /dev/null "http://localhost:7777$page" || { echo "GET $page failed"; docker logs hegram; exit 1; }
+            curl -sf -o /dev/null "http://localhost:5844$page" || { echo "GET $page failed"; docker logs hegram; exit 1; }
             echo "GET $page OK"
           done
 

@@ -37,7 +37,7 @@ To rebuild from scratch, delete the files above and run the command again.
 uv run main.py
 ```
 
-The app is served on http://localhost:7777. Use `uv run main.py debug` for hot reloading.
+The app is served on http://localhost:5844. Use `uv run main.py debug` for hot reloading.
 
 ## Docker
 
@@ -45,5 +45,5 @@ The image builds the data itself, so building it needs network access:
 
 ```bash
 docker build -t hegram .
-docker run -p 7777:7777 hegram
+docker run -p 5844:5844 hegram
 ```
