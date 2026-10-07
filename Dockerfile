@@ -11,7 +11,8 @@ COPY . /app
 
 EXPOSE 7777
 
-RUN uv sync --no-dev --group build
+# Install the exact versions pinned in uv.lock; fails if the lock is out of date with pyproject.toml.
+RUN uv sync --locked --no-dev --group build
 
 RUN uv run --no-sync python -m hegram.build_dataframes
 
