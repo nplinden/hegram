@@ -1,9 +1,9 @@
 FROM ghcr.io/astral-sh/uv:bookworm-slim
 
-# System libraries WeasyPrint needs to render the PDF worksheets, Liberation Sans, which stands in for Arial,
-# and curl for health checks.
+# Liberation Sans, which stands in for Arial in the PDF worksheets (Typst reads system fonts; Ezra SIL ships
+# with the app), and curl for health checks.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-liberation2 curl \
+    && apt-get install -y --no-install-recommends fonts-liberation2 curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -17,5 +17,5 @@ RUN uv sync --locked --no-dev --group build
 
 RUN uv run --no-sync python -m hegram.build_dataframes
 
-# 2 workers so a slow PDF in one doesn't block the other (~330 MB each at peak), 4 threads each for light requests.
+# 2 worker processes (~250 MB each, mostly the in-memory corpus) with 4 threads each.
 CMD ["uv", "run", "--no-sync", "gunicorn", "--bind", "0.0.0.0:5844", "--workers", "2", "--threads", "4", "--timeout", "60", "wsgi:server"]
