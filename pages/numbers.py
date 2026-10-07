@@ -250,93 +250,91 @@ def _result_card(number, given_key, user_answers):
     )
 
 
-layout = dmc.MantineProvider(
-    html.Div(
-        [
-            dcc.Store(id="numbers-store", storage_type="session"),
-            dcc.Interval(id="numbers-init", interval=1, max_intervals=1),
-            dmc.Modal(
-                id="numbers-intro-modal",
-                opened=False,
-                title="Exercice sur les nombres",
-                children=[
-                    html.P(
-                        "Un nombre s'affiche sous l'une de ses trois formes. "
-                        "Retrouvez les deux autres. Les formes de 1 à 19 sont au féminin absolu (formes de comptage)."
-                    ),
-                ],
-            ),
-            dmc.Modal(
-                id="numbers-settings-modal",
-                opened=False,
-                title="Paramètres",
-                children=[
-                    dmc.CheckboxGroup(
-                        id="numbers-range-check",
-                        label="Plages autorisées",
-                        value=["1-10"],
-                        children=dmc.Group(
-                            [
-                                dmc.Checkbox(value="1-10", label="1–10"),
-                                dmc.Checkbox(value="11-19", label="11–19"),
-                                dmc.Checkbox(value="20-90", label="20–90"),
-                                dmc.Checkbox(value="100-400", label="100–400"),
-                            ]
-                        ),
-                        mb=16,
-                    ),
-                    dmc.CheckboxGroup(
-                        id="numbers-hint-type-check",
-                        label="Formes pouvant être données comme indice",
-                        value=["arabic", "name", "numeral"],
-                        children=dmc.Group(
-                            [
-                                dmc.Checkbox(value="arabic", label="Numéral arabe"),
-                                dmc.Checkbox(value="name", label="Nom hébreu"),
-                                dmc.Checkbox(value="numeral", label="Numéral hébreu"),
-                            ]
-                        ),
-                        mb=8,
-                    ),
-                ],
-            ),
-            html.Div(
-                dmc.Flex(
-                    [
-                        dmc.ActionIcon(
-                            DashIconify(icon="material-symbols:info", width=20),
-                            id="numbers-intro-btn",
-                            variant="subtle",
-                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                            size="lg",
-                        ),
-                        dmc.ActionIcon(
-                            DashIconify(icon="material-symbols:settings", width=20),
-                            id="numbers-settings-btn",
-                            variant="subtle",
-                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                            size="lg",
-                        ),
-                    ],
-                    justify="flex-end",
-                    align="center",
-                    gap="xs",
+layout = html.Div(
+    [
+        dcc.Store(id="numbers-store", storage_type="session"),
+        dcc.Interval(id="numbers-init", interval=1, max_intervals=1),
+        dmc.Modal(
+            id="numbers-intro-modal",
+            opened=False,
+            title="Exercice sur les nombres",
+            children=[
+                html.P(
+                    "Un nombre s'affiche sous l'une de ses trois formes. "
+                    "Retrouvez les deux autres. Les formes de 1 à 19 sont au féminin absolu (formes de comptage)."
                 ),
-                style={"maxWidth": "400px", "marginInline": "auto", "marginBottom": "4px"},
+            ],
+        ),
+        dmc.Modal(
+            id="numbers-settings-modal",
+            opened=False,
+            title="Paramètres",
+            children=[
+                dmc.CheckboxGroup(
+                    id="numbers-range-check",
+                    label="Plages autorisées",
+                    value=["1-10"],
+                    children=dmc.Group(
+                        [
+                            dmc.Checkbox(value="1-10", label="1–10"),
+                            dmc.Checkbox(value="11-19", label="11–19"),
+                            dmc.Checkbox(value="20-90", label="20–90"),
+                            dmc.Checkbox(value="100-400", label="100–400"),
+                        ]
+                    ),
+                    mb=16,
+                ),
+                dmc.CheckboxGroup(
+                    id="numbers-hint-type-check",
+                    label="Formes pouvant être données comme indice",
+                    value=["arabic", "name", "numeral"],
+                    children=dmc.Group(
+                        [
+                            dmc.Checkbox(value="arabic", label="Numéral arabe"),
+                            dmc.Checkbox(value="name", label="Nom hébreu"),
+                            dmc.Checkbox(value="numeral", label="Numéral hébreu"),
+                        ]
+                    ),
+                    mb=8,
+                ),
+            ],
+        ),
+        html.Div(
+            dmc.Flex(
+                [
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:info", width=20),
+                        id="numbers-intro-btn",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:settings", width=20),
+                        id="numbers-settings-btn",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
+                ],
+                justify="flex-end",
+                align="center",
+                gap="xs",
             ),
-            html.Div(id="numbers-card"),
-            dmc.Button(
-                "Trouver un nombre",
-                id="numbers-action-btn",
-                color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                fullWidth=True,
-                radius="xl",
-                size="md",
-                style={"maxWidth": "400px", "marginInline": "auto", "display": "block", "marginBottom": "24px"},
-            ),
-        ],
-        className="container",
-    )
+            style={"maxWidth": "400px", "marginInline": "auto", "marginBottom": "4px"},
+        ),
+        html.Div(id="numbers-card"),
+        dmc.Button(
+            "Trouver un nombre",
+            id="numbers-action-btn",
+            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+            fullWidth=True,
+            radius="xl",
+            size="md",
+            style={"maxWidth": "400px", "marginInline": "auto", "display": "block", "marginBottom": "24px"},
+        ),
+    ],
+    className="container",
 )
 
 

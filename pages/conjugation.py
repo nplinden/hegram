@@ -454,207 +454,205 @@ number_select = dmc.MultiSelect(
 
 
 def layout():
-    return dmc.MantineProvider(
-        dash.html.Div(
-            children=[
-                dcc.Store(id="solution-storage", storage_type="memory"),
-                dcc.Store(id="conj-pdf-samples", storage_type="memory"),
-                dcc.Download(id="conj-pdf-download"),
-                dcc.Download(id="conj-correction-download"),
-                dmc.Modal(
-                    id="conj-detail-modal",
-                    opened=False,
-                    size="xl",
-                    children=[],
-                ),
-                dmc.Modal(
-                    id="conj-intro-modal",
-                    opened=False,
-                    title="Exercice de conjugaison",
-                    children=[
-                        html.P(
-                            "Une application d'exercice à la conjugaison en hébreu biblique. Cliquez sur \"Trouver un verbe\" pour choisir aléatoirement une forme verbale dans le corpus biblique. Essayez d'analyser la conjugaison de ce verbe ! Le verset correspondant est également fourni pour plus de contexte."
-                        ),
-                        html.P('L\'icône "Paramètres" permet de restreindre le choix des formes verbales.'),
-                    ],
-                ),
-                dmc.Modal(
-                    id="conj-settings-modal",
-                    opened=False,
-                    title="Paramètres",
-                    children=[
-                        root_freq_slider,
-                        root_select,
-                        book_select,
-                        binyan_select,
-                        tense_select,
-                        person_select,
-                        gender_select,
-                        number_select,
-                        dmc.Divider(label="Fiche d'exercice PDF", labelPosition="left", my=12),
-                        dmc.Text(
-                            "Générez une fiche imprimable de verbes tirés au hasard selon les filtres ci-dessus. "
-                            "Le corrigé correspond à la dernière fiche téléchargée.",
-                            size="sm",
-                            c="dimmed",
-                            mb=8,
-                        ),
-                        dmc.NumberInput(
-                            id="conj-pdf-n-questions",
-                            label="Nombre de questions",
-                            min=1,
-                            max=50,
-                            step=1,
-                            value=10,
-                            w=160,
-                            mb=12,
-                        ),
-                        dmc.Group(
-                            [
-                                dmc.Button(
-                                    "Questionnaire",
-                                    id="conj-pdf-btn",
-                                    leftSection=DashIconify(icon="material-symbols:download", width=18),
-                                    variant="outline",
-                                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                                ),
-                                dmc.Button(
-                                    "Corrigé",
-                                    id="conj-correction-btn",
-                                    disabled=True,
-                                    leftSection=DashIconify(icon="material-symbols:download", width=18),
-                                    variant="light",
-                                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                                ),
-                            ],
-                            grow=True,
-                        ),
-                    ],
-                ),
-                dmc.Flex(
-                    [
-                        dmc.ActionIcon(
-                            DashIconify(icon="material-symbols:info", width=20),
-                            id="conj-intro-btn",
-                            variant="subtle",
-                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                            size="lg",
-                        ),
-                        dmc.ActionIcon(
-                            DashIconify(icon="material-symbols:settings", width=20),
-                            id="conj-settings-btn",
-                            variant="subtle",
-                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                            size="lg",
-                        ),
-                    ],
-                    justify="flex-end",
-                    align="center",
-                    gap="xs",
-                    mb=4,
-                ),
-                dmc.Button(
-                    "Trouver un verbe",
-                    id="conj-action-btn",
-                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                    radius="xl",
-                    size="md",
-                    fullWidth=True,
-                    style={"maxWidth": "640px", "marginInline": "auto", "display": "block", "marginBottom": "16px"},
-                ),
-                html.Div(
-                    html.Div(
+    return dash.html.Div(
+        children=[
+            dcc.Store(id="solution-storage", storage_type="memory"),
+            dcc.Store(id="conj-pdf-samples", storage_type="memory"),
+            dcc.Download(id="conj-pdf-download"),
+            dcc.Download(id="conj-correction-download"),
+            dmc.Modal(
+                id="conj-detail-modal",
+                opened=False,
+                size="xl",
+                children=[],
+            ),
+            dmc.Modal(
+                id="conj-intro-modal",
+                opened=False,
+                title="Exercice de conjugaison",
+                children=[
+                    html.P(
+                        "Une application d'exercice à la conjugaison en hébreu biblique. Cliquez sur \"Trouver un verbe\" pour choisir aléatoirement une forme verbale dans le corpus biblique. Essayez d'analyser la conjugaison de ce verbe ! Le verset correspondant est également fourni pour plus de contexte."
+                    ),
+                    html.P('L\'icône "Paramètres" permet de restreindre le choix des formes verbales.'),
+                ],
+            ),
+            dmc.Modal(
+                id="conj-settings-modal",
+                opened=False,
+                title="Paramètres",
+                children=[
+                    root_freq_slider,
+                    root_select,
+                    book_select,
+                    binyan_select,
+                    tense_select,
+                    person_select,
+                    gender_select,
+                    number_select,
+                    dmc.Divider(label="Fiche d'exercice PDF", labelPosition="left", my=12),
+                    dmc.Text(
+                        "Générez une fiche imprimable de verbes tirés au hasard selon les filtres ci-dessus. "
+                        "Le corrigé correspond à la dernière fiche téléchargée.",
+                        size="sm",
+                        c="dimmed",
+                        mb=8,
+                    ),
+                    dmc.NumberInput(
+                        id="conj-pdf-n-questions",
+                        label="Nombre de questions",
+                        min=1,
+                        max=50,
+                        step=1,
+                        value=10,
+                        w=160,
+                        mb=12,
+                    ),
+                    dmc.Group(
                         [
-                            html.Div(
-                                [
-                                    html.Div(children=[], id="word-div"),
-                                ],
-                                style={
-                                    "flex": 1,
-                                    "borderRight": "1px solid rgba(0,0,0,0.1)",
-                                    "display": "flex",
-                                    "flexDirection": "column",
-                                    "alignItems": "center",
-                                    "justifyContent": "center",
-                                    "padding": "24px 16px",
-                                    "minHeight": "200px",
-                                },
+                            dmc.Button(
+                                "Questionnaire",
+                                id="conj-pdf-btn",
+                                leftSection=DashIconify(icon="material-symbols:download", width=18),
+                                variant="outline",
+                                color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                             ),
-                            html.Div(
-                                [
-                                    html.Div(
-                                        [
-                                            dmc.Select(
-                                                placeholder="Racine",
-                                                value=None,
-                                                data=_ROOT_DATA,
-                                                searchable=True,
-                                                id="root-answer",
-                                            ),
-                                            dmc.Select(
-                                                placeholder="Binyan",
-                                                value=None,
-                                                data=dropdown_data["Binyan"],
-                                                id="binyan-answer",
-                                            ),
-                                            dmc.Select(
-                                                placeholder="Temps",
-                                                value=None,
-                                                data=dropdown_data["Tense"],
-                                                id="tense-answer",
-                                            ),
-                                            dmc.Select(
-                                                placeholder="Personne", value=None, data=answer_data, id="person-answer"
-                                            ),
-                                        ],
-                                        id="answer-dropdowns",
-                                        style={"display": "flex", "flexDirection": "column", "gap": "12px"},
-                                    ),
-                                    html.Div(
-                                        [],
-                                        id="answer-results",
-                                        style={"display": "none"},
-                                    ),
-                                ],
-                                id="answer-panel",
-                                style={
-                                    "flex": 1,
-                                    "display": "flex",
-                                    "flexDirection": "column",
-                                    "gap": "12px",
-                                    "padding": "24px 16px",
-                                    "justifyContent": "center",
-                                },
+                            dmc.Button(
+                                "Corrigé",
+                                id="conj-correction-btn",
+                                disabled=True,
+                                leftSection=DashIconify(icon="material-symbols:download", width=18),
+                                variant="light",
+                                color=dmc.DEFAULT_THEME["colors"]["dark"][6],
                             ),
                         ],
-                        style={"display": "flex"},
+                        grow=True,
                     ),
-                    id="answer-card",
-                    className="card",
-                    style={**_ANSWER_CARD_STYLE, "display": "none"},
-                ),
+                ],
+            ),
+            dmc.Flex(
+                [
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:info", width=20),
+                        id="conj-intro-btn",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:settings", width=20),
+                        id="conj-settings-btn",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
+                ],
+                justify="flex-end",
+                align="center",
+                gap="xs",
+                mb=4,
+            ),
+            dmc.Button(
+                "Trouver un verbe",
+                id="conj-action-btn",
+                color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                radius="xl",
+                size="md",
+                fullWidth=True,
+                style={"maxWidth": "640px", "marginInline": "auto", "display": "block", "marginBottom": "16px"},
+            ),
+            html.Div(
                 html.Div(
                     [
-                        dmc.Flex(children=[], id="clause-div", className="fullverse"),
                         html.Div(
-                            [],
-                            id="frenchverse-div",
-                            className="frenchverse",
+                            [
+                                html.Div(children=[], id="word-div"),
+                            ],
                             style={
-                                "display": "none",
-                                "borderTop": "1px solid rgba(0,0,0,0.1)",
-                                "marginTop": "16px",
-                                "paddingTop": "16px",
+                                "flex": 1,
+                                "borderRight": "1px solid rgba(0,0,0,0.1)",
+                                "display": "flex",
+                                "flexDirection": "column",
+                                "alignItems": "center",
+                                "justifyContent": "center",
+                                "padding": "24px 16px",
+                                "minHeight": "200px",
+                            },
+                        ),
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        dmc.Select(
+                                            placeholder="Racine",
+                                            value=None,
+                                            data=_ROOT_DATA,
+                                            searchable=True,
+                                            id="root-answer",
+                                        ),
+                                        dmc.Select(
+                                            placeholder="Binyan",
+                                            value=None,
+                                            data=dropdown_data["Binyan"],
+                                            id="binyan-answer",
+                                        ),
+                                        dmc.Select(
+                                            placeholder="Temps",
+                                            value=None,
+                                            data=dropdown_data["Tense"],
+                                            id="tense-answer",
+                                        ),
+                                        dmc.Select(
+                                            placeholder="Personne", value=None, data=answer_data, id="person-answer"
+                                        ),
+                                    ],
+                                    id="answer-dropdowns",
+                                    style={"display": "flex", "flexDirection": "column", "gap": "12px"},
+                                ),
+                                html.Div(
+                                    [],
+                                    id="answer-results",
+                                    style={"display": "none"},
+                                ),
+                            ],
+                            id="answer-panel",
+                            style={
+                                "flex": 1,
+                                "display": "flex",
+                                "flexDirection": "column",
+                                "gap": "12px",
+                                "padding": "24px 16px",
+                                "justifyContent": "center",
                             },
                         ),
                     ],
-                    id="verse-card",
-                    className="card",
-                    style={**_VERSE_CARD_STYLE, "display": "none"},
+                    style={"display": "flex"},
                 ),
-            ],
-            className="container",
-        )
+                id="answer-card",
+                className="card",
+                style={**_ANSWER_CARD_STYLE, "display": "none"},
+            ),
+            html.Div(
+                [
+                    dmc.Flex(children=[], id="clause-div", className="fullverse"),
+                    html.Div(
+                        [],
+                        id="frenchverse-div",
+                        className="frenchverse",
+                        style={
+                            "display": "none",
+                            "borderTop": "1px solid rgba(0,0,0,0.1)",
+                            "marginTop": "16px",
+                            "paddingTop": "16px",
+                        },
+                    ),
+                ],
+                id="verse-card",
+                className="card",
+                style={**_VERSE_CARD_STYLE, "display": "none"},
+            ),
+        ],
+        className="container",
     )
 
 

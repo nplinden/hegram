@@ -217,73 +217,69 @@ def open_stat_intro_modal(_):
     return True
 
 
-layout = dmc.MantineProvider(
-    children=[
-        html.Div(
-            [
-                dmc.Modal(
-                    id="stat-intro-modal",
-                    opened=False,
-                    size="xl",
-                    title="Statistiques sur les racines verbales",
-                    children=[
-                        html.P(
-                            "Vous trouverez ici un aperçu du nombre d'occurrences de chaque racine verbale dans la Bible hébraïque, avec une ventilation selon les binyanim et les temps. Cette page comporte trois volets :"
+layout = html.Div(
+    [
+        dmc.Modal(
+            id="stat-intro-modal",
+            opened=False,
+            size="xl",
+            title="Statistiques sur les racines verbales",
+            children=[
+                html.P(
+                    "Vous trouverez ici un aperçu du nombre d'occurrences de chaque racine verbale dans la Bible hébraïque, avec une ventilation selon les binyanim et les temps. Cette page comporte trois volets :"
+                ),
+                dmc.List(
+                    [
+                        dmc.ListItem(
+                            "Un tableau de toutes les racines verbales existantes et de leur nombre total d'occurrences. Sélectionnez un binyan dans le menu déroulant ajouter la colonne correspondante au tableau. En cliquant sur les flèches dans l'en-tête de la colonne. Vous pouvez trier le tableau par nombre d'occurrences pour le binôme correspondant."
                         ),
-                        dmc.List(
+                        dmc.ListItem(
+                            "Le diagramme à barres montre la répartition des occurrences de binyan et de temps dans la Bible hébraïque. Par défaut, il montre une agrégation de toutes les occurrences de racines verbales. En sélectionnant une ou plusieurs racines dans le tableau, vous pouvez restreindre les racines prises en compte dans le graphique."
+                        ),
+                        dmc.ListItem(
                             [
-                                dmc.ListItem(
-                                    "Un tableau de toutes les racines verbales existantes et de leur nombre total d'occurrences. Sélectionnez un binyan dans le menu déroulant ajouter la colonne correspondante au tableau. En cliquant sur les flèches dans l'en-tête de la colonne. Vous pouvez trier le tableau par nombre d'occurrences pour le binôme correspondant."
-                                ),
-                                dmc.ListItem(
-                                    "Le diagramme à barres montre la répartition des occurrences de binyan et de temps dans la Bible hébraïque. Par défaut, il montre une agrégation de toutes les occurrences de racines verbales. En sélectionnant une ou plusieurs racines dans le tableau, vous pouvez restreindre les racines prises en compte dans le graphique."
-                                ),
-                                dmc.ListItem(
-                                    [
-                                        "Lorsqu'une racine est sélectionnée dans le tableau, une section de définition apparaît sous le graphique. Les définitions sont tirées du ",
-                                        html.A(
-                                            "dépôt GitHub openscriptures",
-                                            href="https://github.com/openscriptures/strongs/",
-                                            className="link",
-                                        ),
-                                    ]
+                                "Lorsqu'une racine est sélectionnée dans le tableau, une section de définition apparaît sous le graphique. Les définitions sont tirées du ",
+                                html.A(
+                                    "dépôt GitHub openscriptures",
+                                    href="https://github.com/openscriptures/strongs/",
+                                    className="link",
                                 ),
                             ]
                         ),
-                    ],
-                ),
-                dmc.Flex(
-                    [
-                        dmc.ActionIcon(
-                            DashIconify(icon="material-symbols:info", width=20),
-                            id="stat-intro-btn",
-                            variant="subtle",
-                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                            size="lg",
-                        ),
-                    ],
-                    justify="flex-end",
-                    align="center",
-                    className="container",
-                ),
-                html.Div(
-                    children=[
-                        html.Div([dropdown, table]),
-                        html.Div(
-                            [
-                                chart,
-                            ],
-                        ),
-                    ],
-                    className="occurrence-grid container",
-                ),
-                html.Div(
-                    [],
-                    id="definition-card",
-                    style=_DEFINITION_CARD_STYLE,
-                    className="container",
+                    ]
                 ),
             ],
-        )
-    ]
+        ),
+        dmc.Flex(
+            [
+                dmc.ActionIcon(
+                    DashIconify(icon="material-symbols:info", width=20),
+                    id="stat-intro-btn",
+                    variant="subtle",
+                    color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                    size="lg",
+                ),
+            ],
+            justify="flex-end",
+            align="center",
+            className="container",
+        ),
+        html.Div(
+            children=[
+                html.Div([dropdown, table]),
+                html.Div(
+                    [
+                        chart,
+                    ],
+                ),
+            ],
+            className="occurrence-grid container",
+        ),
+        html.Div(
+            [],
+            id="definition-card",
+            style=_DEFINITION_CARD_STYLE,
+            className="container",
+        ),
+    ],
 )

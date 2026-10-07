@@ -1,10 +1,9 @@
 import dash
-import dash_mantine_components as dmc
 from dash import html
 
 dash.register_page(__name__, path="/")
 
-layout = dmc.MantineProvider(
+layout = html.Div(
     [
         html.H1("Bienvenue sur Hegram !"),
         html.P("Hegram est un site dédié à l'apprentissage et à l'exploration de l'Hébreu biblique."),

@@ -77,73 +77,71 @@ def _sample(with_suffix):
     return flexion.sample(n=1).iloc[0].to_dict()
 
 
-layout = dmc.MantineProvider(
-    html.Div(
-        [
-            dcc.Store(id="prep-store", storage_type="session"),
-            dcc.Interval(id="prep-init", interval=1, max_intervals=1),
-            dmc.Modal(
-                id="prep-intro-modal",
-                opened=False,
-                title="Exercice sur les prépositions",
-                children=[
-                    html.P(
-                        "Une préposition hébraïque s'affiche. "
-                        "Retrouvez sa traduction française. "
-                        "Activez les suffixes dans les paramètres pour inclure les formes avec pronoms suffixes."
-                    ),
-                ],
-            ),
-            dmc.Modal(
-                id="prep-settings-modal",
-                opened=False,
-                title="Paramètres",
-                children=[
-                    dmc.Checkbox(
-                        id="prep-suffix-check",
-                        label="Inclure les suffixes",
-                        checked=False,
-                        mb=8,
-                    ),
-                ],
-            ),
-            html.Div(
-                dmc.Flex(
-                    [
-                        dmc.ActionIcon(
-                            DashIconify(icon="material-symbols:info", width=20),
-                            id="prep-intro-btn",
-                            variant="subtle",
-                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                            size="lg",
-                        ),
-                        dmc.ActionIcon(
-                            DashIconify(icon="material-symbols:settings", width=20),
-                            id="prep-settings-btn",
-                            variant="subtle",
-                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                            size="lg",
-                        ),
-                    ],
-                    justify="flex-end",
-                    align="center",
-                    gap="xs",
+layout = html.Div(
+    [
+        dcc.Store(id="prep-store", storage_type="session"),
+        dcc.Interval(id="prep-init", interval=1, max_intervals=1),
+        dmc.Modal(
+            id="prep-intro-modal",
+            opened=False,
+            title="Exercice sur les prépositions",
+            children=[
+                html.P(
+                    "Une préposition hébraïque s'affiche. "
+                    "Retrouvez sa traduction française. "
+                    "Activez les suffixes dans les paramètres pour inclure les formes avec pronoms suffixes."
                 ),
-                style={"maxWidth": "400px", "marginInline": "auto", "marginBottom": "4px"},
+            ],
+        ),
+        dmc.Modal(
+            id="prep-settings-modal",
+            opened=False,
+            title="Paramètres",
+            children=[
+                dmc.Checkbox(
+                    id="prep-suffix-check",
+                    label="Inclure les suffixes",
+                    checked=False,
+                    mb=8,
+                ),
+            ],
+        ),
+        html.Div(
+            dmc.Flex(
+                [
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:info", width=20),
+                        id="prep-intro-btn",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:settings", width=20),
+                        id="prep-settings-btn",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
+                ],
+                justify="flex-end",
+                align="center",
+                gap="xs",
             ),
-            html.Div(id="prep-card"),
-            dmc.Button(
-                "Voir la solution",
-                id="prep-action-btn",
-                color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                fullWidth=True,
-                radius="xl",
-                size="md",
-                style={"maxWidth": "400px", "marginInline": "auto", "display": "block", "marginBottom": "24px"},
-            ),
-        ],
-        className="container",
-    )
+            style={"maxWidth": "400px", "marginInline": "auto", "marginBottom": "4px"},
+        ),
+        html.Div(id="prep-card"),
+        dmc.Button(
+            "Voir la solution",
+            id="prep-action-btn",
+            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+            fullWidth=True,
+            radius="xl",
+            size="md",
+            style={"maxWidth": "400px", "marginInline": "auto", "display": "block", "marginBottom": "24px"},
+        ),
+    ],
+    className="container",
 )
 
 

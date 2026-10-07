@@ -86,31 +86,29 @@ def make_page(
     elif imperatif is not None:
         rows.append(_conj_card("Impératif", imperatif))
 
-    layout = dmc.MantineProvider(
-        html.Div(
-            [
-                dcc.Download(id=f"download-{page_id}"),
-                dmc.Flex(
-                    [
-                        html.Div(style={"width": "36px"}),
-                        html.H1(title, style={"margin": 0, "flex": 1, "textAlign": "center"}),
-                        dmc.ActionIcon(
-                            DashIconify(icon="material-symbols:download", width=20),
-                            id=f"btn-{page_id}",
-                            variant="subtle",
-                            color=dmc.DEFAULT_THEME["colors"]["dark"][6],
-                            size="lg",
-                        ),
-                    ],
-                    align="center",
-                    mb=16,
-                ),
-                html.Div(_single_card("Racine", root), style={"marginBottom": "16px"}),
-                *rows,
-            ],
-            className="container",
-            style={"maxWidth": "860px", "marginInline": "auto"},
-        )
+    layout = html.Div(
+        [
+            dcc.Download(id=f"download-{page_id}"),
+            dmc.Flex(
+                [
+                    html.Div(style={"width": "36px"}),
+                    html.H1(title, style={"margin": 0, "flex": 1, "textAlign": "center"}),
+                    dmc.ActionIcon(
+                        DashIconify(icon="material-symbols:download", width=20),
+                        id=f"btn-{page_id}",
+                        variant="subtle",
+                        color=dmc.DEFAULT_THEME["colors"]["dark"][6],
+                        size="lg",
+                    ),
+                ],
+                align="center",
+                mb=16,
+            ),
+            html.Div(_single_card("Racine", root), style={"marginBottom": "16px"}),
+            *rows,
+        ],
+        className="container",
+        style={"maxWidth": "860px", "marginInline": "auto"},
     )
 
     @callback(
