@@ -8,7 +8,7 @@ TENSE_SERIES = [
     {"name": "Yiqtol", "color": "green.6"},
     {"name": "Wayyiqtol", "color": "indigo.6"},
     {"name": "Imperative", "color": "grape.6"},
-    {"name": "Infinitive (abslute)", "color": "teal.6"},
+    {"name": "Infinitive (absolute)", "color": "teal.6"},
     {"name": "Infinitive (construct)", "color": "yellow.6"},
     {"name": "Participle", "color": "pink.6"},
     {"name": "Participle (passive)", "color": "lime.6"},
@@ -50,7 +50,7 @@ dropdown_data = {
         {"value": "Participle", "label": "Participe actif"},
         {"value": "Participle (passive)", "label": "Participe passif"},
         {"value": "Infinitive (construct)", "label": "Infinitif construit"},
-        {"value": "Infinitive (abslute)", "label": "Infinitif absolu"},
+        {"value": "Infinitive (absolute)", "label": "Infinitif absolu"},
     ],
     "Person": [
         {"value": "1", "label": "1ère"},
@@ -95,7 +95,7 @@ en_to_fr = {
         "Participle": "Participe actif",
         "Participle (passive)": "Participe passif",
         "Infinitive (construct)": "Infinitif construit",
-        "Infinitive (abslute)": "Infinitif absolu",
+        "Infinitive (absolute)": "Infinitif absolu",
     },
     "Person": {
         "1": "1ère",

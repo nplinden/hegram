@@ -83,7 +83,7 @@ def build_conjugation():
         "impf": "Yiqtol",
         "wayq": "Wayyiqtol",
         "impv": "Imperative",
-        "infa": "Infinitive (abslute)",
+        "infa": "Infinitive (absolute)",
         "infc": "Infinitive (construct)",
         "ptca": "Participle",
         "ptcp": "Participle (passive)",

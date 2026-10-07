@@ -167,7 +167,7 @@ table = dash_table.DataTable(
     page_size=12,
     page_count=100,
     page_action="custom",
-    style_cell={"fontSize": 20, "font-familiy": "monospace"},
+    style_cell={"fontSize": 20, "fontFamily": "monospace"},
     style_cell_conditional=[
         {
             "if": {"column_id": "Root"},
