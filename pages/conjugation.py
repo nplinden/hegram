@@ -407,6 +407,24 @@ button {
 </html>"""
 
 
+def filter_conjugations(roots, books, binyanim, tenses, persons, genders, numbers) -> pl.DataFrame:
+    """Verb occurrences matching the settings filters. An empty or unset filter allows every value."""
+    filters = {
+        "Root": roots,
+        "Book": books,
+        "Binyan": binyanim,
+        "Tense": tenses,
+        "Person": persons,
+        "Gender": genders,
+        "Number": numbers,
+    }
+    conditions = [pl.col(column).is_in(values) for column, values in filters.items() if values]
+    df = pl.scan_parquet("data/conjugation.parquet")
+    if conditions:
+        df = df.filter(conditions)
+    return df.collect()
+
+
 @callback(
     Output("clause-div", "children"),
     Output("word-div", "children"),
@@ -456,16 +474,7 @@ def handle_action(
     person_answer,
 ):
     if store is None or store.get("answered"):
-        df = pl.scan_parquet("data/conjugation.parquet")
-        filtered = df.filter(
-            pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
-            & pl.when(bool(binyanim)).then(pl.col("Binyan").is_in(binyanim)).otherwise(pl.lit(True))
-            & pl.when(bool(tenses)).then(pl.col("Tense").is_in(tenses)).otherwise(pl.lit(True))
-            & pl.when(bool(persons)).then(pl.col("Person").is_in(persons)).otherwise(pl.lit(True))
-            & pl.when(bool(genders)).then(pl.col("Gender").is_in(genders)).otherwise(pl.lit(True))
-            & pl.when(bool(numbers)).then(pl.col("Number").is_in(numbers)).otherwise(pl.lit(True))
-            & pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
-        ).collect()
+        filtered = filter_conjugations(roots, book, binyanim, tenses, persons, genders, numbers)
         if filtered.is_empty():
             return (
                 no_update,
@@ -1076,16 +1085,7 @@ def generate_pdf(n_clicks, n_questions, roots, book, binyanim, tenses, persons, 
     if not n_questions:
         return no_update, no_update, _error_notification(_NO_QUESTION_COUNT_MESSAGE)
     try:
-        df = pl.scan_parquet("data/conjugation.parquet")
-        filtered = df.filter(
-            pl.when(bool(book)).then(pl.col("Book").is_in(book)).otherwise(pl.lit(True))
-            & pl.when(bool(binyanim)).then(pl.col("Binyan").is_in(binyanim)).otherwise(pl.lit(True))
-            & pl.when(bool(tenses)).then(pl.col("Tense").is_in(tenses)).otherwise(pl.lit(True))
-            & pl.when(bool(persons)).then(pl.col("Person").is_in(persons)).otherwise(pl.lit(True))
-            & pl.when(bool(genders)).then(pl.col("Gender").is_in(genders)).otherwise(pl.lit(True))
-            & pl.when(bool(numbers)).then(pl.col("Number").is_in(numbers)).otherwise(pl.lit(True))
-            & pl.when(bool(roots)).then(pl.col("Root").is_in(roots)).otherwise(pl.lit(True))
-        ).collect()
+        filtered = filter_conjugations(roots, book, binyanim, tenses, persons, genders, numbers)
         if filtered.is_empty():
             return no_update, no_update, _error_notification(_NO_VERB_MESSAGE)
         k = min(int(n_questions), len(filtered))
